@@ -9,7 +9,7 @@
 private ["_locs","_locPos","_min","_max","_randomPoint"];
 
 _locs = _this;
-_locPos = _locs call dzn_fnc_convertTriggerToLocation;
+_locPos = _locs call dzn_fnc_getZonePosition;
 
 _min = _locPos select 1;
 _max = _locPos select 2;

@@ -5,7 +5,7 @@
 // To disable unused fucntions - comment next values
 // *************************************
 #define	COMMON_FUNCTIONS		true
-//#define	AREA_FUNCTIONS		true
+#define	AREA_FUNCTIONS		true
 
 
 class CfgFunctions

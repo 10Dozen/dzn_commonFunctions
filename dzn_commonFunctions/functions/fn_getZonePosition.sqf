@@ -1,5 +1,5 @@
 /*
-	@Array of Zone positioning = (@Array of locations) call dzn_fnc_convertTriggerToLocation
+	@Array of Zone positioning = (@Array of locations) call dzn_fnc_getZonePosition
 	
 	Return central position of locations and max and min of x and y
 	INPUT:

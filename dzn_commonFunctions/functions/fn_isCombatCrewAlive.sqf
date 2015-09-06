@@ -1,5 +1,5 @@
 /*
-	@IsAlive = @Vehicle call dzn_fnc_checkIsCrewAlive
+	@IsAlive = @Vehicle call dzn_fnc_isCombatCrewAlive
 	
 	Check if Gunner and Commander of vehicle are alive
 	INPUT:

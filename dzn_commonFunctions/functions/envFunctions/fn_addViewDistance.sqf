@@ -8,10 +8,15 @@
 	Increase VD and VOD on given step up to 15000 limit
 */
 
-params [["_vdStep", 1000], ["_vodStep", 400]];
+params [["_vdStep", 1000], ["_vodStep", 500]];
 
-setViewDistance (viewDistance + _vdStep);
-setObjectViewDistance [(getObjectViewDistance select 0) + _vodStep, getObjectViewDistance select 1];
+if (viewDistance + _vdStep > 15000) then {
+	setViewDistance 15000;
+	setObjectViewDistance  [7500, getObjectViewDistance select 1];
+} else {
+	setViewDistance (viewDistance + _vdStep);
+	setObjectViewDistance [(getObjectViewDistance select 0) + _vodStep, getObjectViewDistance select 1];
+};
 
 hintSilent format [
 	"View distance: %1 (%2) m"

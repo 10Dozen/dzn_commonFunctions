@@ -9,17 +9,16 @@
 */
 
 params [["_vdStep", 1000], ["_vodStep", 500]];
-
 if (viewDistance - _vdStep < 1000) then {
-	viewDistance 1000;
+	setViewDistance 1000;
 	setObjectViewDistance [900, getObjectViewDistance select 1];
 } else {
 	setViewDistance (viewDistance - _vdStep);
 	setObjectViewDistance [(getObjectViewDistance select 0) - _vodStep, getObjectViewDistance select 1];
 };
 
-hintSilent format [
-	"View distance: %1 (%2) m"
+hintSilent parseText format [
+	"<t color='#86CC5E'>View distance:</t> %1 (%2) <t color='#86CC5E'>m</t>"
 	, viewDistance
 	, getObjectViewDistance select 0
 ];

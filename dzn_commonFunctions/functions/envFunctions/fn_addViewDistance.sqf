@@ -18,8 +18,8 @@ if (viewDistance + _vdStep > 15000) then {
 	setObjectViewDistance [(getObjectViewDistance select 0) + _vodStep, getObjectViewDistance select 1];
 };
 
-hintSilent format [
-	"View distance: %1 (%2) m"
+hintSilent parseText format [
+	"<t color='#86CC5E'>View distance:</t> %1 (%2) <t color='#86CC5E'>m</t>"
 	, viewDistance
 	, getObjectViewDistance select 0
 ];

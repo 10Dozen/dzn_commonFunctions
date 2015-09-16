@@ -80,6 +80,8 @@ class CfgFunctions
 			class setDateTime {};
 			class setFog {};
 			class setWeather {};
+			class addViewDistance {};
+			class reduceViewDistance {};
 		};
 		#endif
 		

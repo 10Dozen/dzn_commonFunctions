@@ -9,14 +9,10 @@
 		3: ARRAY	(Optional)	- List of classnames to exclude 
 	OUTPUT: ARRAY (list of houses)
 */
-params ["_pos","_dist",["_positiveFilter", ["House"]], ["_negativeFilter",[]]];
+params ["_pos","_dist", ["_positiveFilter", ["House"]], ["_negativeFilter",[]]];
 private["_structures","_buildings"];
 
-_structures = if (_positiveFilter isEqualTo []) then {
-	nearestObjects [_pos, ["House"], _dist];
-} else {
-	nearestObjects [_pos, _this select 2, _dist];
-};
+_structures = nearestObjects [_pos, _positiveFilter, _dist];
 
 _buildings = [];
 {

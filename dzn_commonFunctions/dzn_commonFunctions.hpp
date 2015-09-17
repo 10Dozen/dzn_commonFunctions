@@ -51,6 +51,7 @@ class CfgFunctions
 			class getHousesNear {};	
 			class getHousePositions {};	
 			class getLocationBuildings {};
+			class getLocationRoads {};
 			class assignInBuilding {};			
 		};
 		#endif

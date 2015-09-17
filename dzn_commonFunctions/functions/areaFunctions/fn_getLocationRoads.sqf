@@ -6,7 +6,6 @@
 	Return a list of roads placed inside given locations
 */
 
-params ["_locs"];
 private ["_zoneRoads", "_loc", "_roads"];
 
 _zoneRoads = [];
@@ -19,6 +18,6 @@ _zoneRoads = [];
 			_zoneRoads pushBack _x;	
 		};
 	} forEach _roads;
-} forEach _locs;
+} forEach _this;
 
 _zoneRoads

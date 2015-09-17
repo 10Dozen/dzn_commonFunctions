@@ -49,7 +49,8 @@ class CfgFunctions
 			class createPathFromRandom {};	
 			
 			class getHousesNear {};	
-			class getHousePositions {};			
+			class getHousePositions {};	
+			class getLocationBuildings {};
 			class assignInBuilding {};			
 		};
 		#endif

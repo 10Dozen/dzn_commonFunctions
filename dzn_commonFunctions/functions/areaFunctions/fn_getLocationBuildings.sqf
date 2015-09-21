@@ -8,7 +8,7 @@
 	Return a list of buildings placed inside given locations
 */
 
-params ["_locs", ["_posFilter", nil], ["_negFilter", nil]];
+params ["_locs", ["_posFilter", ["House"]], ["_negFilter", []]];
 private ["_zoneBuildings", "_loc", "_locationBuildings"];
 
 _zoneBuildings = [];

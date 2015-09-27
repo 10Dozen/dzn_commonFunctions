@@ -30,7 +30,10 @@ class CfgFunctions
 
 			class assignInVehicle {};
 			class isCombatCrewAlive {};
-			class getPosOnGivenDir  {};			
+			class getPosOnGivenDir  {};
+			
+			class getComposition {};
+			class setComposition {};
 		};
 		#endif
 		

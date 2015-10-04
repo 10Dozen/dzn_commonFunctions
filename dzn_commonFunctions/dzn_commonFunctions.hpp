@@ -31,6 +31,7 @@ class CfgFunctions
 			class assignInVehicle {};
 			class isCombatCrewAlive {};
 			class getPosOnGivenDir  {};
+			class isPlayerNear {};
 			
 			class getComposition {};
 			class setComposition {};

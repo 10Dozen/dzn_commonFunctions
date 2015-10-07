@@ -46,6 +46,7 @@ class CfgFunctions
 			class convertTriggerToLocation {};
 			class isInLocation {};
 			class isInWater {};
+			class isInArea2d {};
 			
 			class getRandomPointInZone {};
 			class getZonePosition {};

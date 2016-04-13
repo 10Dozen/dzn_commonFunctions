@@ -36,4 +36,4 @@ private _objs = [];
 	_x allowDamage false;
 	_x enableSimulation true;
 	_x spawn { sleep 2; _this allowDamage true; };
-} forEach _this;
+} forEach _objs;

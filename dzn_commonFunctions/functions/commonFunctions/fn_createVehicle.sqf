@@ -9,9 +9,10 @@
 */
 
 params ["_posObj","_class"];
-private["_pos","_dir"];
 
-if (typename _x == "ARRAY") then {
+private _pos = [];
+private _dir = 0;
+if (typename _posObj == "ARRAY") then {
 	_pos = _posObj select 0;
 	_dir = _posObj select 1;
 } else {

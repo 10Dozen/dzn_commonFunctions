@@ -1,11 +1,10 @@
 /*
 	[] spawn { 
 		Result = [ 
-			@DialogStructuredText
-			, [ @ButtonLabel1, @ButtonLabel2 ]
-			, [ @BackgroundColor, @ButtonBGColor1, @ButtonBGColor2 ]
-			, [ @ButtonTextColor1, @ButtonTextColor2 ]		
-		] call dzn_fnc_ShowDialog;
+			[@Text, @BG_Color]
+			, [@Button1Text, @Button1_BG_Color, @Button1TextColor]
+			, [@Button2Text, @Button2_BG_Color, @Button2TextColor]
+		] call dzn_fnc_ShowBasicDialog;
 	};
 	
 	If arguments are not passed -- defaults are used.	
@@ -20,21 +19,24 @@ missionNamespace setVariable ["dzn_Dialog_Result", -1];
 #define DEFAULT_IF_NIL(X, Y)			if (isNil { X }) then { Y } else { X }
 
 params [
-	["_paramText", ""]
-	, ["_paramButtons", BUTTONS]
-	, ["_paramBGColors", [BG_COLOR, BUTTON_BG_COLOR] ]
-	, ["_paramTextColors", [BUTTON_TEXT_COLOR] ]
+	"_paramDialog"
+	,["_paramButtonOK", ["CLOSE", BUTTON_BG_COLOR, BUTTON_TEXT_COLOR]]
+	,["_paramButtonCancel", nil]
 ];
 
-ParBGColor = _paramBGColors;
+private _paramText = _paramDialog select 0;
+private _bgColor = DEFAULT_IF_NIL(_paramDialog select 1, BG_COLOR);
 
-private _bgColor = _paramBGColors select 0;
-private _button_ok_bgColor =  DEFAULT_IF_NIL( _paramBGColors select 1, BUTTON_BG_COLOR );
-private _button_cancel_bgColor = DEFAULT_IF_NIL( _paramBGColors select 2, BUTTON_BG_COLOR );
+private _button_ok_text = _paramButtonOK select 0;
+private _button_ok_bgColor = DEFAULT_IF_NIL(_paramButtonOK select 1, BUTTON_BG_COLOR);
+private _button_ok_textColor = if (!isNil {_paramButtonOK select 1}) then { DEFAULT_IF_NIL(_paramButtonOK select 2, BUTTON_TEXT_COLOR) } else { BUTTON_TEXT_COLOR };
 
-private _button_ok_textColor = DEFAULT_IF_NIL( _paramTextColors select 0, BUTTON_TEXT_COLOR );
-private _button_cancel_textColor = DEFAULT_IF_NIL( _paramTextColors select 1, BUTTON_TEXT_COLOR );
-
+private ["_button_cancel_text", "_button_cancel_bgColor","_button_cancel_textColor"];
+if (!isNil {_paramButtonCancel}) then {
+	_button_cancel_text = DEFAULT_IF_NIL(_paramButtonCancel select 0, nil);
+	_button_cancel_bgColor = DEFAULT_IF_NIL(_paramButtonCancel select 1, BUTTON_BG_COLOR);
+	_button_cancel_textColor = if (!isNil {_paramButtonCancel select 1}) then { DEFAULT_IF_NIL(_paramButtonCancel select 2, BUTTON_TEXT_COLOR) } else { BUTTON_TEXT_COLOR };
+};
 
 // Define some constants for us to use when laying things out.
 #define GUI_GRID_X		(0)
@@ -96,19 +98,19 @@ _okButton ctrlSetPosition [BG_X, _yCoord, BUTTON_WIDTH, BUTTON_HEIGHT];
 _okButton ctrlSetBackgroundColor _button_ok_bgColor;
 _okButton ctrlSetFont "PuristaLight";
 _okButton ctrlSetTextColor _button_ok_textColor;
-_okButton ctrlSetText (_paramButtons select 0);
+_okButton ctrlSetText _button_ok_text;
 
 _okButton ctrlSetEventHandler ["ButtonClick", "missionNamespace setVariable ['dzn_Dialog_Result', 1]; closeDialog 1;"];
 _okButton ctrlCommit 0;
 _controlCount = _controlCount + 1;
 
-if (!isNil { _paramButtons select 1 }) then {
+if (!isNil { _paramButtonCancel }) then {
 	private _cancelButton = _dialog ctrlCreate ["RscButtonMenuCancel", BASE_IDC + _controlCount];
 	_cancelButton ctrlSetPosition [CANCEL_BUTTON_X, _yCoord, BUTTON_WIDTH, BUTTON_HEIGHT];
 	_cancelButton ctrlSetBackgroundColor _button_cancel_bgColor;
 	_cancelButton ctrlSetFont "PuristaLight";
 	_cancelButton ctrlSetTextColor _button_cancel_textColor;
-	_cancelButton ctrlSetText (_paramButtons select 1);	
+	_cancelButton ctrlSetText _button_cancel_text;	
 	
 	_cancelButton ctrlSetEventHandler ["ButtonClick", "missionNamespace setVariable ['dzn_Dialog_Result', -1]; closeDialog 2;"];
 	_cancelButton ctrlCommit 0;

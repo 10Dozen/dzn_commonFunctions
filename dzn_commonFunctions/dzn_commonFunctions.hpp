@@ -108,7 +108,8 @@ class CfgFunctions
 		
 		class uiFunctions
 		{
-			file = "dzn_commonFunctions\functions\uiFunctions";			
+			file = "dzn_commonFunctions\functions\uiFunctions";
+			class ShowBasicDialog {};
 			class ShowChooseDialog {};
 		};
 	};

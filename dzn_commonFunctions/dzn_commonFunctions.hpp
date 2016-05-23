@@ -110,6 +110,7 @@ class CfgFunctions
 		{
 			file = "dzn_commonFunctions\functions\uiFunctions";
 			class ShowBasicDialog {};
+			class ShowMessage {};
 			class ShowChooseDialog {};
 		};
 	};

@@ -7,3 +7,18 @@ class dzn_Dynamic_Dialog
 	
 	};
 };
+
+class RscTitles 
+{
+	class dzn_Dynamic_Message
+	{
+		idd = 133799;
+		movingEnable = 0;
+		duration = 60;
+		onLoad = "_this call dzn_fnc_dynamic_message_onLoad"; 
+		class controls 
+		{
+		
+		};
+	};
+};

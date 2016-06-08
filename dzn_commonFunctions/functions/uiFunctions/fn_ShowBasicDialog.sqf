@@ -7,16 +7,17 @@
 		] call dzn_fnc_ShowBasicDialog;
 	};
 	
+	Show "OK"/"Yes-No" dialog and return user choice.
 	If arguments are not passed -- defaults are used.
 	
 	[] spawn { 
 		Result = [["Do you agree?"], ["Yes"], ["No"]] call dzn_fnc_ShowBasicDialog;
 	};
 	[] spawn { 
-		Result = [["Do you agree?", [.2,.1,.1]], ["Yes"], ["No"]] call dzn_fnc_ShowBasicDialog;
+		Result = [["Do you agree?", [.2,.1,.1,.5]], ["Yes"], ["No"]] call dzn_fnc_ShowBasicDialog;
 	};
 	[] spawn { 
-		Result = [[<t color='#AAAAAA' align='left'>Do you agree?</t>", [.2,.1,.1]], ["Yes", [.0,.4,.1]], ["No",[.4,.0,.0]]] call dzn_fnc_ShowBasicDialog;
+		Result = [["<t color='#AAAAAA' align='left'>Do you agree?</t>", [.2,.1,.1,.5]], ["Yes", [.0,.4,.1,.5]], ["No",[.4,.0,.0,.5]]] call dzn_fnc_ShowBasicDialog;
 	};
 	
 	

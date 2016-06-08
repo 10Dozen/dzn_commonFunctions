@@ -2,7 +2,7 @@
 ##### Version: 0.65
 A library of common and useful functions
 
-Check Wiki for details.
+Check [Wiki](https://github.com/10Dozen/dzn_commonFunctions/wiki/Common-Functions) for details.
 
 
 <br/>*Uses Killzone_Kid's KK_fnc_inString function*

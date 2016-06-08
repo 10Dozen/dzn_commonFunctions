@@ -105,6 +105,7 @@ class CfgFunctions
 			
 			class getItemDisplayName {};
 			class getVehicleDisplayName {};
+			class addWhitelistedArsenal {};
 		};
 		#endif
 		

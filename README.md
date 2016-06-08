@@ -4,4 +4,4 @@ A library of common and useful functions
 
 Check Wiki for details.
 
-*Uses Killzone_Kid's KK_fnc_inString functio.n*
+*Uses Killzone_Kid's KK_fnc_inString function*

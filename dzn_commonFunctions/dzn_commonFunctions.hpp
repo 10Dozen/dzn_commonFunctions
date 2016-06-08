@@ -37,6 +37,8 @@ class CfgFunctions
 			
 			class getComposition {};
 			class setComposition {};
+			
+			class inString {};
 		};
 		#endif
 		
@@ -109,6 +111,7 @@ class CfgFunctions
 		class uiFunctions
 		{
 			file = "dzn_commonFunctions\functions\uiFunctions";
+			class CountTextLines {};			
 			class ShowBasicDialog {};
 			class ShowMessage {};
 			class ShowChooseDialog {};

@@ -1,6 +1,6 @@
 /*
 	[ 
-		@DialogStructuredText(lines in array)
+		@Text(lines in array, can be raw (not parsed) StructuredText)
 		, @Position_Template or [@Array of XY, @DialogWidth(Chars)]
 		, @BG_Color
 		, @Duration or @ConditionToHide
@@ -20,6 +20,8 @@
 	["Hello Kitty", "TOP", [0,0,.2,.8], 15] call dzn_fnc_ShowMessage;
 	["Hello Kitty", "TOP", [0,0,.2,.8], "A > 0"] call dzn_fnc_ShowMessage;
 	
+	
+	["Hello Kitty", [1,1,74]] call dzn_fnc_ShowMessage;
 */
 
 disableSerialization;
@@ -43,9 +45,21 @@ if (typename _paramType == "STRING") then {
 			_displayOffsetY = 1;
 			_displayCharWidth = 74;
 		};
-		case "MIDDLE": {};
-		case "BOTTOM": {};
-		case "HINT": {};		
+		case "MIDDLE": {
+			_displayOffsetX = 1;
+			_displayOffsetY = 11;
+			_displayCharWidth = 74;		
+		};
+		case "BOTTOM": {
+			_displayOffsetX = 1;
+			_displayOffsetY = 19;
+			_displayCharWidth = 74;		
+		};
+		case "HINT": {
+			_displayOffsetX = 39;
+			_displayOffsetY = 1;
+			_displayCharWidth = 30;
+		};		
 	};
 } else {
 	_displayOffsetX = _paramType select 0;
@@ -117,7 +131,6 @@ _dialog call dzn_fnc_dynamicMessage_clearControls;
 private _background = _dialog ctrlCreate ["IGUIBack", -1];
 _background ctrlSetPosition [BG_X, BG_Y, BG_WIDTH, 10 * GUI_GRID_H];
 _background ctrlCommit 0;
-
 	
 // Start placing controls 1 units down in the window.
 private _yCoord = BG_Y + (0.5 * GUI_GRID_H);
@@ -126,7 +139,7 @@ private _controlCount = 2;
 
 #define TITLE_WIDTH			((_displayWidth - 2) * GUI_GRID_W)
 #define TITLE_HEIGHT			(1 * GUI_GRID_H)
-#define TITLE_COLUMN_X			(2 * GUI_GRID_W + GUI_GRID_X)
+#define TITLE_COLUMN_X			BG_X + (GUI_GRID_W + GUI_GRID_X)
 
 // Create the label	
 {

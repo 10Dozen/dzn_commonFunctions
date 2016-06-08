@@ -51,6 +51,6 @@ _arr = [];
 } forEach (_p nearObjects _r);
 
 copyToClipboard str(_arr);
-if (isServer) then { hint parseText "dzn_commonFunctions<br /><br />Composition was copied to clipboard"; }
+if (isServer) then { hint parseText "dzn_commonFunctions<br /><br />Composition was copied to clipboard"; };
 
 _arr

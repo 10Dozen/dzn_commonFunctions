@@ -3,7 +3,7 @@
 		Result = [ 
 			[@Text, @BG_Color]
 			, [@Button1Text, @Button1_BG_Color, @Button1TextColor]
-			, [@Button2Text, @Button2_BG_Color, @Button2TextColor]
+			, [@Button2Text, @Button2_BG_Color, @Button2TextColor]			
 		] call dzn_fnc_ShowBasicDialog;
 	};
 	

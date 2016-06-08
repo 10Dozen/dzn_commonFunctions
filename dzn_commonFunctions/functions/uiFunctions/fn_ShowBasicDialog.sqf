@@ -7,7 +7,19 @@
 		] call dzn_fnc_ShowBasicDialog;
 	};
 	
-	If arguments are not passed -- defaults are used.	
+	If arguments are not passed -- defaults are used.
+	
+	[] spawn { 
+		Result = [["Do you agree?"], ["Yes"], ["No"]] call dzn_fnc_ShowBasicDialog;
+	};
+	[] spawn { 
+		Result = [["Do you agree?", [.2,.1,.1]], ["Yes"], ["No"]] call dzn_fnc_ShowBasicDialog;
+	};
+	[] spawn { 
+		Result = [[<t color='#AAAAAA' align='left'>Do you agree?</t>", [.2,.1,.1]], ["Yes", [.0,.4,.1]], ["No",[.4,.0,.0]]] call dzn_fnc_ShowBasicDialog;
+	};
+	
+	
 */
 disableSerialization;
 missionNamespace setVariable ["dzn_Dialog_Result", -1];
@@ -25,6 +37,7 @@ params [
 ];
 
 private _paramText = _paramDialog select 0;
+private _displayCharWidth = 74;
 private _bgColor = DEFAULT_IF_NIL(_paramDialog select 1, BG_COLOR);
 
 private _button_ok_text = _paramButtonOK select 0;
@@ -71,7 +84,10 @@ private _controlCount = 2;
 
 
 // Create the label
-private _labelCalculatedRowsHeight = TITLE_HEIGHT * ceil ((count _paramText) / 74 );
+private _isStringText = typename _paramText == "STRING";
+private _displayTextLength = [if (_isStringText) then { _paramText } else { str(_paramText) }, _displayCharWidth] call dzn_fnc_CountTextLines;
+private _labelCalculatedRowsHeight = TITLE_HEIGHT * _displayTextLength;	
+
 private _labelControl = _dialog ctrlCreate ["RscStructuredText", BASE_IDC + _controlCount];
 _labelControl ctrlSetPosition [TITLE_COLUMN_X, _yCoord, TITLE_WIDTH, _labelCalculatedRowsHeight];
 _labelControl ctrlSetFont "PuristaLight";

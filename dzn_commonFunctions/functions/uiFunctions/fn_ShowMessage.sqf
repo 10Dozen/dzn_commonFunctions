@@ -6,6 +6,7 @@
 		, @Duration or @ConditionToHide
 	] call dzn_fnc_ShowMessagel
 	
+	Display customizable Hint message.
 	nil call dzn_fnc_ShowMessage - initialization
 	
 	["Hello Kitty"] call dzn_fnc_ShowMessage;
@@ -27,7 +28,7 @@ params [
 	"_paramText"
 	, ["_paramType", "TOP"]
 	, ["_paramColor", [0,0,0,0.6]]
-	, ["_paramTC", "DEFAULT"]
+	, ["_paramTC", 15]
 ];
 
 if (typename _paramText == "STRING") then { _paramText = [_paramText]; };
@@ -101,7 +102,7 @@ if (
 ) then {
 	_dialog = uiNamespace getVariable "dzn_DynamicMessageDialog";	
 } else {
-	133799 cutRsc ["dzn_Dynamic_Message_2","PLAIN",0];
+	133799 cutRsc ["dzn_Dynamic_Message","PLAIN",0];
 	_dialog = uiNamespace getVariable "dzn_DynamicMessageDialog";	
 };
 

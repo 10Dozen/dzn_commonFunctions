@@ -4,7 +4,7 @@
 		, @Position_Template or [@Array of XY, @DialogWidth(Chars)]
 		, @BG_Color
 		, @Duration or @ConditionToHide
-	] call dzn_fnc_ShowMessagel
+	] call dzn_fnc_ShowMessage
 	
 	Display customizable Hint message.
 	nil call dzn_fnc_ShowMessage - initialization

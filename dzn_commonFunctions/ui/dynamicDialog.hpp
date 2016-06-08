@@ -14,7 +14,7 @@ class RscTitles
 	{
 		idd = 133799;
 		movingEnable = 0;
-		duration = 60;
+		duration = 60000;
 		onLoad = "_this call dzn_fnc_dynamic_message_onLoad"; 
 		class controls 
 		{

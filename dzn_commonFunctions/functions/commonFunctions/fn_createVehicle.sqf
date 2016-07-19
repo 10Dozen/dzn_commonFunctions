@@ -1,13 +1,16 @@
 /*
-	@Object = [ @Object or [@Pos, @Dir], @Classname, @Kit] call dzn_fnc_createVehicle
-	Safely creates unit on given position, sets direction.
-	
-	INPUT:
-		0: OBJECT or ARRAY - reference object or [ Position, Direction ]
-		1: STRING - classname of the vehicle
-		2: STRING - dzn_gear kit name
-	OUTPUT: OBJECT (created vehicle)
-*/
+ * @Object = [ @Object or [@Pos, @Dir], @Classname, @Kit] call dzn_fnc_createVehicle dzn_fnc_createVehicle
+ * Safely creates unit on given position, sets direction.
+ * 
+ * INPUT:
+ * 0: OBJECT or ARRAY - reference object or [ Position, Direction ]
+ * 1: STRING - classname of the vehicle
+ * 2: STRING - dzn_gear kit name
+ * OUTPUT: OBJECT (created vehicle)
+ * 
+ * EXAMPLES:
+ *      _veh = [ [[100,100,0], 90], "C_SUV_01_F", "kit_civ_cargo" ] call dzn_fnc_createVehicle
+ */
 
 params ["_posObj","_class",["_kit",""]];
 

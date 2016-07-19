@@ -12,4 +12,13 @@
  *      [player, [ ["currentWeapon", primaryWeapon player, false], ["currentUniform", uniform player, false] ], true] call dzn_fnc_setVars
  */
  
- 
+params["_o", "_vars", "_override"];
+
+for "_i" from 0 to (count _vars)-1 do {
+	private _exist = isNil { _o getVariable (_vars select _i select 0) };
+	if (!_exist || (_exist && _override)) then {
+		_o setVariable (_vars select _i);
+	};
+};
+
+true

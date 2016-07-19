@@ -1,14 +1,15 @@
 /*
-	@Object = [@Object/[@Pos, @Dir], @Classname] call dzn_fnc_createVehicle
+	@Object = [ @Object or [@Pos, @Dir], @Classname, @Kit] call dzn_fnc_createVehicle
 	Safely creates unit on given position, sets direction.
 	
 	INPUT:
 		0: OBJECT or ARRAY - reference object or [ Position, Direction ]
 		1: STRING - classname of the vehicle
+		2: STRING - dzn_gear kit name
 	OUTPUT: OBJECT (created vehicle)
 */
 
-params ["_posObj","_class"];
+params ["_posObj","_class",["_kit",""]];
 
 private _pos = [];
 private _dir = 0;
@@ -26,5 +27,9 @@ _v setPos _pos;
 _v setDir _dir;
 _v setVelocity [0,0,0];	
 _v spawn { sleep 5; _this allowDamage true; };
+
+if (_kit != "" && { !isNil "dzn_gear_serverInitDone" }) then {
+	[_v, _kit, true] call dzn_fnc_gear_assignKit;
+};
 
 _v

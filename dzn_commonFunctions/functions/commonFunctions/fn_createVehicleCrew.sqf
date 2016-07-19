@@ -22,7 +22,12 @@ private _class = switch (_side) do {
 
 {
 	private _unit = _grp createUnit [_class , getPosATL _vehicle, [], 0, "NONE"];
-	if (_kit != "") then { [_unit, _kit] call dzn_fnc_gear_assignKit; };
+	if (_kit != "" && { !isNil "dzn_gear_serverInitDone" }) then {
+		[_unit, _kit, false] call dzn_fnc_gear_assignKit;
+	} else {
+		if (isNil "dzn_gear_serverInitDone") then { diag_log "dzn_fnc_createVehicle: No dzn_gear initialized at the moment"; };
+	};
+	
 	[_unit, _vehicle, _x] call dzn_fnc_assignInVehicle;
 	_unit setSkill _skill;
 } forEach _roles;

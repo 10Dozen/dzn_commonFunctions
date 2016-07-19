@@ -30,6 +30,8 @@ _v spawn { sleep 5; _this allowDamage true; };
 
 if (_kit != "" && { !isNil "dzn_gear_serverInitDone" }) then {
 	[_v, _kit, true] call dzn_fnc_gear_assignKit;
+} else {
+	if (isNil "dzn_gear_serverInitDone") then { diag_log "dzn_fnc_createVehicle: No dzn_gear initialized at the moment"; };
 };
 
 _v

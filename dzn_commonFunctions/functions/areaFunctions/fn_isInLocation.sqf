@@ -1,5 +1,5 @@
 /*
-	@In location? = [@Pos, @Array of locations] call dzn_fnc_isInLocation
+	@In location? = [@Object or @Pos, @Array of locations] call dzn_fnc_isInLocation
 
 	Return is position is in any of given location	
 	INPUT:

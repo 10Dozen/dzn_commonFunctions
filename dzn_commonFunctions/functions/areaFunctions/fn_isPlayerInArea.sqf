@@ -7,7 +7,7 @@
 	OUTPUT: Boolean (true - if there are players near) or Player object
 */
 
-params["_obj","_area",["_mode", "bool"]];
+params["_area",["_mode", "bool"]];
 
 private _r = if (toLower(_mode) == "bool") then { false } else { objNull };
 {

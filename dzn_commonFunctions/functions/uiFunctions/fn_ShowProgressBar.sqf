@@ -10,7 +10,7 @@
 	
 	Display customizable Progress bar.
 	0 is treated as initial step (so StartStep 1 means that at least 1 step was done already).
-	Code can be executed on finish, _this is referense for arguments array
+	Code can be executed (spawned) on finish, _this is referense for arguments array
 	
 	
 	[1, 10, 1, "BOTTOM", { hint format ["Progress done in %1", _this] }, 10] spawn dzn_fnc_ShowProgressBar
@@ -21,7 +21,7 @@ params[
 	, "_endStep"
 	, ["_delay", 1]
 	, ["_position", "bottom"]
-	, ["_code", {}]
+	, ["_code", nil]
 	, ["_args", []]
 ];
 
@@ -44,9 +44,15 @@ private _stepSign = if (_startStep < _endStep) then { 1 } else { -1 };
 private _stepSize = _stepSign * round(1 / _scaleMax);
 private _progress = _startStep;
 
+private _guiX = 0;
+private _guiY = 0.8;
+private _guiWidth = 1;
+private _guiHeight = 0.05;
+private _guiStyle = [_guiX, _guiY, _guiWidth, _guiHeight];
+
 with uiNamespace do { 
 	dzn_ProgressBar = findDisplay 46 ctrlCreate ["RscProgress", -1];
-	dzn_ProgressBar ctrlSetPosition [0,.8,1,0.05];
+	dzn_ProgressBar ctrlSetPosition _guiStyle;
 	dzn_ProgressBar progressSetPosition _startStep;  
 	dzn_ProgressBar ctrlCommit 0;
 };
@@ -59,3 +65,4 @@ for "_i" from _startStep to _endStep step _stepSign do {
 };
 
 ctrlDelete (uiNamespace getVariable "dzn_ProgressBar");
+if (!isNil "_code") then { _args spawn _code; };

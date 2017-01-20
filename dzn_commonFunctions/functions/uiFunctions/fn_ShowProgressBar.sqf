@@ -25,25 +25,12 @@ params[
 	, ["_args", []]
 ];
 
-/*
-	start: 	5
-	end:	10
-	0...1
-	
-	1) Get max vlaue: 	max(5,10) = 10
-	2) Get step size: 	1/10 = 0.1
-	3) How many steps: 	10-5 = 5
-	4) Set start step:	5 * 0.1 = 0.5
-	5) Start loop from:	5
-			to:	10
-		      step:	1		      
-	     add each step:	0.1
-*/
+ctrlDelete (uiNamespace getVariable "dzn_ProgressBar");
 
-private _scaleMax = max(_startStep, _endStep);
+private _scaleMax = _startStep max _endStep;
 private _stepSign = if (_startStep < _endStep) then { 1 } else { -1 };
-private _stepSize = _stepSign * round(1 / _scaleMax);
-private _progress = _startStep;
+private _stepSize = _stepSign * 1 / _scaleMax;
+private _progress = _startStep/_scaleMax;
 
 private _barPosition = [0,0.8,1,0.05];
 if (typename _position == "STRING") then {
@@ -58,13 +45,13 @@ if (typename _position == "STRING") then {
 with uiNamespace do { 
 	dzn_ProgressBar = findDisplay 46 ctrlCreate ["RscProgress", -1];
 	dzn_ProgressBar ctrlSetPosition _barPosition;
-	dzn_ProgressBar progressSetPosition _startStep;  
+	dzn_ProgressBar progressSetPosition _progress;
 	dzn_ProgressBar ctrlCommit 0;
 };
 
 for "_i" from _startStep to _endStep step _stepSign do {
 	sleep _delay;
-	_progress = _progress + _stepSize;	
+	_progress = _progress + _stepSize;
 	(uiNamespace getVariable "dzn_ProgressBar") progressSetPosition _progress;
 	(uiNamespace getVariable "dzn_ProgressBar") ctrlCommit 0;
 };

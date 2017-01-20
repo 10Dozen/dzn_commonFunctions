@@ -13,7 +13,8 @@
 	Code can be executed (spawned) on finish, _this is referense for arguments array
 	
 	
-	[1, 10, 1, "BOTTOM", { hint format ["Progress done in %1", _this] }, 10] spawn dzn_fnc_ShowProgressBar
+	[1, 10, 1, "BOTTOM", { hint format ["Progress done in %1", _this] }, 10] spawn dzn_fnc_ShowProgressBar;
+	[1, 10, 1, [0, 0.3, 1, 0.05], { hint format ["Progress done in %1", _this] }, 10] spawn dzn_fnc_ShowProgressBar;
 */
 
 params[

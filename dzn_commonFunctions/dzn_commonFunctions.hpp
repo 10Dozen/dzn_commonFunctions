@@ -114,6 +114,7 @@ class CfgFunctions
 			class ShowBasicDialog {};
 			class ShowMessage {};
 			class ShowChooseDialog {};
+			class ShowProgressBar {};
 		};
 	};
 };

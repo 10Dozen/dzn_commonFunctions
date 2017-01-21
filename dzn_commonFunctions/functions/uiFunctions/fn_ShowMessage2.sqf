@@ -22,6 +22,14 @@
 	
 	
 	["Hello Kitty", [1,1,74]] call dzn_fnc_ShowMessage;
+	
+	
+	with uiNamespace do { 
+		dzn_ProgressBar = findDisplay 46 ctrlCreate ["RscText", -1];
+		dzn_ProgressBar ctrlSetPosition [0, 0.8, 1, 0.05] ;
+		dzn_ProgressBar ctrlSetText "Showed Message";
+		dzn_ProgressBar ctrlCommit 0;
+	};
 */
 
 disableSerialization;

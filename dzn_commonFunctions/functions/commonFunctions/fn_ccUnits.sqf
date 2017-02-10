@@ -9,34 +9,36 @@
  * OUTPUT: BOOLEAN
  * 
  * EXAMPLES:
- *      _allEastDead = [[mapTriggers, east], "<", 1] call dzn_fnc_ccUnits
- *      _unitsInArea = [[base_trg, west], ">=", 3] call dzn_fnc_ccUnits
+ *      _allEastDead = [[mapTriggers, east], "<", 1] call dzn_fnc_ccUnits;
+ *      _unitsInArea = [[base_trg, west], ">=", 3] call dzn_fnc_ccUnits;
+ *      _unitsInArea = [[[], west], "==", 1] call dzn_fnc_ccUnits;
  *      
  */
 
 params["_cond", "_operator", "_value"];
-	
+
 private _sideString = format [ "&& side _x == %1", _cond select 1];
 private _customString = if (!isNil { _cond select 2 }) then { format [ "&& %1", _cond select 2] } else { "" };
 
 private _area = _cond select 0;
 private _areaString = "";
-if (typename _area != "STRING") then {
-	if (typename _area == "ARRAY") then {		
-		{
-			_areaString = format ["%1 && _x inArea (_area select %2)", _areaString, _forEachIndex];
-		} forEach (_cond select 0);
-	} else {
-		_areaString = "&& _x inArea _area";
-	};	
+
+if (typename _area != "ARRAY") then {
+	_area = [_area];
 };
-	
+
+if !(_area isEqualTo []) then {		
+	{
+		_areaString = format ["%1 && _x inArea (_area select %2)", _areaString, _forEachIndex];
+	} forEach _area;
+};
+
 private _condString = format [
 	"{ true %1 %2 %3 }"
 	, _areaString
 	, _sideString
 	, _customString
-];	
+];
 
 call compile format [
 	"%1 count allUnits %2 _value"

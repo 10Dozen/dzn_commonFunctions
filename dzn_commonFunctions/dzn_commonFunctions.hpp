@@ -42,6 +42,9 @@ class CfgFunctions
 			class inString {};
 			
 			class addAction {};
+			
+			class ccUnits {};
+			class ccPlayers {};
 		};
 		#endif
 		

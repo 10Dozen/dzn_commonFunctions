@@ -31,7 +31,7 @@ while { _u call compile _loopCondition } do {
 		_u playMoveNow _animation;
 	};
 	
-	if (!alive _x) exitWith { _u switchMove "" ; };
+	if (!alive _u) exitWith { _u switchMove "" ; };
 };
 
 _u switchMove "" ;

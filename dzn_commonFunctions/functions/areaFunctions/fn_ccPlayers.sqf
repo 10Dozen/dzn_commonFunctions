@@ -5,8 +5,8 @@
  * 
  * INPUT:
  * 0: ARRAY - array of conditions in format [@Trigger or @Array of triggers (OBJECT or ARRAY), @Side (SIDE), @Custom conditions (STRING)]
- * 1: STRING - Comparsion operator: "==", "!=", ">", ">=", "<", "<="
- * 2: NUMBER - Number to compare (if -1 -- function will return list of the units that match conditions)
+ * 1: STRING - Comparsion operator: "==", "!=", ">", ">=", "<", "<="  (if "" or not passed -- function will return list of the units that match conditions)
+ * 2: NUMBER - Number to compare (if -1 or not passed -- function will return list of the units that match conditions)
  * OUTPUT: BOOLEAN
  * 
  * EXAMPLES:

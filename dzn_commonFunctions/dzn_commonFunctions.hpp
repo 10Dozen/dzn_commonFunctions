@@ -25,7 +25,7 @@ class CfgFunctions
 			file = "dzn_commonFunctions\functions\commonFunctions";
 			
 			class getMissionParametes {};
-			class getValueByKey {};			
+			class getValueByKey {};
 			class setValueByKey {};	
 			class setVars {};
 			class selectAndRemove {};
@@ -42,9 +42,6 @@ class CfgFunctions
 			class inString {};
 			
 			class addAction {};
-			
-			class ccUnits {};
-			class ccPlayers {};
 		};
 		#endif
 		
@@ -60,6 +57,8 @@ class CfgFunctions
 			
 			class isPlayerNear {};
 			class isPlayerInArea {};
+			class ccUnits {};
+			class ccPlayers {};
 			
 			class getRandomPointInZone {};
 			class getZonePosition {};
@@ -68,10 +67,10 @@ class CfgFunctions
 			class createPathFromRoads {};
 			
 			class getHousesNear {};	
-			class getHousePositions {};	
+			class getHousePositions {};
 			class getLocationBuildings {};
 			class getLocationRoads {};
-			class assignInBuilding {};			
+			class assignInBuilding {};
 		};
 		#endif	
 
@@ -113,7 +112,7 @@ class CfgFunctions
 		class uiFunctions
 		{
 			file = "dzn_commonFunctions\functions\uiFunctions";
-			class CountTextLines {};			
+			class CountTextLines {};
 			class ShowBasicDialog {};
 			class ShowMessage {};
 			class ShowChooseDialog {};

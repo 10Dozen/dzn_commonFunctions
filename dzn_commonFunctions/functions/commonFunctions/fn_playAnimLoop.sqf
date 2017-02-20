@@ -24,14 +24,16 @@ params[
 if (_isGlobal) then {
 	[_u, _animation, _loopCondition, false, true] remoteExec ["dzn_fnc_playAnimLoop"];
 };
-
-while { _u call compile _loopCondition } do {
-	if (animationState _u != _animation ) then {
+	
+private _exit = false;
+while { call compile _loopCondition } do {		
+	if (animationState _u != _animation ) then {			
 		_u switchMove _animation;
 		_u playMoveNow _animation;
 	};
-	
-	if (!alive _u) exitWith { _u switchMove "" ; };
-};
 
-_u switchMove "" ;
+	if (!alive _u) exitWith { _exit = true; };
+};
+	
+if (_exit) exitWith {};
+_u switchMove "";

@@ -42,6 +42,7 @@ class CfgFunctions
 			class inString {};
 			
 			class addAction {};
+			class playAnimLoop {};
 		};
 		#endif
 		

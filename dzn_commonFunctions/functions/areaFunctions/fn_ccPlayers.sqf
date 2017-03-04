@@ -44,7 +44,6 @@ private _condString = format [
 	, _customString
 ];
 
-XC = _condString;
 private _result = if (_value >= 0 && _operator != "") then {
 	call compile format [
 		"%1 count (call BIS_fnc_listPlayers) %2 _value"

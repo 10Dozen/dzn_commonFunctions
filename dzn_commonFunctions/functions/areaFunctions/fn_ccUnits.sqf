@@ -47,8 +47,6 @@ private _condString = format [
 	, _customString
 ];
 
-XC = _condString;
-
 private _result = if (_operatorAndValue != "") then {
 	call compile format [
 		"%1 count allUnits %2"

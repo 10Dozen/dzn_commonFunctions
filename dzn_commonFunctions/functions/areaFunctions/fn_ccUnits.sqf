@@ -7,7 +7,6 @@
  * 0: TRIGGER or List of TRIGGERS or [] - Area to search (1 or several triggers). If [] - all map units will be checked 
  * 1: STRING - side of units ("west","east","resistance")
  * 2: STRING - custom conditions where _x is reference to unit ("" or nil if not used)
- *                undefined
  * 3: STRING - comparative operator and value (e.g. "> 4", "== 15")
  * OUTPUT: BOOLEAN or ARRAY
  * 

@@ -6,7 +6,7 @@
 		0 (ARRAY)- array of locations
 	OUTPUT:ARRAY (Pos3d, xMin, yMin, xMax, yMax)
 */
-private ["_i","_xMin","_xMax","_yMin","_yMax","_cPos","_locPos","_dir","_dist","_pointPos"];
+private ["_i","_xMin","_xMax","_yMin","_yMax","_cPos","_locPos","_dir","_sizeMax","_dist","_pointPos"];
 
 _xMin = 90000;
 _xMax = 0;

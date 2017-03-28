@@ -17,5 +17,32 @@
 	
 	
 */
-params["_posParam", "_providerParam", "_fireParam", "_correctorsParam", "_conditionParam"];
+params["_posParam", "_providerParam", "_fireParam", "_correctors", "_condition"];
+
+// Position
+private _area = if (typename (_posParam select 0) == "ARRAY") then {
+	[ createLocation [ "NameVillage" , _posParam select 0, _posParam select 1, _posParam select 1] ];
+} else {
+	_posParam
+};
+
+// Provider
+private _providers = if (typename _providerParam == "STRING") then {
+	[]	// Virtual	
+} else {
+	_providerParam
+};
+
+// Firemission		, [ @RateOfFire, @RoundsPerSalvo, @RoundsType, @MaxRounds ]	
+private _fm_ROF = _fireParam select 0;
+private _fm_Salvo = _fireParam select 1;
+private _fm_Type = _fireParam select 2;
+private _fm_Max = _fireParam select 3;
+
+// Correctors
+private _isCorrected = if (_correctorsParam isEqualTo []) then { false } else { true };
+
+
+// End of Settings
+
 

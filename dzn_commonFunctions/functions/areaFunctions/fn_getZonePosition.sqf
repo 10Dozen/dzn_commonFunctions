@@ -22,7 +22,7 @@ _cPos = [];
 	if (typename _x == "LOCATION") then {
 		_locPos = locationPosition _x;
 		_dir = direction _x;
-		_size = [size _x select 0, (size _x select 1];
+		_size = [size _x select 0, size _x select 1];
 	} else {
 		_locPos = getPosASL _x;
 		_dir = triggerArea  _x select 2;

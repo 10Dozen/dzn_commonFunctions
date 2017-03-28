@@ -14,4 +14,8 @@
 	// Arty fire - random in area (3 1-shot per minute, infinite)
 	[ [Trg1, Trg2, Trg3], "Virtual", [3, 1, "Sh_155mm_AMOS"], [], { time < 1500 }] call dzn_fnc_artilleryRun;
 	
+	
+	
 */
+params["_posParam", "_providerParam", "_fireParam", "_correctorsParam", "_conditionParam"];
+

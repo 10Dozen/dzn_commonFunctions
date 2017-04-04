@@ -49,25 +49,7 @@ if (typename _firemissionParams != "ARRAY") then {
 
 // Sequence //
 
-dzn_fnc_art_calculateFiremissionParameters = {
-	params["_d","_h","_charges"];
-	private _g = 9.82;
-	private _result = [];
 
-	{
-		private _evaluated = _x^4 - _g*(_g*_d^2 + 2*_h*_x^2);
-		private _angle = -1;
-		private _time = -1;
-		if (_evaluated > 0) then {
-			_angle = atan( (_x^2 + sqrt(_x^4 - _g*(_g*_d^2 + 2*_h*_x^2)))/(_g * _d) );
-			_time = (_x * sin(_angle) + sqrt((_x * sin _angle)^2 + 2*_g*_h) / _g;
-		};
-
-		_result pushBack [_angle, _time];
-	} forEach _charges;
-
-	_result
-};
 
 // For each Salvo
 // 	For each Provider
@@ -79,29 +61,31 @@ dzn_fnc_art_calculateFiremissionParameters = {
 		_x addEventHandler [
 			"Fired"
 			, {
+				private _shell = (_this select 6);
+				private _v = (_this select 0) getVariable "dzn_artillery_vectorVelocity";
 
-
+				_shell setVelocity (
+					_shell modelToWorldVisual _v vectorDiff (
+						_shell modelToWorldVisual [0,0,0]
+					)
+				);
 			}
 		]
 	];
-
-
 } forEach _battery;
+
 
 for "_i" from 1 to _salvos do {
 	{
 		private _gun = _x;
 		private _tgtPos = (selectRandom _tgtAreas) call dzn_fnc_getRandomPointInZone;
 		private _round = _firemissionParams select 2;
+		private _firemissionCalculated = [
+			_tgtPos distance2d _gun
+			, (getPosASL _gun) - ((ASLToATL _tgtPos) select 2)
+		] call dzn_fnc_selectFiremissionCharge;
 
-		private _firemission = (([)] call dzn_fnc_art_calculateFiremissionParameters) select { _x select 0 > -1 }) select 0;
-        _x setVariable ["dzn_artillery_firemission", _firemission]
-
-		_gun setVariable [
-			"dzn_artillery_firetable"
-			, (_gun getVariable "dzn_artillery_firetable") pushBack [_tgtPos, objNull]
-		];
-
+		_gun setVariable ["dzn_artillery_vectorVelocity", _firemissionCalculated select 0];
 		[_gun, _tgtPos, _round] spawn {
 			private _tgt = createVehicle ["TargetP_Inf_F",_this select 1,[],0,"FLY"];
 			_tgt setPosASL (_this select 1);

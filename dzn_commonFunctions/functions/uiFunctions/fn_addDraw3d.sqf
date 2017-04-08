@@ -81,16 +81,19 @@ private _pos = "";
 if (typename _postionParam == "STRING") then {
 	_pos = switch toLower(_postionParam) do {
 		case "top": {
-			"[visiblePosition _this select 0, visiblePosition _this select 1, 2.2]"
+			"[visiblePosition _this select 0, visiblePosition _this select 1, (visiblePosition _this select 2) + 2.2]"
 		};
 		case "middle": {
-			"[visiblePosition _this select 0, visiblePosition _this select 1, 1.25]"
+			"[visiblePosition _this select 0, visiblePosition _this select 1, (visiblePosition _this select 2) + 1.25]"
 		};
 		case "under": {
-			"[visiblePosition _this select 0, visiblePosition _this select 1, -0.25]"
+			"[visiblePosition _this select 0, visiblePosition _this select 1, (visiblePosition _this select 2) - 0.25]"
 		};			
 		case "overhead": {
 			"[visiblePosition _this select 0, visiblePosition _this select 1, ((_this modelToWorld (_this selectionPosition 'head')) select 2) + 0.75]"
+		};
+		case "center": {
+			"[visiblePosition _this select 0, visiblePosition _this select 1, visiblePosition _this select 2]"
 		};
 		default { "[visiblePosition _this select 0, visiblePosition _this select 1, 2.2]" };
 	};
@@ -101,7 +104,8 @@ if (typename _postionParam == "STRING") then {
 private _visibility = if (typename _visibilityParam == "STRING") then { compile _visibilityParam } else { _visibilityParam };
 
 private _sizeOnDistance = if (typename _sizeOnDistanceParam == "STRING") then { _sizeOnDistanceParam } else { _sizeOnDistanceParam call _fnc_stringify };
-	
+
+
 if (isNil "dzn_draw3d_list") then { dzn_draw3d_list = []; };
 
 private _id = (100000 * count str(_obj));

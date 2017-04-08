@@ -57,7 +57,7 @@ params [
 	, ["_optionalParams", []]
 ];
 
-_text = str(_textParams select 0);
+private _text = str(_textParams select 0);
 if (typename (_textParams select 0) != "STRING") then { 
 	_text = (_textParams select 0) call _fnc_stringify;
 };

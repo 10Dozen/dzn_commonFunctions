@@ -52,6 +52,7 @@ class CfgFunctions
 			class playAnimLoop {};
 			
 			class setVelocityDirAndUp {};
+			class stringify {};
 		};
 		#endif
 		

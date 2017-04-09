@@ -1,36 +1,35 @@
-/* 
- *	@StrongResult = @Data call dzn_fnc_stringify;	
+/*
+ *	@Result = [@Data, @StrongTypes] call dzn_fnc_stringify;
+ *	
+ *	0: @Data (any)
+ *	1: @StrongTypes (ARRAY of strings)	-	"STRING","ARRAY","CODE","BOOL","NUMBER"
  *
  *	Converts input data to string:
- *	"string" 		-> """string"""
- *	{ code } 		-> "code"
- *	[A,r,r,a,y] 		-> "A,r,r,a,y"
- *	5			-> "5"
- *
- *	@WeakResult = [@Data, true] call dzn_fnc_stringify;	
- *
- *	"string" 		-> "string"
- *	{ code } 		-> "code"
- *	[A,r,r,a,y] 		-> "[A,r,r,a,y]"
- *	5			-> "5"
+ *	
+ *	DATA:			WEAK:			STRONG:
+ *	"string" 		"string"		"""string"""
+ *	{ code } 		"{ code }"		"code"
+ *	[A,r,r,a,y] 		"[A,r,r,a,y]"		"A,r,r,a,y"
+ *	5			"5"			"5"
  *
  */
- 
- private _result = 0;
- private _isWeak = !(isNil "_this select 0");
- 
-  if (_isWeak) then {
- 	_result = switch (typename (_this select 0)) do {		
+
+params["_data", ["_types", ["code"]]];
+
+private _result = 0;
+private _types = _types apply { toUpper _x };
+
+if (typename _data in _types) then {
+	_result = switch (typename (_data)) do {		
 		case "CODE";
-		case "ARRAY":  { ((str(_this select 0) splitString "") select [1, count str(_this select 0) - 2]) joinString "") };
-		default { str(_this select 0) };
+		case "ARRAY":  { ((str(_data) splitString "") select [1, count str(_data) - 2]) joinString "" };
+		default { str(_data) };
 	};
- } else {
-	_result = switch (typename (_this)) do {
-		case "STRING": { _this };
-		case "CODE": { ((str(_this) splitString "") select [1, count str(_this) - 2]) joinString "") };
-		default { str(_this) };
+} else {
+	_result = switch (typename (_data)) do {
+		case "STRING": { _data };
+		default { str(_data) };
 	};
- };
- 
- _result
+};
+
+_result

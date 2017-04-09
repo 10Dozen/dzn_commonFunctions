@@ -24,29 +24,40 @@
 	
 	@ChangeSizeOnDistnaceExpression		-	code (should return Number (font size multiplier))
 	
+	Examples:
+	[gl1,["Gunner"]] call dzn_fnc_addDraw3d
 	
+	[gl1, ["Gunner"], "top","true", "1"] call dzn_fnc_addDraw3d
+	[gl1, ["Gunner"], "top","true", "1/(player distance _this)"] call dzn_fnc_addDraw3d
+	[gl1, ["Gunner"], "top","true", {1}] call dzn_fnc_addDraw3d
+	[gl1, ["Gunner"], "top","true", {1/(player distance _this)}] call dzn_fnc_addDraw3d
+
+	[gl1,["Gunner"],"top","false"] call dzn_fnc_addDraw3d
+	[gl1,["Gunner"],"top",{false}] call dzn_fnc_addDraw3d
+	[gl1,["Gunner"],"top",{true}] call dzn_fnc_addDraw3d
+	[gl1,["Gunner"],"top",{A > 1}] call dzn_fnc_addDraw3d
+
+	[gl1,[{primaryWeapon _this}]] call dzn_fnc_addDraw3d
+	[gl1,["Gunner", {[1,0,0,A]}]] call dzn_fnc_addDraw3d
+
+	[gl1, ["Gunner",[1,0,0,1]]] call dzn_fnc_addDraw3d
+	[gl1, ["Gunner",[1,1,1,1], 1]] call dzn_fnc_addDraw3d
+	[gl1, ["Gunner",[1,1,1,1], 1, "PuristaLight"]] call dzn_fnc_addDraw3d
+	[gl1, ["Gunner",[1,1,1,1], 0.5, "PuristaLight","left"]] call dzn_fnc_addDraw3d
 	
+	[gl1, ["Gunner"], "top"] call dzn_fnc_addDraw3d
+	[gl1, ["Gunner"], "middle"] call dzn_fnc_addDraw3d
+	[gl1, ["Gunner"], "under"] call dzn_fnc_addDraw3d
+	[gl1, ["Gunner"], "overhead"] call dzn_fnc_addDraw3d
+	[gl1, ["Gunner"], "center"] call dzn_fnc_addDraw3d
 	
-	gl1 call dzn_fnc_removeDraw3d;
-	[gl1, ["Gunner"]] call dzn_fnc_addDraw3d;
-x	[gl1, ["Gunner",[1,0,0,1]]] call dzn_fnc_addDraw3d;
-x	[gl1, ["Gunner",[1,1,1,1], 3]] call dzn_fnc_addDraw3d;
-x	[gl1, ["Gunner",[1,1,1,1], 3, "PuristLight"]] call dzn_fnc_addDraw3d;
-x	[gl1, ["Gunner",[1,1,1,1], 3, "PuristLight","left"]] call dzn_fnc_addDraw3d;
-	
-	[gl1, ["Gunner"], "top"] call dzn_fnc_addDraw3d;
-	[gl1, ["Gunner"], "middle"] call dzn_fnc_addDraw3d;
-	[gl1, ["Gunner"], "under"] call dzn_fnc_addDraw3d;
-	[gl1, ["Gunner"], "overhead"] call dzn_fnc_addDraw3d;
-	[gl1, ["Gunner"], "center"] call dzn_fnc_addDraw3d;
-	
-	[gl1, ["Gunner"], {getPos player}] call dzn_fnc_addDraw3d;
-	[gl1, ["Gunner"], {[visiblePosition _this select 0, visiblePosition _this select 1, 6]}] call dzn_fnc_addDraw3d;
-	[gl1, ["Gunner"], "default should be here"] call dzn_fnc_addDraw3d;
+	[gl1, ["Gunner"], {getPos player}] call dzn_fnc_addDraw3d
+	[gl1, ["Gunner"], {[visiblePosition _this select 0, visiblePosition _this select 1, 5]}] call dzn_fnc_addDraw3d
+	[gl1, ["Gunner"], "default should be here"] call dzn_fnc_addDraw3d
 
 */
 if !(hasInterface) exitWith {};
-private _fnc_stringify = { ((str(_this) splitString "") select [1, count str(_this) - 2]) joinString "")};
+
 params [
 	"_obj"
 	, "_textParams"
@@ -58,7 +69,7 @@ params [
 
 private _text = str(_textParams select 0);
 if (typename (_textParams select 0) != "STRING") then { 
-	_text = (_textParams select 0) call _fnc_stringify;
+	_text = [(_textParams select 0),["CODE","STRING"]] call dzn_fnc_stringify;
 };
 private _color = [1,1,1,1];
 private _size = 0.2;	
@@ -66,7 +77,7 @@ private _font = "PuristaMedium";
 private _align = "center";
 
 if !(isNil {_textParams select 1}) then {
-	_color = (_textParams select 1) call _fnc_stringify;	
+	_color = [(_textParams select 1)] call dzn_fnc_stringify;	
 	if !(isNil {_textParams select 2}) then {
 		_size = _textParams select 2;			
 		if !(isNil {_textParams select 3}) then {
@@ -80,31 +91,27 @@ private _pos = "";
 if (typename _postionParam == "STRING") then {
 	_pos = switch toLower(_postionParam) do {
 		case "top": {
-			"[visiblePosition _this select 0, visiblePosition _this select 1, (visiblePosition _this select 2) + 2.2]"
+			"[visiblePosition _this select 0, visiblePosition _this select 1, 2.2]"
 		};
 		case "middle": {
-			"[visiblePosition _this select 0, visiblePosition _this select 1, (visiblePosition _this select 2) + 1.25]"
+			"[visiblePosition _this select 0, visiblePosition _this select 1, 1.25]"
 		};
 		case "under": {
-			"[visiblePosition _this select 0, visiblePosition _this select 1, (visiblePosition _this select 2) - 0.25]"
+			"[visiblePosition _this select 0, visiblePosition _this select 1, -0.25]"
 		};			
 		case "overhead": {
 			"[visiblePosition _this select 0, visiblePosition _this select 1, ((_this modelToWorld (_this selectionPosition 'head')) select 2) + 0.75]"
 		};
-		case "center": {
-			"[visiblePosition _this select 0, visiblePosition _this select 1, visiblePosition _this select 2]"
-		};
 		default { "[visiblePosition _this select 0, visiblePosition _this select 1, 2.2]" };
 	};
 } else {
-	_pos = _postionParam call _fnc_stringify;
+	_pos = [_postionParam] call dzn_fnc_stringify;
 };
 	
 private _visibility = if (typename _visibilityParam == "STRING") then { compile _visibilityParam } else { _visibilityParam };
 
-private _sizeOnDistance = if (typename _sizeOnDistanceParam == "STRING") then { _sizeOnDistanceParam } else { _sizeOnDistanceParam call _fnc_stringify };
-
-
+private _sizeOnDistance = if (typename _sizeOnDistanceParam == "STRING") then { _sizeOnDistanceParam } else { [_sizeOnDistanceParam] call dzn_fnc_stringify };
+	
 if (isNil "dzn_draw3d_list") then { dzn_draw3d_list = []; };
 
 private _id = (100000 * count str(_obj));

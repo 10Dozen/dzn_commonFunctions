@@ -14,7 +14,7 @@
  *
  */
 
-params["_data", ["_types", ["code"]]];
+params["_data", ["_types", ["CODE"]]];
 
 private _result = 0;
 private _types = _types apply { toUpper _x };

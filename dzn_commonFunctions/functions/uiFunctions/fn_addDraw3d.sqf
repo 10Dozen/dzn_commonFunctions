@@ -46,8 +46,7 @@ x	[gl1, ["Gunner",[1,1,1,1], 3, "PuristLight","left"]] call dzn_fnc_addDraw3d;
 
 */
 if !(hasInterface) exitWith {};
-private _fnc_stringify = { ((str(_this) splitString "") select { !(_x in ["{","}"]) }) joinString "" };
-
+private _fnc_stringify = { ((str(_this) splitString "") select [1, count str(_this) - 2]) joinString "")};
 params [
 	"_obj"
 	, "_textParams"

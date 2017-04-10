@@ -3,10 +3,13 @@
 	[
 		@Artillery Unit or @Array of Units
 		, [@TgtPos, @Radius] or @Trigger or @Array of Triggers
-		, [@Salvos, @Delay, @RoundType]
+		, [@Salvos, @Delay, @(optional)RoundType]
 		, @(optional)BarrageFire (true by default)
+		, @(optional)ConditionToRun (code with _this reference to gun)
 	] spawn dzn_fnc_artilleryFiremission;
 
+	
+	
 	// 1 gun, 5 salvos of 1 roound in 5 minutes
 	[ Art1, [ [1000,1000,0], 30 ], [5, 10, "Sh_155mm_AMOS"]] spawn dzn_fnc_artilleryFiremission;
 	[ Art1, [Trg1,Trg2], [5, 20]] spawn dzn_fnc_artilleryFiremission;
@@ -24,7 +27,13 @@
 	[ [Art1, Art2, Art3, Art4, Art5], Trg1, [12, 35], false] spawn dzn_fnc_artilleryFiremission;
 */
 
-params["_providerParams","_targetParams","_firemissionParams",["_isBarrageFire",true]];
+params[
+	"_providerParams"
+	,"_targetParams"
+	,"_firemissionParams"
+	,["_isBarrageFire",true]
+	,["_condition",{true}]
+];
 
 // Settings //
 private _battery = if (typename _providerParams == "ARRAY") then { _providerParams } else { [_providerParams] };
@@ -90,9 +99,12 @@ if (_salvos < 0) then {
 				private _fmParams = (_this select 0) getVariable "dzn_artillery_firemission"; // [0@Angle, 1@Velocity, 2@TravelTime, 3@ChargeNo, 4@Direction];
 				private _shell = _this select 6;
 				
+				[_shell, ["V"], "center", {true}, {1}] call dzn_fnc_AddDraw3d;
+				
 				[_shell, _fmParams select 4, _fmParams select 0, _fmParams select 1] call dzn_fnc_setVelocityDirAndUp;
 				
 				if ((_this select 0) getVariable "dzn_artillery_useVirtualMagazine") then { (_this select 0) setVehicleAmmo 1; };
+				(_this select 0) setVariable ["dzn_artillery_shotsInProgress", false, true];
 			}
 		]
 		,true
@@ -108,7 +120,14 @@ for "_i" from 1 to _salvos do {
 			sleep (if ( (_delay/(count _battery)) < 8 ) then { 8 } else { ( _delay/(count _battery) ) });
 		};
 		
-		if ( (alive (gunner _x) || !((gunner _x) getVariable ["ACE_isUnconscious", false])) && _x getVariable "dzn_artillery_inFiremission" ) then { 		
+		if (
+			(
+				alive (gunner _x) 
+				|| !((gunner _x) getVariable ["ACE_isUnconscious", false])				
+			) 
+			&& _x call _condition
+			&& _x getVariable "dzn_artillery_inFiremission"			
+		) then { 		
 			if ((weaponState [_x, [0]]) select 4 == 0) then { 
 				reload _x;
 				sleep 3;
@@ -128,9 +147,11 @@ for "_i" from 1 to _salvos do {
 				_firemissionCalculated pushBack (_x getDir _tgtPos);
 				
 				_x setVariable ["dzn_artillery_firemission", _firemissionCalculated, true]; // [@Angle, @Velocity, @TravelTime, @ChargeNo, @Direction]
-				[_x, _tgtPos] spawn {				
-					private _tgt = createVehicle ["Land_HelipadEmpty_F",_this select 1,[],0,"FLY"];
-					_tgt setPosASL (_this select 1);
+				_x setVariable ["dzn_artillery_shotsInProgress", true, true];
+				[_x, _tgtPos] spawn {
+					// private _tgt = createVehicle ["Land_HelipadEmpty_F",_this select 1,[],0,"FLY"];
+					private _tgt = createVehicle ["VR_3DSelector_01_default_F",_this select 1,[],0,"NONE"];
+					// _tgt setPosASL (_this select 1);
 
 					(_this select 0) doWatch _tgt;
 					(_this select 0) doTarget _tgt;
@@ -140,7 +161,7 @@ for "_i" from 1 to _salvos do {
 					(_this select 0) fireAtTarget [_tgt];
 					
 					sleep 1;
-					deleteVehicle _tgt;
+					// deleteVehicle _tgt;
 				};
 			};
 		};
@@ -151,7 +172,9 @@ for "_i" from 1 to _salvos do {
 
 // End of sequence
 
-{	
+waitUntil { (_battery select { _x getVariable ["dzn_artillery_shotsInProgress",false] }) isEqualTo [] };
+
+{
 	_x removeEventHandler ["Fired", _x getVariable "dzn_artillery_eh"];
 	_x setVariable ["dzn_artillery_inFiremission", false, true];
 } forEach _battery;

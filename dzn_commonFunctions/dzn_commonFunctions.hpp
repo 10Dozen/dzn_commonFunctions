@@ -124,9 +124,10 @@ class CfgFunctions
 		class supportFunctions
 		{
 			file = "dzn_commonFunctions\functions\supportFunctions";
-			class artilleryFiremission {};
-			class selectFiremissionCharge {};
-			class cancelFiremission {};
+			
+			class ArtilleryFiremission {};
+			class SelectFiremissionCharge {};
+			class CancelFiremission {};
 		};
 		#endif
 		
@@ -134,11 +135,14 @@ class CfgFunctions
 		class uiFunctions
 		{
 			file = "dzn_commonFunctions\functions\uiFunctions";
+			
 			class CountTextLines {};
 			class ShowBasicDialog {};
 			class ShowMessage {};
 			class ShowChooseDialog {};
 			class ShowProgressBar {};
+			class AddDraw3d {};
+			class RemoveDraw3d {};
 		};
 		#endif
 	};

@@ -28,7 +28,14 @@
 		, @(for Button)ExecuteCode(Code)	
 	]
 ]
+
+Added: Multi-line version UI classes RscTextMulti and RscEditMulti for use with scripted controls
+
 */
+
+private _background = findDisplay 46 ctrlCreate ["RscTextMulti", -1];
+_background ctrlSetBackgroundColor [0,0,0,.6];	
+_background ctrlSetPosition [0, 0.3, 1, 0.04];
 
 {
 	private _line = _x select 0;

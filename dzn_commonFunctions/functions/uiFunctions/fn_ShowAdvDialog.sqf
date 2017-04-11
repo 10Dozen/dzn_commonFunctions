@@ -32,27 +32,32 @@
 Added: Multi-line version UI classes RscTextMulti and RscEditMulti for use with scripted controls
 
 */
+with uiNamespace do { 
+	private _dialog = findDisplay 46;
+	private _background = _dialog ctrlCreate ["RscTextMulti", -1];
+	_background ctrlSetBackgroundColor [0,0,0,.6];
+	_background ctrlSetPosition [0, 0.3, 1, 0.04];
 
-private _background = findDisplay 46 ctrlCreate ["RscTextMulti", -1];
-_background ctrlSetBackgroundColor [0,0,0,.6];	
-_background ctrlSetPosition [0, 0.3, 1, 0.04];
+	{
+		/* Parse parameters */
+		private _line = _x select 0;
+		private _type = _x select 1;
+		private _data = _x select 2;
+		private _textParams = [];
+		private _tileParams = [];
+		private _expression = {true};
 
-{
-	private _line = _x select 0;
-	private _type = _x select 1;
-	private _data = _x select 2;
-	private _textParams = [];
-	private _tileParams = [];
-	private _expression = {true};
-	
-	if (!isNil {_x select 3}) then {
-		_textParams = _x select 3;
-		if (!isNil {_x select 4}) then {
-			_tileParams = _x select 4;
-			if (!isNil {_x select 5}) then {
-				_expression = _x select 5;
+		if (!isNil {_x select 3}) then {
+			_textParams = _x select 3;
+			if (!isNil {_x select 4}) then {
+				_tileParams = _x select 4;
+				if (!isNil {_x select 5}) then {_expression = _x select 5;};
 			};
 		};
-	};
-	
-} forEach _this;
+		
+		/* Create compoment */
+		
+		
+
+	} forEach _this;
+};

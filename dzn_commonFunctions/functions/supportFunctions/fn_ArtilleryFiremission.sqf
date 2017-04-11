@@ -95,36 +95,33 @@ if (_salvos < 0) then {
 	_x setVariable ["dzn_artillery_eh",
 		_x addEventHandler [
 			"Fired"
-			, {				
-				[_this select 6,  (_this select 0) getVariable "dzn_artillery_firemission"] spawn {
-					[_this select 0, ["V"], "center", {true}, {1}] call dzn_fnc_AddDraw3d;
+			, {
+				[_this select 0, _this select 6,  (_this select 0) getVariable "dzn_artillery_firemission"] spawn {
+					params["_gun", "_shell", "_firemission"];
+					
+					if (_gun getVariable "dzn_artillery_useVirtualMagazine") then { _gun setVehicleAmmo 1; };
+					_gun setVariable ["dzn_artillery_shotsInProgress", false, true];
 				
-					params["_shell", "_firemission"];
+					[
+						_shell
+						, _firemission select 4
+						, _firemission select 0
+						, _firemission select 1
+					] call dzn_fnc_setVelocityDirAndUp;
 					
-					waitUntil { (getPosATL _shell select 2) > 150 };
-					systemChat "Shell altitude: >150m";
+					if (DEBUG) then { [_shell, ["V"], "center", {true}, {1}] call dzn_fnc_AddDraw3d; };
 					
-					waitUntil { (getPosATL _shell select 2) < 200 };
-					systemChat "Shell altitude: <200m - Correction";
+					waitUntil { (getPosATL _shell select 2) > 150 };					
+					waitUntil { (getPosATL _shell select 2) < 100 };
 					
-					// [0@Angle, 1@Velocity, 2@TravelTime, 3@ChargeNo, 4@Direction, 5@TGTPosition]					
+					// [0@Angle, 1@Velocity, 2@TravelTime, 3@ChargeNo, 4@Direction, 5@TGTPosition]
 					[
 						_shell
 						, _firemission select 4
 						, -( acos ( (_shell distance2d (_firemission select 5)) / (_shell distance (_firemission select 5)) ) )
-						, 50
+						, 100
 					] call dzn_fnc_setVelocityDirAndUp;				
 				};
-				
-				/*
-				private _fmParams = (_this select 0) getVariable "dzn_artillery_firemission"; // [0@Angle, 1@Velocity, 2@TravelTime, 3@ChargeNo, 4@Direction];
-				private _shell = _this select 6;				
-				
-				[_shell, _fmParams select 4, _fmParams select 0, _fmParams select 1] call dzn_fnc_setVelocityDirAndUp;
-				*/
-				
-				if ((_this select 0) getVariable "dzn_artillery_useVirtualMagazine") then { (_this select 0) setVehicleAmmo 1; };
-				(_this select 0) setVariable ["dzn_artillery_shotsInProgress", false, true];
 			}
 		]
 		,true
@@ -157,9 +154,9 @@ for "_i" from 1 to _salvos do {
 			if (_firemissionCalculated isEqualTo []) then { 
 				diag_log format["dzn_artillery: %1 - Failed to find appropriate charge for distance %1", _x, _tgtPos distance2d _x];
 				systemChat format["dzn_artillery: %1 - Failed to find appropriate charge for distance %1", _x, _tgtPos distance2d _x];
-			} else {
-				_firemissionCalculated pushBack _tgtPos;
+			} else {				
 				_firemissionCalculated pushBack (_x getDir _tgtPos);
+				_firemissionCalculated pushBack _tgtPos;
 				
 				// [@Angle, @Velocity, @TravelTime, @ChargeNo, @Direction, @TGTPosition]
 				_x setVariable ["dzn_artillery_firemission", _firemissionCalculated, true]; 

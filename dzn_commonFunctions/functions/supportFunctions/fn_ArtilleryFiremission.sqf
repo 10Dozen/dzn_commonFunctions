@@ -95,13 +95,33 @@ if (_salvos < 0) then {
 	_x setVariable ["dzn_artillery_eh",
 		_x addEventHandler [
 			"Fired"
-			, {
-				private _fmParams = (_this select 0) getVariable "dzn_artillery_firemission"; // [0@Angle, 1@Velocity, 2@TravelTime, 3@ChargeNo, 4@Direction];
-				private _shell = _this select 6;
+			, {				
+				[_this select 6,  (_this select 0) getVariable "dzn_artillery_firemission"] spawn {
+					[_this select 0, ["V"], "center", {true}, {1}] call dzn_fnc_AddDraw3d;
 				
-				[_shell, ["V"], "center", {true}, {1}] call dzn_fnc_AddDraw3d;
+					params["_shell", "_firemission"];
+					
+					waitUntil { (getPosATL _shell select 2) > 150 };
+					systemChat "Shell altitude: >150m";
+					
+					waitUntil { (getPosATL _shell select 2) < 200 };
+					systemChat "Shell altitude: <200m - Correction";
+					
+					// [0@Angle, 1@Velocity, 2@TravelTime, 3@ChargeNo, 4@Direction, 5@TGTPosition]					
+					[
+						_shell
+						, _firemission select 4
+						, -( acos ( (_shell distance2d (_firemission select 5)) / (_shell distance (_firemission select 5)) ) )
+						, 50
+					] call dzn_fnc_setVelocityDirAndUp;				
+				};
+				
+				/*
+				private _fmParams = (_this select 0) getVariable "dzn_artillery_firemission"; // [0@Angle, 1@Velocity, 2@TravelTime, 3@ChargeNo, 4@Direction];
+				private _shell = _this select 6;				
 				
 				[_shell, _fmParams select 4, _fmParams select 0, _fmParams select 1] call dzn_fnc_setVelocityDirAndUp;
+				*/
 				
 				if ((_this select 0) getVariable "dzn_artillery_useVirtualMagazine") then { (_this select 0) setVehicleAmmo 1; };
 				(_this select 0) setVariable ["dzn_artillery_shotsInProgress", false, true];
@@ -128,25 +148,21 @@ for "_i" from 1 to _salvos do {
 			&& _x call _condition
 			&& _x getVariable "dzn_artillery_inFiremission"			
 		) then { 		
-			if ((weaponState [_x, [0]]) select 4 == 0) then { 
-				reload _x;
-				sleep 3;
-			};
+			if ((weaponState [_x, [0]]) select 4 == 0) then { reload _x; sleep 3; };
 			
 			// Calculating shot parameters:	1) Target pos, 2) Direction to target, 3) Angle, 4) Projectile velocity
 			private _tgtPos = [selectRandom _tgtAreas] call dzn_fnc_getRandomPointInZone;
-			private _firemissionCalculated = [
-				_tgtPos distance2d _x
-				, ((getPosASL _x) select 2) - ((ASLToATL _tgtPos) select 2)
-			] call dzn_fnc_selectFiremissionCharge;
+			private _firemissionCalculated = [_tgtPos distance2d _x, ((getPosASL _x) select 2) - ((ASLToATL _tgtPos) select 2)] call dzn_fnc_selectFiremissionCharge;
 			
 			if (_firemissionCalculated isEqualTo []) then { 
 				diag_log format["dzn_artillery: %1 - Failed to find appropriate charge for distance %1", _x, _tgtPos distance2d _x];
 				systemChat format["dzn_artillery: %1 - Failed to find appropriate charge for distance %1", _x, _tgtPos distance2d _x];
 			} else {
+				_firemissionCalculated pushBack _tgtPos;
 				_firemissionCalculated pushBack (_x getDir _tgtPos);
 				
-				_x setVariable ["dzn_artillery_firemission", _firemissionCalculated, true]; // [@Angle, @Velocity, @TravelTime, @ChargeNo, @Direction]
+				// [@Angle, @Velocity, @TravelTime, @ChargeNo, @Direction, @TGTPosition]
+				_x setVariable ["dzn_artillery_firemission", _firemissionCalculated, true]; 
 				_x setVariable ["dzn_artillery_shotsInProgress", true, true];
 				[_x, _tgtPos] spawn {
 					// private _tgt = createVehicle ["Land_HelipadEmpty_F",_this select 1,[],0,"FLY"];

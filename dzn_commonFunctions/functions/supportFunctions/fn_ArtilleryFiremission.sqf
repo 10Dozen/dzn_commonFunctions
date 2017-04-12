@@ -99,9 +99,11 @@ if (_salvos < 0) then {
 				[_this select 0, _this select 6,  (_this select 0) getVariable "dzn_artillery_firemission"] spawn {
 					params["_gun", "_shell", "_firemission"];
 					
+					systemChat "Shot";
 					if (_gun getVariable "dzn_artillery_useVirtualMagazine") then { _gun setVehicleAmmo 1; };
 					_gun setVariable ["dzn_artillery_shotsInProgress", false, true];
 				
+					systemChat "First correction";
 					[
 						_shell
 						, _firemission select 4
@@ -111,16 +113,27 @@ if (_salvos < 0) then {
 					
 					if (DEBUG) then { [_shell, ["V"], "center", {true}, {1}] call dzn_fnc_AddDraw3d; };
 					
-					waitUntil { (getPosATL _shell select 2) > 150 };					
-					waitUntil { (getPosATL _shell select 2) < 100 };
+					waitUntil { (getPosATL _shell select 2) > 150 };
+					systemChat "Over 150";
 					
+					// player attachTo [_shell, [0,0,1]];
+					// VC = _shell;
+					// FM = _firemission;
+					
+					waitUntil { (getPosATL _shell select 2) < 135 };
+					systemChat "Second correction";
 					// [0@Angle, 1@Velocity, 2@TravelTime, 3@ChargeNo, 4@Direction, 5@TGTPosition]
+					_shell setVelocity ((_firemission select 5) vectorDiff (getPosATL _shell));
+					
+					/*
+					
 					[
 						_shell
 						, _firemission select 4
 						, -( acos ( (_shell distance2d (_firemission select 5)) / (_shell distance (_firemission select 5)) ) )
-						, 100
-					] call dzn_fnc_setVelocityDirAndUp;				
+						, 150
+					] call dzn_fnc_setVelocityDirAndUp;			
+*/					
 				};
 			}
 		]

@@ -131,7 +131,7 @@ for "_i" from 1 to _salvos do {
 			private _firemissionCalculated = [_tgtPos distance2d _x, ((getPosASL _x) select 2) - ((ASLToATL _tgtPos) select 2)] call dzn_fnc_selectFiremissionCharge;
 			
 			if (_firemissionCalculated isEqualTo []) then { 
-				diag_log format["dzn_artillery: %1 - Failed to find appropriate charge for distance %1", _x, _tgtPos distance2d _x];
+				diag_log format["dzn_artillery: %1 - Failed to find appropriate charge for distance %2", _x, _tgtPos distance2d _x];
 			} else {				
 				_firemissionCalculated pushBack (_x getDir _tgtPos);
 				_firemissionCalculated pushBack _tgtPos;

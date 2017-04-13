@@ -47,7 +47,7 @@ private _tgtGeneratedArea = objNull;
 if (typename _targetParams == "ARRAY") then {
 	if (typename (_targetParams select 0) == "ARRAY") then {
 		_tgtGeneratedArea = createTrigger ["EmptyDetector", _targetParams select 0];
-		_tgtGeneratedArea setTriggerArea [_targetParams select 1, _targetParams select 1, 0, false, 0];
+		_tgtGeneratedArea setTriggerArea [_targetParams select 1, _targetParams select 1, 0, false, 100];
 		_tgtAreas = [_tgtGeneratedArea];
 	} else {
 		_tgtAreas = _targetParams;

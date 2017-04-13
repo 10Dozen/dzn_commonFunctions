@@ -46,6 +46,9 @@ with uiNamespace do {
 		private _textParams = [];
 		private _tileParams = [];
 		private _expression = {true};
+		
+		private _widthMultiplier = 1 / ( {(_x select 0 )== _line} count _this );
+		
 
 		if (!isNil {_x select 3}) then {
 			_textParams = _x select 3;

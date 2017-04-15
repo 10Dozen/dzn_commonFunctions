@@ -13,10 +13,9 @@ private _result = [];
 	private _angle = -1;
 	private _time = -1;
 	if (_evaluated > 0) exitWith {
-		_angle = atan( (_x^2 + sqrt(_x^4 - _g*(_g*_d^2 + 2*_h*_x^2)))/(_g * _d) );
+		_angle = atan( (_x^2 + sqrt(_evaluated))/(_g * _d) );
 		_time = (_x * sin(_angle) + sqrt((_x * sin _angle)^2 + 2*_g*_h)) / _g;
 
-		// @VelocityVector, @Angle, @Time
 		_result = [_angle, _x, _time, _forEachIndex + 1];
 	};
 } forEach _charges;

@@ -71,6 +71,7 @@ class CfgFunctions
 			class ccUnits {};
 			class ccPlayers {};
 			
+			class getRandomPoint {};
 			class getRandomPointInZone {};
 			class getZonePosition {};
 			class createPathFromKeypoints {};

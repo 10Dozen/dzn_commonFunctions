@@ -102,6 +102,8 @@ with uiNamespace do {
 	_background ctrlSetPosition [0, 0.045, 1, 0.045 * ((count _itemsProperties)-1) ];
 	_background ctrlCommit 0;
 	
+	private _crtlId = 14500;
+	
 	{
 		private _lineItems = _x;
 		private _yOffset = _forEachIndex * 0.045;
@@ -130,25 +132,37 @@ with uiNamespace do {
 					_item ctrlSetPosition [_xOffset, _yOffset, 1*_widthMultiplier, 0.045];
 				};
 				case "DROPDOWN": {
-					_item = _dialog ctrlCreate ["RscCombo", -1];
+					_item = _dialog ctrlCreate ["RscCombo", _crtlId];
 					_item ctrlSetPosition [_xOffset, _yOffset, _widthMultiplier, 0.045];		
 					_data apply { 
 						_item lbAdd (if (typename _x == "STRING") then { _x } else { str(_x) });
 					};
 					_item lbSetCurSel 0;
-					_item ctrlSetEventHandler ["LBSelChanged", "hint format['%1', _this]"];					
+					_item ctrlSetEventHandler [
+						"LBSelChanged"
+						, "missionNamespace setVariable [
+							'dzn_DynamicAdvDialog_ReturnValue_" + str (_crtlId) + "'
+							, [_this select 1, (_this select 0) lbText (_this select 1)]
+						];"
+					];		
 				};
 				case "INPUT": {
-					_item = _dialog ctrlCreate ["RscEdit", -1];
+					_item = _dialog ctrlCreate ["RscEdit", _crtlId];
 					_item ctrlSetPosition [_xOffset, _yOffset, _widthMultiplier, 0.045];		
 					_item ctrlSetBackgroundColor (_tileStyle select 0);
-					_item ctrlSetEventHandler ["KeyUp", "hint format['%1', _this]"];
+					_item ctrlSetEventHandler [
+						"KeyUp"
+						, "missionNamespace setVariable [
+							'dzn_DynamicAdvDialog_ReturnValue_" + str (_crtlId) + "'
+							, ctrlText (_this select 0)
+						];"
+					];
 					
 					_item ctrlSetFont (_textStyle select 2);
 					_item ctrlSetTextColor (_textStyle select 0);
 				};
 				case "BUTTON": {
-					_item = _dialog ctrlCreate ["RscButtonMenuOK", -1];					
+					_item = _dialog ctrlCreate ["RscButtonMenuOK", _crtlId];					
 					_item ctrlSetPosition [
 						_xOffset + 0.01*_widthMultiplier
 						, _yOffset
@@ -156,7 +170,7 @@ with uiNamespace do {
 						, 0.04
 					];
 					_item ctrlSetBackgroundColor (_tileStyle select 0);
-					_item ctrlSetEventHandler ["ButtonClick", _expression];					
+					_item ctrlSetEventHandler ["ButtonClick", _expression];
 				};
 			};
 			
@@ -165,8 +179,10 @@ with uiNamespace do {
 				_item ctrlSetFont (_textStyle select 2);
 				_item ctrlSetTextColor (_textStyle select 0);
 			};
+			
 			_item ctrlCommit 0;
 		
+			_crtlId = _crtlId + 1;
 			_items pushBack _item;
 		} forEach _lineItems;	
 	} forEach _itemsProperties;

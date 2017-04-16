@@ -158,8 +158,6 @@ with uiNamespace do {
 						];"
 					];
 					
-					_item ctrlSetFont (_textStyle select 2);
-					_item ctrlSetTextColor (_textStyle select 0);
 				};
 				case "BUTTON": {
 					_item = _dialog ctrlCreate ["RscButtonMenuOK", _crtlId];					
@@ -176,9 +174,9 @@ with uiNamespace do {
 			
 			if !(_type in ["DROPDOWN","INPUT"]) then {
 				_item ctrlSetText _data;
-				_item ctrlSetFont (_textStyle select 2);
-				_item ctrlSetTextColor (_textStyle select 0);
 			};
+			_item ctrlSetFont (_textStyle select 2);
+			_item ctrlSetTextColor (_textStyle select 0);
 			
 			_item ctrlCommit 0;
 		

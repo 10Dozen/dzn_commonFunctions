@@ -97,6 +97,11 @@ with uiNamespace do {
 	private _dialog = findDisplay 134800;
 	private _items = [];
 	
+	private _background = _dialog ctrlCreate ["RscText", -1];
+	_background ctrlSetBackgroundColor [0,0,0,.6];
+	_background ctrlSetPosition [0, 0.045, 1, 0.045 * ((count _itemsProperties)-1) ];
+	_background ctrlCommit 0;
+	
 	{
 		private _lineItems = _x;
 		private _yOffset = _forEachIndex * 0.045;
@@ -118,31 +123,48 @@ with uiNamespace do {
 				case "HEADER": {
 					_item = _dialog ctrlCreate ["RscText", -1];
 					_item ctrlSetPosition [0, _yOffset, 1, 0.04];
+					_item ctrlSetBackgroundColor (_tileStyle select 0);
 				};
 				case "LABEL": {
 					_item = _dialog ctrlCreate ["RscText", -1];
 					_item ctrlSetPosition [_xOffset, _yOffset, 1*_widthMultiplier, 0.045];
 				};
-				case "DROPDOWN": {};
+				case "DROPDOWN": {
+					_item = _dialog ctrlCreate ["RscCombo", -1];
+					_item ctrlSetPosition [_xOffset, _yOffset, _widthMultiplier, 0.045];		
+					_data apply { 
+						_item lbAdd (if (typename _x == "STRING") then { _x } else { str(_x) });
+					};
+					_item lbSetCurSel 0;
+					_item ctrlSetEventHandler ["LBSelChanged", "hint format['%1', _this]"];					
+				};
+				case "INPUT": {
+					_item = _dialog ctrlCreate ["RscEdit", -1];
+					_item ctrlSetPosition [_xOffset, _yOffset, _widthMultiplier, 0.045];		
+					_item ctrlSetBackgroundColor (_tileStyle select 0);
+					_item ctrlSetEventHandler ["KeyUp", "hint format['%1', _this]"];
+					
+					_item ctrlSetFont (_textStyle select 2);
+					_item ctrlSetTextColor (_textStyle select 0);
+				};
 				case "BUTTON": {
 					_item = _dialog ctrlCreate ["RscButtonMenuOK", -1];					
 					_item ctrlSetPosition [
-						_xOffset + 0.1*_widthMultiplier
+						_xOffset + 0.01*_widthMultiplier
 						, _yOffset
-						, 0.8*_widthMultiplier
+						, 0.99*_widthMultiplier
 						, 0.04
 					];
+					_item ctrlSetBackgroundColor (_tileStyle select 0);
 					_item ctrlSetEventHandler ["ButtonClick", _expression];					
 				};
 			};
 			
-			
-			
-			_item ctrlSetBackgroundColor (_tileStyle select 0);
-			_item ctrlSetText _data;
-			_item ctrlSetFont (_textStyle select 2);
-			_item ctrlSetTextColor (_textStyle select 0);
-			
+			if !(_type in ["DROPDOWN","INPUT"]) then {
+				_item ctrlSetText _data;
+				_item ctrlSetFont (_textStyle select 2);
+				_item ctrlSetTextColor (_textStyle select 0);
+			};
 			_item ctrlCommit 0;
 		
 			_items pushBack _item;
@@ -150,10 +172,6 @@ with uiNamespace do {
 	} forEach _itemsProperties;
 	
 	
-	/*
-	private _background = _dialog ctrlCreate ["RscTextMulti", -1];
-	_background ctrlSetBackgroundColor [0,0,0,.6];
-	_background ctrlSetPosition [0, 0.14, 1, 0.5];
-	_background ctrlCommit 0;
-	*/
+	
+	
 } 

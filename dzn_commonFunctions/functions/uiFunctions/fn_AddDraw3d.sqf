@@ -114,8 +114,8 @@ private _sizeOnDistance = if (typename _sizeOnDistanceParam == "STRING") then { 
 	
 if (isNil "dzn_draw3d_list") then { dzn_draw3d_list = []; };
 
-private _id = (100000 * count str(_obj));
-for "_i" from 4 to 1 step -1 do { _id = _id + round(random 9) * 10^_i; };
+private _id = round(random 9);
+for "_i" from 1 to 6 do { _id = _id + round(random 9) * 10^_i; };
 
 dzn_draw3d_list pushBack [
 	_id

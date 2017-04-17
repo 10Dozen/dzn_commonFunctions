@@ -43,8 +43,31 @@
 	[ 0@LineNo, 1@Type("INPUT"), 2@TextStyling, 3@TileStyling]
 
 
+[
+ [0, "HEADER", "Dozins Menu"]
+ , [1, "LABEL", "Select player"]
+ , [2, "SLIDER", [10, 100, 15]]
+ , [3, "BUTTON", "OK", {closeDialog 2}]
+
+] call dzn_fnc_ShowAdvDialog
 
 addMissionEventHandler ["EachFrame", { if !(isNil "dzn_DynamicAdvDialog_Results") then { hint str[dzn_DynamicAdvDialog_Results] }]
+
+
+[
+	[0, "HEADER", "Dozins Menu"]
+	, [1, "LABEL", "Select player"]
+	, [1, "LISTBOX", ["Player1", "Player2", "Player3"], [{hint "1"},{hint "2"},{hint "3"}]]
+	
+	, [2, "LABEL", "Select player"]
+	, [2, "DROPDOWN", ["Player1", "Player2", "Player3"], [{hint "1"},{hint "2"},{hint "3"}]]
+	
+	, [3, "INPUT"]
+	
+	, [3, "CHECKBOX"]
+
+	,[4,"BUTTON", "OK", {closeDialog 2}]
+] call dzn_fnc_ShowAdvDialog
 
 [
 	[0, "HEADER", "Dozins Menu"]
@@ -68,10 +91,10 @@ addMissionEventHandler ["EachFrame", { if !(isNil "dzn_DynamicAdvDialog_Results"
 	
 	, [3, "BUTTON", "Teleport", { 
 		private _tpInput = _this select 0;
-		player setPos (getPos ((_tpInput select 3) select (_tpInput select 1)));
+		player setPos (getPos ((_tpInput select 2) select (_tpInput select 0)));
 	}]
 	, [3, "BUTTON", "Show hint", {
-		private _hintText = _this select 1 select 1;
+		private _hintText = _this select 1 select 0;
 		hint _hintText;
 	}]
 	, [3, "BUTTON", "Spawn vehicle", {
@@ -154,13 +177,41 @@ private _itemsVerticalOffsets = [];
 				_expression = [{true}];
 			};
 		};
+		case "LISTBOX": {
+			// [ 0@LineNo, 1@Type("LABEL"),	2@TextItems, 3@ExpressionsPerItem, 4@TextStyling, 5@TileStyling ]
+			_data = _x select 2;
+			if !(isNil {_x select 3}) then {
+				_expression = _x select 3;
+				if !(isNil {_x select 4}) then { 
+					_textParams = _x select 4;
+					if !(isNil {_x select 5}) then { _tileParams = _x select 5; };
+				};
+			}  else {
+				_expression = [{true}];
+			};
+		};
+		case "CHECKBOX": {
+			// [ 0@LineNo, 1@Type("CHECKBOX"), 2@TextStyling, 3@TileStyling ]
+			if !(isNil {_x select 2}) then {
+				_textParams = _x select 2;
+				if !(isNil {_x select 3}) then { _tileParams = _x select 3; };
+			};
+		};
 		case "INPUT": {
 			// [ 0@LineNo, 1@Type("INPUT"), 2@TextStyling, 3@TileStyling ]
 			if !(isNil {_x select 2}) then {
 				_textParams = _x select 2;
 				if !(isNil {_x select 3}) then { _tileParams = _x select 3; };
 			};
-		};	
+		};
+		case "SLIDER": {
+			// [ 0@LineNo, 1@Type("SLIDER"), 2@[@Min,@Max,@Current], 3@TextStyling, 4@TileStyling ]
+			_data = _x select 2;
+			if !(isNil {_x select 3}) then {
+				_textParams = _x select 3;
+				if !(isNil {_x select 4}) then { _tileParams = _x select 4; };
+			};
+		};			
 	};
 	
 	private _widthMultiplier = 1 / ( {(_x select 0 )== _line} count _this );
@@ -184,7 +235,6 @@ with uiNamespace do {
 	private _items = [];
 	
 	private _ctrlId = 14500;
-	// missionNamespace setVariable ["dzn_DynamicAdvDialog_Results", []];
 	private _background = _dialog ctrlCreate ["RscText", -1];
 	
 	private _yOffset = 0;
@@ -258,6 +308,68 @@ with uiNamespace do {
 					
 					_ctrlId = _ctrlId + 1;
 				};
+				case "LISTBOX": {
+					_item = _dialog ctrlCreate ["RscXListBox", _ctrlId];
+					_item ctrlSetPosition [_xOffset, _yOffset, _widthMultiplier, _ySize];		
+					_data apply { 
+						_item lbAdd (if (typename _x == "STRING") then { _x } else { str(_x) });
+					};
+					_item ctrlSetEventHandler [
+						"LBSelChanged"						
+						, "missionNamespace setVariable [
+							'dzn_DynamicAdvDialog_ReturnValue_" + str (_ctrlId) + "'
+							, [_this select 1, (_this select 0) lbText (_this select 1)]
+						];"
+					];	
+					_item lbSetCurSel 0;
+					
+					missionNamespace setVariable [
+						format["dzn_DynamicAdvDialog_DropdownExpressions_%1",_ctrlId]
+						,_expression
+					];
+					
+					_ctrlId = _ctrlId + 1;
+				};
+				case "CHECKBOX": {
+					_item = _dialog ctrlCreate ["RscCheckbox", _ctrlId];					
+					_item ctrlSetPosition [2*_xOffset - 0.045, _yOffset, (_textStyle select 2), (_textStyle select 2) + 0.005];
+					_item ctrlSetEventHandler [
+						"CheckedChanged"
+						, "missionNamespace setVariable [
+							'dzn_DynamicAdvDialog_ReturnValue_" + str (_ctrlId) + "'
+							, _this
+						];"
+					];
+					
+					_ctrlId = _ctrlId + 1;					
+				};
+				
+				case "SLIDER": {
+					_item = _dialog ctrlCreate ["RscSlider", _ctrlId];
+					_item ctrlSetPosition [_xOffset, _yOffset, _widthMultiplier, _ySize];		
+					_item ctrlSetBackgroundColor _tileStyle;
+					
+					_item sliderSetRange [_data select 0, _data select 1];
+					_item sliderSetPosition (_data select 2);
+					_item sliderSetSpeed [1, 1];
+					_item ctrlSetTooltip format["%1 (min: %2, max: %3)", _data select 2, _data select 0, _data select 1];
+					
+					_item ctrlSetEventHandler [
+						"SliderPosChanged"
+						, "(_this select 0) sliderSetPosition round(sliderPosition (_this select 0));
+						(_this select 0) ctrlSetTooltip ( 
+							(_this select 0) ctrlSetTooltip format[
+								'%1 (min:%2, max: %3)'
+								, sliderPosition (_this select 0)
+								, sliderRange (_this select 0) select 0
+								, sliderRange (_this select 0) select 1
+							]
+						)"
+					];
+					
+					_ctrlId = _ctrlId + 1;
+				};
+				
 				case "BUTTON": {
 					_item = _dialog ctrlCreate ["RscButtonMenuOK", -1];					
 					_item ctrlSetPosition [
@@ -282,7 +394,7 @@ with uiNamespace do {
 				};
 			};
 			
-			if !(_type in ["DROPDOWN","INPUT"]) then {
+			if !(_type in ["DROPDOWN","INPUT","LISTBOX","CHECKBOX","SLIDER"]) then {
 				_item ctrlSetStructuredText parseText _data;
 			};
 			_item ctrlSetTextColor (_textStyle select 0);
@@ -307,6 +419,69 @@ with uiNamespace do {
 if (isNil "dzn_fnc_DynamicAdvDialog_getValues") then {
 	dzn_fnc_DynamicAdvDialog_getValues = {
 		dzn_DynamicAdvDialog_Results = [];
+		_t = [];
+		for "_i" from 14500 to dzn_DynamicAdvDialog_ControlID do {
+			private _resultData = [];
+			private _ctrl = findDisplay 134800 displayCtrl _i;
+			
+			private _value = "";
+			private _valueData = "";
+			private _expressions = [];
+			
+			private _needCollectOutput = true;
+			
+			_t pushBack (ctrlClassName _ctrl);
+			
+			switch (ctrlClassName _ctrl) do {
+				case "RscEdit": {
+					_value = ctrlText  _ctrl;
+					_t pushBack "Edit";
+				};
+				case "RscCheckBox": {
+					_value = cbChecked _ctrl;
+					_t pushBack "Checkbox";
+				};
+				case "RscXListBox";
+				case "RscCombo": {
+					_value = lbCurSel _ctrl;
+					_valueData = _ctrl lbText _value;
+					_expressions = call compile format ["dzn_DynamicAdvDialog_DropdownExpressions_%1", _i]
+				};
+				case "RscSlider": {
+					_value = sliderPosition _ctrl;
+					_valueData = sliderRange _ctrl;
+				};
+				default {
+					_t pushBack "it is a button";
+					_needCollectOutput = false;
+				};
+			};
+			
+			if (_needCollectOutput) then {
+				_resultData pushBack _value;
+				if (typename _valueData == "STRING" && {_valueData != ""}) then {
+					_resultData pushBack _valueData;
+					_resultData pushBack _expressions;
+				};
+				
+				if (typename _valueData == "ARRAY") then {
+					_resultData pushBack _valueData;
+				};
+				
+				dzn_DynamicAdvDialog_Results pushBack _resultData;
+			};
+		};
+		
+		XXCCA = _t;
+		dzn_DynamicAdvDialog_Results
+	};
+};
+
+
+/*
+if (isNil "dzn_fnc_DynamicAdvDialog_getValues") then {
+	dzn_fnc_DynamicAdvDialog_getValues = {
+		dzn_DynamicAdvDialog_Results = [];
 		for "_i" from 14500 to dzn_DynamicAdvDialog_ControlID do {
 			private _resultData = [_i];
 			private _value = call compile format ["dzn_DynamicAdvDialog_ReturnValue_%1", _i];
@@ -328,3 +503,4 @@ if (isNil "dzn_fnc_DynamicAdvDialog_getValues") then {
 		dzn_DynamicAdvDialog_Results
 	};
 };
+*/

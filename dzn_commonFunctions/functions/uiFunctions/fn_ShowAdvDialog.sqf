@@ -1,191 +1,371 @@
 /*
-[
-	[0, "HEADER", "Title text"]
-	,[1, "LABEL", "Select player"]
-	,[1, "DROPDOWN", [1,2,3,4,5,6]]
-	,[2, "LABEL", "Actions"]
-	,[3, "BUTTON", "Teleport", [], [], {_this setPosASL (getPosASL player)}]
-	,[3, "BUTTON", "Heal", [[1,1,1,1],0.22,'PuristaLight','center'], [[1,1,1,1],0.25], { _this call dzn_fnc_healUnit }]
+	[@Item1, @Item2, ... ,@ItemN] call dzn_fnc_ShowAdvDialog;	
 	
-] call dzn_fnc_ShowAdvDialog;
+	Displays dialog with selected elements and inputs, allows to read entred values (e.g. to use on button click).
+	
+	Item types and syntax:
+	
+	[ 0@LineNo, 1@Type("HEADER"), 2@Title, 3@(optional)TextStyling, 4@(optional)TileStyling ]
+	[ 0@LineNo, 1@Type("LABEL"), 2@Title, 3(optional)@TextStyling, 4(optional)@TileStyling ]
+	[ 0@LineNo, 1@Type("BUTTON"), 2@Title, 3@Code, 4@(optional)TextStyling, 5@(optional)TileStyling, 6@(optional)ActiveTileStyling ]
+	[ 0@LineNo, 1@Type("DROPDOWN"), 2@ListItems, 3@(optional)ExpressionsPerItem, 4@(optional)TextStyling, 5@(optional)TileStyling ]
+	[ 0@LineNo, 1@Type("LISTBOX"), 2@ListItems, 3@(optional)ExpressionsPerItem, 4@(optional)TextStyling, 5@(optional)TileStyling ]
+	[ 0@LineNo, 1@Type("CHECKBOX"), 2@(optional)TextStyling, 3@(optional)TileStyling ]	
+	[ 0@LineNo, 1@Type("INPUT"), 2@(optional)TextStyling, 3@(optional)TileStyling ]
+	[ 0@LineNo, 1@Type("SLIDER"), 2@[@Min,@Max,@Current], 3@(optional)TextStyling, 4@(optional)TileStyling ]
 
-	-----------------------------------------
-	| Title text                            |
-	-----------------------------------------
-	| Select player      |_______________V| |
-	| Actions								|
-	| |_Teleport________| |_Heal__________| |
-	|_______________________________________|
-
-
-[
+	, where:
+		Type (STRING)			- "HEADER", "LABEL","BUTTON","DROPDOWN","LISTBOX","CHECKBOX","INPUT","SLIDER"
+		Title (STRING)			- displayed name of element (label, header, button name)
+		ListItems (ARRAY)		- array of elements names for DROPDOWN and LISTBOX
+		[@Min,@Max,@Current]	- scalar values for SLIDER
+		Code (CODE)			- code to execute on button click (all dialog values are available as _this. To close dialog - use closeDialog 2)
+		ExpressionsPerItem (ARRAY)	- array of code for each item in list for DROPDOWN or LISTBOX
+		TextStyling (ARRAY)		- [@ColorRGBA, @Size, @Font] of element
+		TileStyling (ARRAY)		- [@ColorRGBA, @Height] of element's background
+		ActiveTileStyling (ARRAY)	- [@ColorRGBA, @Size, @Font] of element (INPUT) on click
+		
+	Examples:
 	[
-		0@LineNo(Number)
-		, 1@Type(String)
-		, 2@Data(String or Array of string)
-		, 3@(optional)TextStyling(Array)		[@Color, @Size, @Font, @Align]
-		, 4@(optional)ElementStyling(Array)	[@Color, @Height]
-		, 5@(for Button)ExecuteCode(Code)	
-	]
-]
+		[0, "HEADER", "Dynamic Advanced Dialog"]
+		, [1, "LABEL", "Select teleport position"]
+		, [1, "DROPDOWN", ["Airfield", "Mike-26", "Kamino Firing range"], [tp1,tp2,tp3]]
+		
+		, [2, "LABEL","Hint (reason)"]
+		, [2, "INPUT"]
+		
+		, [3, "BUTTON", "Teleport", { 
+			private _tpInput = _this select 0;
+			player setPos (getPos ((_tpInput select 2) select (_tpInput select 0)));
+		}]
+		, [3, "BUTTON", "Show hint", {
+			private _hintText = _this select 1 select 0;
+			hint _hintText;
+		}]
+		, [3, "BUTTON", "Spawn vehicle", {
+			"C_Offroad_01_F" createVehicle position player;
+			hint "Spawned";
+		}]
+		, [3, "BUTTON", "End mission", {hint "No sweetie"}]
+		
+		, [4, "LABEL", "Listbox ->"]
+		, [4, "LISTBOX", ["Item1", "Item2", "Item3"]]
+		
+		, [5, "LABEL", "Checkboxes -->"]
+		, [5, "CHECKBOX"]
+		
+		, [6, "LABEL", "Sider"]
+		, [7, "SLIDER", [0,100,50]]
 
-Added: Multi-line version UI classes RscTextMulti and RscEditMulti for use with scripted controls
-
-
-[
-	[0, "HEADER", "Title text"]
-	,[1, "LABEL", "Select player"]
-	,[1, "LABEL", "Select player 2"]
-] call dzn_fnc_ShowAdvDialog;
-
-[
-	[0, "HEADER", "Title text"]
-	,[1, "LABEL", "Select player"]
-	,[1, "LABEL", "Select player 2"]
-	,[2, "BUTTON", "Select", [], [], {hint "SELECTED"}]
-	,[3, "BUTTON", "Say hi", [], [], {hint "Hi!"}]
-	,[3, "BUTTON", "Say bye", [], [], {hint "Bye-bye!"}]
-] call dzn_fnc_ShowAdvDialog;
+	] call dzn_fnc_ShowAdvDialog
 
 
 */
-private _defaultTextStyling = [[1,1,1,1], 0.04, "PuristaLight", "left"] ;
-private _defaultElementStyling = [[0,0,0,0.7], 0.04];
-private _defaultHeaderStyling = [[0.77, 0.51, 0.08, 0.8] , 0.04];
 
-_fnc_setItem = {
-	// [ @item, @Size, @Color, @Text ] call _fnc_setItem
 
-	(_this select 0) ctrlSetBackgroundColor (_this select 2);
-	(_this select 0) ctrlSetPosition (_this select 1);
-	(_this select 0) ctrlCommit 0;
-};
+/*
+ *	Parse and Set-Up parameters
+ */
+#define	DIALOG_ID		134800
+#define	START_CTRL_ID		14500
+
+private _defaultTextStyling 		= [[1,1,1,1], "PuristaLight", 0.04];
+private _defaultElementStyling 		= [0,0,0,0.7];
+private _defaultHeaderStyling 		= [0.77, 0.51, 0.08, 0.8];
+private _defaultActiveElementStyling 	= [1,1,1,0.7];
 
 private _itemsProperties = [];
+private _itemsVerticalOffsets = [];
+
 {
 	/* Parse parameters */
 	private _line = _x select 0;
 	private _type = toUpper(_x select 1);
-	private _data = _x select 2;
+	private _data = "";
 	private _textParams = _defaultTextStyling;
-	private _tileParams = if (_type == "HEADER") then { _defaultHeaderStyling } else { _defaultElementStyling };
-	private _expression = {true};
+	private _tileParams = _defaultElementStyling;
+	private _activeTileParams = _defaultActiveElementStyling;
+	private _expression = "true";
 	
-	private _widthMultiplier = 1 / ( {(_x select 0 )== _line} count _this );
-	
-	if (!isNil {_x select 3}) then {
-		_textParams = if ( (_x select 3) isEqualTo [] ) then { _defaultTextStyling } else { _x select 3 };
-		if (!isNil {_x select 4}) then {
-			_tileParams  = if ( (_x select 4) isEqualTo [] ) then { _defaultElementStyling } else { _x select 4 };
-			if (!isNil {_x select 5}) then {_expression = _x select 5;};
+	switch (_type) do {
+		case "HEADER": {
+			// [ 0@LineNo, 1@Type("HEADER"), 2@Title, 3@(optional)TextStyling, 4@(optional)TileStyling ]
+			_data = _x select 2;
+			_tileParams = _defaultHeaderStyling;
+			
+			if (isNil {_x select 3}) then {
+				_textParams = _defaultTextStyling;
+			} else {
+				_textParams = _x select 3;
+				_tileParams = if (isNil {_x select 4}) then { _defaultHeaderStyling } else { _x select 4 };
+			};
 		};
+		case "LABEL": {
+			// [ 0@LineNo, 1@Type("LABEL"), 2@Title, 3(optional)@TextStyling, 4(optional)@TileStyling ]
+			_data = _x select 2;
+			if !(isNil {_x select 3}) then {
+				_textParams = _x select 3;
+				if !(isNil {_x select 4}) then { _tileParams = _x select 4 };
+			};
+		};
+		case "BUTTON": {		
+			// [ 0@LineNo, 1@Type("BUTTON"), 2@Title, 3@Code, 4@(optional)TextStyling, 5@(optional)TileStyling, 6@(optional)ActiveTileStyling ]
+			_data = _x select 2;
+			if !(isNil {_x select 3}) then {
+				_expression = ((str(_x select 3) splitString "") select [1, count str(_x select 3) - 2]) joinString "";
+				if !(isNil {_x select 4}) then { 
+					_textParams = _x select 4;
+					if !(isNil {_x select 5}) then { 
+						_tileParams = _x select 5;
+						if !(isNil {_x select 6}) then { _activeTileParams = _x select 6 };
+					};
+				};
+			};
+		};
+		case "DROPDOWN": {
+			// [ 0@LineNo, 1@Type("DROPDOWN"), 2@ListItems, 3@(optional)ExpressionsPerItem, 4@T(optional)extStyling, 5@(optional)TileStyling ]
+			_data = _x select 2;
+			if !(isNil {_x select 3}) then {
+				_expression = _x select 3;
+				if !(isNil {_x select 4}) then { 
+					_textParams = _x select 4;
+					if !(isNil {_x select 5}) then { _tileParams = _x select 5; };
+				};
+			}  else {
+				_expression = [{true}];
+			};
+		};
+		case "LISTBOX": {
+			// [ 0@LineNo, 1@Type("LISTBOX"), 2@ListItems, 3@(optional)ExpressionsPerItem, 4@(optional)TextStyling, 5@(optional)TileStyling ]
+			_data = _x select 2;
+			if !(isNil {_x select 3}) then {
+				_expression = _x select 3;
+				if !(isNil {_x select 4}) then { 
+					_textParams = _x select 4;
+					if !(isNil {_x select 5}) then { _tileParams = _x select 5; };
+				};
+			}  else {
+				_expression = [{true}];
+			};
+		};
+		case "CHECKBOX": {
+			// [ 0@LineNo, 1@Type("CHECKBOX"), 2@(optional)TextStyling, 3@(optional)TileStyling ]
+			if !(isNil {_x select 2}) then {
+				_textParams = _x select 2;
+				if !(isNil {_x select 3}) then { _tileParams = _x select 3; };
+			};
+		};
+		case "INPUT": {
+			// [ 0@LineNo, 1@Type("INPUT"), 2@(optional)TextStyling, 3@(optional)TileStyling ]
+			if !(isNil {_x select 2}) then {
+				_textParams = _x select 2;
+				if !(isNil {_x select 3}) then { _tileParams = _x select 3; };
+			};
+		};
+		case "SLIDER": {
+			// [ 0@LineNo, 1@Type("SLIDER"), 2@[@Min,@Max,@Current], 3@(optional)TextStyling, 4@(optional)TileStyling ]
+			_data = _x select 2;
+			if !(isNil {_x select 3}) then {
+				_textParams = _x select 3;
+				if !(isNil {_x select 4}) then { _tileParams = _x select 4; };
+			};
+		};			
 	};
 	
-	private _lineProperties = [_line, _type, _data, _textParams, _tileParams, ((str(_expression) splitString "") select [1, count str(_expression) - 2]) joinString "", _widthMultiplier];
+	private _widthMultiplier = 1 / ( {(_x select 0 )== _line} count _this );
+	private _lineProperties = [_line, _type, _data, _textParams, _tileParams, _activeTileParams, _expression, _widthMultiplier];
 	
 	if (isNil {_itemsProperties select _line}) then {
 		_itemsProperties set [_line, [ _lineProperties ]];
+		_itemsVerticalOffsets set [_line, (_textParams select 2) + 0.005];
 	} else {
 		(_itemsProperties select _line) pushBack _lineProperties;
+		_itemsVerticalOffsets set [_line, (_itemsVerticalOffsets select _line) max ((_textParams select 2) + 0.005) ];
 	};	
 } forEach _this;
 
-XC = _itemsProperties;
 
+/*
+ *	Generation of Dialog and Controls
+ */
 with uiNamespace do { 
 	createDialog "dzn_Dynamic_Dialog_Advanced";
-	private _dialog = findDisplay 134800;
+	private _dialog = findDisplay DIALOG_ID;
 	private _items = [];
 	
+	private _ctrlId = START_CTRL_ID;	
 	private _background = _dialog ctrlCreate ["RscText", -1];
-	_background ctrlSetBackgroundColor [0,0,0,.6];
-	_background ctrlSetPosition [0, 0.045, 1, 0.045 * ((count _itemsProperties)-1) ];
-	_background ctrlCommit 0;
-	
-	private _crtlId = 14500;
+	private _yOffset = 0;
 	
 	{
-		private _lineItems = _x;
-		private _yOffset = _forEachIndex * 0.045;
+		private _lineItems = _x;		
+		private _ySize = _itemsVerticalOffsets select _forEachIndex;
 		
 		{			
 			private _xOffset = _forEachIndex / (count _lineItems);	// For 2 grid: 0 = 0; 1 = 1/2 = 0.5
 			
-			// [ 0@_line, 1@_type, 2@_data, 3@_textParams, 4@_tileParams, 5@_expression, 6@_widthMultiplier];
+			// [ 0_line, 1_type, 2_data, 3_textParams, 4_tileParams, 5_activeTileParams, 6_expression, 7_widthMultiplier]
 			private _line = _x select 0;
 			private _type = _x select 1;
 			private _data = _x select 2;
-			private _textStyle = _x select 3;	// [ 0@Color, 1@Size, 2@Font, 3@Align ]	
-			private _tileStyle = _x select 4;	// [ 0@Color, 1@Height ]
-			private _expression = _x select 5;
-			private _widthMultiplier = _x select 6;		
+			private _textStyle = _x select 3;	// [ 0@Color, 1@Font, 2@Size ]	
+			private _tileStyle = _x select 4;	// 0@Color
+			private _activeStyle = _x select 5; // @Color
+			private _expression = _x select 6;
+			private _widthMultiplier = _x select 7;		
 			
 			private _item = -1;
 			switch (_type) do {
-				case "HEADER": {
-					_item = _dialog ctrlCreate ["RscText", -1];
-					_item ctrlSetPosition [0, _yOffset, 1, 0.04];
-					_item ctrlSetBackgroundColor (_tileStyle select 0);
+				case "HEADER": {				
+					_item = _dialog ctrlCreate ["RscStructuredText", -1];
+					_item ctrlSetPosition [0, _yOffset, 1, _ySize - 0.005];
+					_item ctrlSetBackgroundColor _tileStyle;
 				};
 				case "LABEL": {
-					_item = _dialog ctrlCreate ["RscText", -1];
-					_item ctrlSetPosition [_xOffset, _yOffset, 1*_widthMultiplier, 0.045];
-				};
-				case "DROPDOWN": {
-					_item = _dialog ctrlCreate ["RscCombo", _crtlId];
-					_item ctrlSetPosition [_xOffset, _yOffset, _widthMultiplier, 0.045];		
-					_data apply { 
-						_item lbAdd (if (typename _x == "STRING") then { _x } else { str(_x) });
-					};
-					_item lbSetCurSel 0;
-					_item ctrlSetEventHandler [
-						"LBSelChanged"
-						, "missionNamespace setVariable [
-							'dzn_DynamicAdvDialog_ReturnValue_" + str (_crtlId) + "'
-							, [_this select 1, (_this select 0) lbText (_this select 1)]
-						];"
-					];		
-				};
+					_item = _dialog ctrlCreate ["RscStructuredText", -1];
+					_item ctrlSetPosition [_xOffset, _yOffset, _widthMultiplier, _ySize];
+				};				
 				case "INPUT": {
-					_item = _dialog ctrlCreate ["RscEdit", _crtlId];
-					_item ctrlSetPosition [_xOffset, _yOffset, _widthMultiplier, 0.045];		
-					_item ctrlSetBackgroundColor (_tileStyle select 0);
-					_item ctrlSetEventHandler [
-						"KeyUp"
-						, "missionNamespace setVariable [
-							'dzn_DynamicAdvDialog_ReturnValue_" + str (_crtlId) + "'
-							, ctrlText (_this select 0)
-						];"
+					_item = _dialog ctrlCreate ["RscEdit", _ctrlId];
+					_item ctrlSetPosition [_xOffset, _yOffset, _widthMultiplier, _ySize];		
+					_item ctrlSetBackgroundColor _tileStyle;
+					
+					_ctrlId = _ctrlId + 1;
+				};
+				case "DROPDOWN";
+				case "LISTBOX": {				
+					_item = _dialog ctrlCreate [if (_type == "DROPDOWN") then { "RscCombo" } else { "RscXListBox" }, _ctrlId];
+					_item ctrlSetPosition [_xOffset, _yOffset, _widthMultiplier, _ySize];		
+					_data apply { _item lbAdd (if (typename _x == "STRING") then { _x } else { str(_x) }); };
+					_item lbSetCurSel 0;
+					
+					missionNamespace setVariable [
+						format["dzn_DynamicAdvDialog_DropdownExpressions_%1",_ctrlId]
+						,_expression
 					];
 					
+					_ctrlId = _ctrlId + 1;
 				};
+				case "CHECKBOX": {
+					_item = _dialog ctrlCreate ["RscCheckbox", _ctrlId];					
+					_item ctrlSetPosition [2*_xOffset - 0.045, _yOffset, (_textStyle select 2), (_textStyle select 2) + 0.005];
+					
+					_ctrlId = _ctrlId + 1;					
+				};
+				case "SLIDER": {
+					_item = _dialog ctrlCreate ["RscSlider", _ctrlId];
+					_item ctrlSetPosition [_xOffset, _yOffset, _widthMultiplier, _ySize];		
+					_item ctrlSetBackgroundColor _tileStyle;
+					
+					_item sliderSetRange [_data select 0, _data select 1];
+					_item sliderSetPosition (_data select 2);
+					_item sliderSetSpeed [1, 1];
+					_item ctrlSetTooltip format["%1 (min: %2, max: %3)", _data select 2, _data select 0, _data select 1];
+					
+					_item ctrlSetEventHandler [
+						"SliderPosChanged"
+						, "(_this select 0) sliderSetPosition round(sliderPosition (_this select 0));
+						(_this select 0) ctrlSetTooltip ( 
+							(_this select 0) ctrlSetTooltip format[
+								'%1 (min:%2, max: %3)'
+								, sliderPosition (_this select 0)
+								, sliderRange (_this select 0) select 0
+								, sliderRange (_this select 0) select 1
+							]
+						)"
+					];
+					
+					_ctrlId = _ctrlId + 1;
+				};				
 				case "BUTTON": {
-					_item = _dialog ctrlCreate ["RscButtonMenuOK", _crtlId];					
+					_item = _dialog ctrlCreate ["RscButtonMenuOK", -1];					
 					_item ctrlSetPosition [
 						_xOffset + 0.01*_widthMultiplier
 						, _yOffset
 						, 0.99*_widthMultiplier
-						, 0.04
+						, _ySize - 0.005
 					];
-					_item ctrlSetBackgroundColor (_tileStyle select 0);
-					_item ctrlSetEventHandler ["ButtonClick", _expression];
+					_item ctrlSetBackgroundColor _tileStyle;
+					_item ctrlSetActiveColor _activeStyle;
+					
+					_item ctrlSetEventHandler [
+						"ButtonClick"
+						, format[ 
+							"with missionNamespace do {
+								private _this = call dzn_fnc_DynamicAdvDialog_getValues;
+								%1
+							}"
+							, _expression
+						]
+					];
 				};
 			};
 			
-			if !(_type in ["DROPDOWN","INPUT"]) then {
-				_item ctrlSetText _data;
+			if !(_type in ["DROPDOWN","INPUT","LISTBOX","CHECKBOX","SLIDER"]) then {
+				_item ctrlSetStructuredText parseText _data;
 			};
-			_item ctrlSetFont (_textStyle select 2);
+			
 			_item ctrlSetTextColor (_textStyle select 0);
+			_item ctrlSetFont (_textStyle select 1);
+			_item ctrlSetFontHeight (_textStyle select 2);
 			
 			_item ctrlCommit 0;
 		
-			_crtlId = _crtlId + 1;
 			_items pushBack _item;
-		} forEach _lineItems;	
+		} forEach _lineItems;
+		
+		_yOffset = _yOffset + _ySize;
 	} forEach _itemsProperties;
 	
-	
-	
-	
-} 
+	missionNamespace setVariable ["dzn_DynamicAdvDialog_ControlID", _ctrlId];
+	_background ctrlSetBackgroundColor [0,0,0,.6];
+	_background ctrlSetPosition [0, (_itemsVerticalOffsets select 0), 1, _yOffset - (_itemsVerticalOffsets select 0) ];
+	_background ctrlCommit 0;
+}; 
+
+if (isNil "dzn_fnc_DynamicAdvDialog_getValues") then {
+	dzn_fnc_DynamicAdvDialog_getValues = {
+		dzn_DynamicAdvDialog_Results = [];
+		
+		for "_i" from START_CTRL_ID to dzn_DynamicAdvDialog_ControlID do {
+			private _resultData = [];
+			private _ctrl = findDisplay DIALOG_ID displayCtrl _i;
+			
+			private _value = "";
+			private _valueData = "";
+			private _expressions = [];			
+			private _needCollectOutput = true;
+			
+			
+			switch (ctrlClassName _ctrl) do {
+				case "RscEdit": { _value = ctrlText  _ctrl; };
+				case "RscCheckBox": { _value = cbChecked _ctrl;	};
+				case "RscXListBox";
+				case "RscCombo": {
+					_value = lbCurSel _ctrl;
+					_valueData = _ctrl lbText _value;
+					_expressions = call compile format ["dzn_DynamicAdvDialog_DropdownExpressions_%1", _i]
+				};
+				case "RscSlider": {
+					_value = sliderPosition _ctrl;
+					_valueData = sliderRange _ctrl;
+				};
+				default { _needCollectOutput = false; };
+			};
+			
+			if (_needCollectOutput) then {
+				_resultData pushBack _value;
+				if (typename _valueData == "STRING" && {_valueData != ""}) then {
+					_resultData pushBack _valueData;
+					_resultData pushBack _expressions;
+				};
+				
+				if (typename _valueData == "ARRAY") then { _resultData pushBack _valueData; };
+				
+				dzn_DynamicAdvDialog_Results pushBack _resultData;
+			};
+		};
+		
+		dzn_DynamicAdvDialog_Results
+	};
+};

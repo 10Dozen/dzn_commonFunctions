@@ -34,7 +34,7 @@
 	[ 0@LineNo, 1@Type("LABEL"), 2@Title, 3@TextStyling, 4@TileStyling]
 	
 	// BUTTON
-	[ 0@LineNo, 1@Type("BUTTON"), 2@Title, 3@Code, 4@TextStyling, 5@TileStyling, 6@ActiveTileStyling]
+	[ 0@LineNo, 1@Type("BUTTON"), 2@Title, 3@Code (where _this is list of dialog inputs results), 4@TextStyling, 5@TileStyling, 6@ActiveTileStyling]
 	
 	// DROPDOWN
 	[ 0@LineNo, 1@Type("LABEL"), 2@[0@Title, 1@Code], 3@TextStyling, 4@TileStyling]
@@ -43,6 +43,8 @@
 	[ 0@LineNo, 1@Type("INPUT"), 2@TextStyling, 3@TileStyling]
 
 
+
+addMissionEventHandler ["EachFrame", { if !(isNil "dzn_DynamicAdvDialog_Results") then { hint str[dzn_DynamicAdvDialog_Results] }]
 
 [
 	[0, "HEADER", "Dozins Menu"]
@@ -55,6 +57,30 @@
 	, [3, "BUTTON", "Action 3", {hint "Action 3 executed"}]
 	, [3, "BUTTON", "Action 4", {hint "Action 4 executed"}]
 ] call dzn_fnc_ShowAdvDialog
+
+[
+	[0, "HEADER", "Game Server Officer Menu"]
+	, [1, "LABEL", "Select teleport position"]
+	, [1, "DROPDOWN", ["Airfield", "Mike-26", "Kamino Firing range"], [tp1,tp2,tp3]]
+	
+	, [2, "LABEL","Hint (reason)"]
+	, [2, "INPUT"]
+	
+	, [3, "BUTTON", "Teleport", { 
+		private _tpInput = _this select 0;
+		player setPos (getPos ((_tpInput select 3) select (_tpInput select 1)));
+	}]
+	, [3, "BUTTON", "Show hint", {
+		private _hintText = _this select 1 select 1;
+		hint _hintText;
+	}]
+	, [3, "BUTTON", "Spawn vehicle", {
+		"C_Offroad_01_F" createVehicle position player;
+		hint "Spawned";
+	}]
+	, [3, "BUTTON", "End mission", {hint "No sweetie"}]
+] call dzn_fnc_ShowAdvDialog
+
 
 
 ((str(_expression) splitString "") select [1, count str(_expression) - 2]) joinString ""
@@ -157,7 +183,8 @@ with uiNamespace do {
 	private _dialog = findDisplay 134800;
 	private _items = [];
 	
-	private _crtlId = 14500;
+	private _ctrlId = 14500;
+	// missionNamespace setVariable ["dzn_DynamicAdvDialog_Results", []];
 	private _background = _dialog ctrlCreate ["RscText", -1];
 	
 	private _yOffset = 0;
@@ -196,40 +223,43 @@ with uiNamespace do {
 					_item ctrlSetPosition [_xOffset, _yOffset, _widthMultiplier, _ySize];
 				};
 				case "DROPDOWN": {
-					_item = _dialog ctrlCreate ["RscCombo", _crtlId];
+					_item = _dialog ctrlCreate ["RscCombo", _ctrlId];
 					_item ctrlSetPosition [_xOffset, _yOffset, _widthMultiplier, _ySize];		
 					_data apply { 
 						_item lbAdd (if (typename _x == "STRING") then { _x } else { str(_x) });
 					};
 					_item lbSetCurSel 0;
 					_item ctrlSetEventHandler [
-						"LBSelChanged"
+						"LBSelChanged"						
 						, "missionNamespace setVariable [
-							'dzn_DynamicAdvDialog_ReturnValue_" + str (_crtlId) + "'
+							'dzn_DynamicAdvDialog_ReturnValue_" + str (_ctrlId) + "'
 							, [_this select 1, (_this select 0) lbText (_this select 1)]
 						];"
 					];		
 					
 					missionNamespace setVariable [
-						format["dzn_DynamicAdvDialog_ReturnValue_%1",_crtlId]
+						format["dzn_DynamicAdvDialog_DropdownExpressions_%1",_ctrlId]
 						,_expression
 					];
+					
+					_ctrlId = _ctrlId + 1;
 				};
 				case "INPUT": {
-					_item = _dialog ctrlCreate ["RscEdit", _crtlId];
+					_item = _dialog ctrlCreate ["RscEdit", _ctrlId];
 					_item ctrlSetPosition [_xOffset, _yOffset, _widthMultiplier, _ySize];		
 					_item ctrlSetBackgroundColor _tileStyle;
 					_item ctrlSetEventHandler [
 						"KeyUp"
 						, "missionNamespace setVariable [
-							'dzn_DynamicAdvDialog_ReturnValue_" + str (_crtlId) + "'
+							'dzn_DynamicAdvDialog_ReturnValue_" + str (_ctrlId) + "'
 							, ctrlText (_this select 0)
 						];"
 					];
 					
+					_ctrlId = _ctrlId + 1;
 				};
 				case "BUTTON": {
-					_item = _dialog ctrlCreate ["RscButtonMenuOK", _crtlId];					
+					_item = _dialog ctrlCreate ["RscButtonMenuOK", -1];					
 					_item ctrlSetPosition [
 						_xOffset + 0.01*_widthMultiplier
 						, _yOffset
@@ -238,13 +268,22 @@ with uiNamespace do {
 					];
 					_item ctrlSetBackgroundColor _tileStyle;
 					_item ctrlSetActiveColor _activeStyle;
-					_item ctrlSetEventHandler ["ButtonClick", _expression];
+					
+					_item ctrlSetEventHandler [
+						"ButtonClick"
+						, format[ 
+							"with missionNamespace do {
+								private _this = call dzn_fnc_DynamicAdvDialog_getValues;
+								%1
+							}"
+							, _expression
+						]
+					];
 				};
 			};
 			
 			if !(_type in ["DROPDOWN","INPUT"]) then {
 				_item ctrlSetStructuredText parseText _data;
-				// _item ctrlSetText _data;
 			};
 			_item ctrlSetTextColor (_textStyle select 0);
 			_item ctrlSetFont (_textStyle select 1);
@@ -252,7 +291,6 @@ with uiNamespace do {
 			
 			_item ctrlCommit 0;
 		
-			_crtlId = _crtlId + 1;
 			_items pushBack _item;
 		} forEach _lineItems;
 		
@@ -260,7 +298,33 @@ with uiNamespace do {
 	} forEach _itemsProperties;
 	
 	CX3 = _yOffset;
+	missionNamespace setVariable ["dzn_DynamicAdvDialog_ControlID", _ctrlId];
 	_background ctrlSetBackgroundColor [0,0,0,.6];
-	_background ctrlSetPosition [0, (_itemsVerticalOffsets select 0), 1, _yOffset - (_itemsVerticalOffsets select 0) ];	//0.045 * ((count _itemsProperties)-1) ];
+	_background ctrlSetPosition [0, (_itemsVerticalOffsets select 0), 1, _yOffset - (_itemsVerticalOffsets select 0) ];
 	_background ctrlCommit 0;
-} 
+}; 
+
+if (isNil "dzn_fnc_DynamicAdvDialog_getValues") then {
+	dzn_fnc_DynamicAdvDialog_getValues = {
+		dzn_DynamicAdvDialog_Results = [];
+		for "_i" from 14500 to dzn_DynamicAdvDialog_ControlID do {
+			private _resultData = [_i];
+			private _value = call compile format ["dzn_DynamicAdvDialog_ReturnValue_%1", _i];
+			
+			if (typename _value == "ARRAY") then {
+				_resultData pushBack (_value select 0);
+				_resultData pushBack (_value select 1);
+			} else {
+				_resultData pushBack _value;
+			};
+			
+			if (!isNil {call compile format ["dzn_DynamicAdvDialog_DropdownExpressions_%1", _i]}) then {
+				_resultData pushBack (call compile format ["dzn_DynamicAdvDialog_DropdownExpressions_%1", _i]);
+			};
+		
+			dzn_DynamicAdvDialog_Results pushBack _resultData;
+		};
+		
+		dzn_DynamicAdvDialog_Results
+	};
+};

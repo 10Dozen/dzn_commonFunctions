@@ -1,7 +1,7 @@
 /*
-	@Pos = @Array of locations call dzn_fnc_getRandomPointInZone
+	@Pos = @Array of locations/triggers call dzn_fnc_getRandomPointInZone
 
-	Return random position inside given location or locations
+	Return random position inside given location/trigger or locations/triggers
 	INPUT:
 		0: ARRAY	- locations to find
 	OUTPUT:	ARRAY Pos3d

@@ -25,6 +25,13 @@
 		TileStyling (ARRAY)		- [@ColorRGBA, @Height] of element's background
 		ActiveTileStyling (ARRAY)	- [@ColorRGBA, @Size, @Font] of element (INPUT) on click
 		
+	_this in Button Code is an array of values formatted as:
+		INPUT			- [@InputText (STRING)]
+		DROPDOWN or LISTBOX	- [@SelectedItemID (SCALAR), @SelectedItemText (STRING), @ExpressionPerItem (ARRAY of CODE)]
+		CHECKBOX		- [@IsChecked (BOOL)]
+		SLIDER			- [@SelectedValue (SCALAR), [@MinimumValue (SCALAR), @MaximumValues (SCALAR)]]
+	Values are listed in order they where added (e.g. from line 0 to 5) and can be reffered as _this select 0 for 1st input item, _this select 6 for 7th input item and so on.	
+		
 	Examples:
 	[
 		[0, "HEADER", "Dynamic Advanced Dialog"]

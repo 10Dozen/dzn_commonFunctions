@@ -1,8 +1,21 @@
 /*
-	@Pos3d = 	[@Pos3d, @Radius, @Height] call dzn_fnc_getRandomPoint;
-	@Pos3d = 	[@Trg/Loc, @Height] call dzn_fnc_getRandomPoint
-			[ [Trg,Trg,Trg], @Height] call dzn_fnc_getRandomPoint
-*/
+ * @Pos3d = [@Pos3d, @Radius, @(optionalHeight] call dzn_fnc_getRandomPoint
+ * @Pos3d = [@Trigger/Location, @Height] call dzn_fnc_getRandomPoint
+ * @Pos3d = [ @List of Triggers, @Height] call dzn_fnc_getRandomPoint
+ *
+ * Return randomly selected Pos3d(ATL) if @Height is passed (if @Height is not passes - zero height is returned).
+ * 
+ * INPUT:
+ * 0: ARRAY or TRIGGER or LOCATION - Pos3d array or List of Triggers/Locations or single Trigger/Location.
+ * 1: NUMBER - Radius and/or Maximum height(optional)
+ * OUTPUT: ARRAY (Pos3d)
+ * 
+ * EXAMPLES:
+ *      _pos1 = [Trg1, 50] call dzn_fnc_getRandomPoint;
+ *      _pos2 = [[Trg2,Trg3,Trg4], 10] call dzn_fnc_getRandomPoint;
+ *      _pos3 = [[1000,1000,0], 150, 150] call dzn_fnc_getRandomPoint;
+ *      _posOnSurface = [Trg1] call dzn_fnc_getRandomPoint;
+ */
 
 private _pos = [];
 private _hIndex = 0;

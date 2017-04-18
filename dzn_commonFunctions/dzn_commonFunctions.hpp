@@ -139,9 +139,12 @@ class CfgFunctions
 			
 			class CountTextLines {};
 			class ShowBasicDialog {};
-			class ShowMessage {};
+			class ShowAdvDialog {};
 			class ShowChooseDialog {};
+			
+			class ShowMessage {};			
 			class ShowProgressBar {};
+			
 			class AddDraw3d {};
 			class RemoveDraw3d {};
 		};

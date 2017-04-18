@@ -1,30 +1,39 @@
 /*
-	[
-		@Artillery Unit or @Array of Units
-		, [@TgtPos, @Radius] or @Trigger or @Array of Triggers
-		, [@Salvos, @Delay, @(optional)RoundType]
-		, @(optional)BarrageFire (true by default)
-		, @(optional)ConditionToRun (code with _this reference to gun)
-	] spawn dzn_fnc_artilleryFiremission;
-
-	
-	
-	// 1 gun, 5 salvos of 1 roound in 5 minutes
-	[ Art1, [ [1000,1000,0], 30 ], [5, 10, "Sh_155mm_AMOS"]] spawn dzn_fnc_artilleryFiremission;
-	[ Art1, [Trg1,Trg2], [5, 20]] spawn dzn_fnc_artilleryFiremission;
-	[ Art4, Trg2, [5, 2]] spawn dzn_fnc_artilleryFiremission;
-	[ Art4, Trg2, [5,2,"8Rnd_82mm_Mo_Smoke_white"]] spawn dzn_fnc_artilleryFiremission;
-	[[Art3,Art4], [Trg1,Trg2], [ -30,2 ]] spawn dzn_fnc_artilleryFiremission
-	
-	// 3 guns, 3 salvos of total 9 rounds in 20*3 = 60 seconds
-	[ [Art1,Art2,Art3], [Trg1, Trg2], [3, 20, "8Rnd_82mm_Mo_Smoke_white"]] spawn dzn_fnc_artilleryFiremission;
-
-	// 2 guns, 6 salvos of 2 rounds in 10 mins
-	[ [Art1,Art2], [Trg1], [6, 1.6, "8Rnd_82mm_Mo_Smoke_white"]]  spawn dzn_fnc_artilleryFiremission;
-
-	// 5 guns, 12 salvos each of total 60 rounds in 12*35 = 7 mins, searching fire
-	[ [Art1, Art2, Art3, Art4, Art5], Trg1, [12, 35], false] spawn dzn_fnc_artilleryFiremission;
-*/
+ * [
+ *	@Battery
+ *	, @TargetingParams
+ *	, @FireParams
+ *	, @(optional)IsBarrageFire
+ *	, @(optional)ConditionToRun
+ * ] spawn  dzn_fnc_ArtilleryFiremission
+ *
+ * Assign firemission to artillery units. Unit will sent shells to the randomly selected position in given target area (trigger/triggers or position and radius). 
+ *      Unit may or may not use real magazines (e.g. infinite artillery firing).
+ * 
+ * INPUT:
+ * 0: OBJECT or ARRAY - Artillery unit or List of artillery units
+ * 1: ARRAY or TRIGGER - Targeting parameters as Trigger or List of Triggers, or [Pos3d, Radius] to represent area that should be attacked
+ * 2: ARRAY - Array of fire parameters in format [@Number of salvos, @Delay between salvos (seconds), @(optional)Round type (from artillery unit magazines)]. 
+ *                @Delay cannot be lower than 8 seconds.
+ * 3: BOOL - (optional) True for barrage fire or False to make units shoot continuously. 
+ *                For example, for 3 barrels battery, 2 salvos  with delay 10: 
+ *			(barrage) 3 shots, 10 seconds delay, 3 shots; 
+ *			(continuous) 1st barrel shot, 3.3 second delay, 2nd barrel shot, 3.3 second delay, 3rd barrel shot, 3.3 second delay, etc.
+ * 4: CODE - (optional) Condition to allow firemission, should return BOOL(true/false). Code will be executed for each gun to decide is it able to continue firemission (_this will be the reference to the gun)
+ * OUTPUT: NULL
+ * 
+ * EXAMPLES:
+ *      // 1 barrel, 2 salvos of HE, barrage fire each 15 seconds
+ *      [Mortar1, [getPos target, 25], [2, 15]] spawn dzn_fnc_artilleryFiremission;
+ *      
+ *      // 2 barrels, 6 salvos of Smoke, barrage fire each 10 seconds 
+ *      [ [Art1,Art2], [Trg1,Trg2], [6, 10, "8Rnd_82mm_Mo_Smoke_white"]] spawn dzn_fnc_artilleryFiremission;
+ *      
+ *      // 5 barrels, 12 salvos of HE, continuous fire during 12*35=420 sec (7 minutes)
+ *      [ [Art1, Art2, Art3, Art4, Art5], Trg1, [12, 35], false] spawn dzn_fnc_artilleryFiremission;
+ *      
+ *      
+ */
 
 params[
 	"_providerParams"

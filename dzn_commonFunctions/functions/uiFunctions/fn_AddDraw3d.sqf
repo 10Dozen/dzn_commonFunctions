@@ -1,61 +1,31 @@
 /*
-	[
-		@Object
-		, [@text, @color, @size, @Font, @Align]
-		, @PositionTemplate or @PositionExpression
-		, @VisibilityCondition
-		, (optional) @ChangeSizeOnDistnaceExpression
-		, 
-		, (optional) [@Icon, @Shadow, @Height, @Witdh, @Angle]
-	] call dzn_fnc_addDraw3d
-	
-	@object 	- 	object
-	
-	@text	-	string or code (should return string)
-	@color	-	array or code (should return 4-element array [R,G,B,A])
-	@size	-	number
-	@font	-	string
-	@align	-	string
-	
-	@PositionTemplate	-	string	(top, overhead, middle, center, under)
-	or @Position		-	code (should return Pos3d)
-	
-	@VisibilityCondition	-	string of code or code (should return bool)
-	
-	@ChangeSizeOnDistnaceExpression		-	code (should return Number (font size multiplier))
-	
-	Examples:
-	[gl1,["Gunner"]] call dzn_fnc_addDraw3d
-	
-	[gl1, ["Gunner"], "top","true", "1"] call dzn_fnc_addDraw3d
-	[gl1, ["Gunner"], "top","true", "1/(player distance _this)"] call dzn_fnc_addDraw3d
-	[gl1, ["Gunner"], "top","true", {1}] call dzn_fnc_addDraw3d
-	[gl1, ["Gunner"], "top","true", {1/(player distance _this)}] call dzn_fnc_addDraw3d
+ * @ID = [ 		
+ *	@Object
+ *	, [@Text, @(optional)ColorRGBA, @(optional)Size, @(optional)Font, @(optional)Align]
+ *	, (optional) @PositionTemplate or @PositionExpression
+ *	, (optional) @VisibilityCondition
+ *	, (optional) @ChangeSizeOnDistnaceExpression
+ * ] call dzn_fnc_addDraw3d dzn_fnc_addDraw3d
+ *
+ * Add draw3d action on each frame for selected item and with given parameters.
+ * 
+ * INPUT:
+ * 0: OBJECT - Object to attach Draw3d label
+ * 1: ARRAY - Text and styling settings in format [@Text (STRING or CODE), (@ColorRGBA (ARRAY or CODE), @Size (SCALAR), @Font (STRING), @Align (STRING))]. 
+ *                For @Text(CODE) - code should return STRING; @ColorRGBA(CODE) - code should return ARRAY (_this is the reference to object)
+ * 2: STRING or CODE - (optional) Position template ("ovehead","top","under","middle","direct") or Code, where _this is the reference to object, should return Pos3d (e.g. [1000,1000,10] or [visiblePosition _this select 0, visiblePosition _this select 1, visiblePosition _this select 2] )
+ * 3: CODE or STRING - (optional) Visibility condition code, should return BOOL (true/false).
+ * 4: CODE or STRING - (optional) Expression of changing size depending on distance, should return SCALAR (number). _this is the reference to object. To disable size change set "1" or {1}
+ * OUTPUT: ID of Draw3d (SCALAR)
+ * 
+ * EXAMPLES:
+ *      _id = [gl1,["Gunner"]] call dzn_fnc_addDraw3d;
+ *      _id = [gl1,[{primaryWeapon _this}], "TOP",{alive _this}] call dzn_fnc_addDraw3d;
+ *      _id = [gl1, ["Gunner", 1, "PuristaLight"]], {[visiblePosition _this select 0, visiblePosition _this select 1, 5]}] call dzn_fnc_addDraw3d;
+ * 
+ */
 
-	[gl1,["Gunner"],"top","false"] call dzn_fnc_addDraw3d
-	[gl1,["Gunner"],"top",{false}] call dzn_fnc_addDraw3d
-	[gl1,["Gunner"],"top",{true}] call dzn_fnc_addDraw3d
-	[gl1,["Gunner"],"top",{A > 1}] call dzn_fnc_addDraw3d
 
-	[gl1,[{primaryWeapon _this}]] call dzn_fnc_addDraw3d
-	[gl1,["Gunner", {[1,0,0,A]}]] call dzn_fnc_addDraw3d
-
-	[gl1, ["Gunner",[1,0,0,1]]] call dzn_fnc_addDraw3d
-	[gl1, ["Gunner",[1,1,1,1], 1]] call dzn_fnc_addDraw3d
-	[gl1, ["Gunner",[1,1,1,1], 1, "PuristaLight"]] call dzn_fnc_addDraw3d
-	[gl1, ["Gunner",[1,1,1,1], 0.5, "PuristaLight","left"]] call dzn_fnc_addDraw3d
-	
-	[gl1, ["Gunner"], "top"] call dzn_fnc_addDraw3d
-	[gl1, ["Gunner"], "middle"] call dzn_fnc_addDraw3d
-	[gl1, ["Gunner"], "under"] call dzn_fnc_addDraw3d
-	[gl1, ["Gunner"], "overhead"] call dzn_fnc_addDraw3d
-	[gl1, ["Gunner"], "center"] call dzn_fnc_addDraw3d
-	
-	[gl1, ["Gunner"], {getPos player}] call dzn_fnc_addDraw3d
-	[gl1, ["Gunner"], {[visiblePosition _this select 0, visiblePosition _this select 1, 5]}] call dzn_fnc_addDraw3d
-	[gl1, ["Gunner"], "default should be here"] call dzn_fnc_addDraw3d
-
-*/
 if !(hasInterface) exitWith {};
 
 params [
@@ -91,14 +61,17 @@ private _pos = "";
 if (typename _postionParam == "STRING") then {
 	_pos = switch toLower(_postionParam) do {
 		case "top": {
-			"[visiblePosition _this select 0, visiblePosition _this select 1, 2.2]"
+			"[visiblePosition _this select 0, visiblePosition _this select 1, (visiblePosition _this select 2) + 2.2]"
 		};
 		case "middle": {
-			"[visiblePosition _this select 0, visiblePosition _this select 1, 1.25]"
+			"[visiblePosition _this select 0, visiblePosition _this select 1, (visiblePosition _this select 2) + 1.25]"
 		};
 		case "under": {
-			"[visiblePosition _this select 0, visiblePosition _this select 1, -0.25]"
-		};			
+			"[visiblePosition _this select 0, visiblePosition _this select 1, (visiblePosition _this select 2) - 0.25]"
+		};
+		case "direct": {
+			"[visiblePosition _this select 0, visiblePosition _this select 1, visiblePosition _this select 2]"
+		};
 		case "overhead": {
 			"[visiblePosition _this select 0, visiblePosition _this select 1, ((_this modelToWorld (_this selectionPosition 'head')) select 2) + 0.75]"
 		};

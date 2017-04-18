@@ -1,4 +1,5 @@
 /*
+ *	NOTE: Only 81mm mortars are capable (or any artillery with muzzle velocity below 305 m/s)
  * [
  *	@Battery
  *	, @TargetingParams

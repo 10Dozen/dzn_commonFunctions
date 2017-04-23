@@ -22,7 +22,7 @@ params[
 ];
 
 if (_isGlobal) then {
-	[_u, _animation, _u call _loopCondition, false, true] remoteExec ["dzn_fnc_playAnimLoop"];
+	[_u, _animation, _loopCondition, false, true] remoteExec ["dzn_fnc_playAnimLoop"];
 };
 	
 private _exit = false;

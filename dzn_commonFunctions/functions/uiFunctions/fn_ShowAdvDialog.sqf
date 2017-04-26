@@ -22,8 +22,8 @@
 		Code (CODE)			- code to execute on button click (all dialog values are available as _this. To close dialog - use closeDialog 2)
 		ExpressionsPerItem (ARRAY)	- array of code for each item in list for DROPDOWN or LISTBOX
 		TextStyling (ARRAY)		- [@ColorRGBA, @Font, @Size] of element
-		TileStyling (ARRAY)		- @ColorRGBA of element's background
-		ActiveTileStyling (ARRAY)	- @ColorRGBA of element (INPUT) on click
+		TileStyling (ARRAY)		- [@ColorRGBA, @Height] of element's background
+		ActiveTileStyling (ARRAY)	- [@ColorRGBA, @Size, @Font] of element (INPUT) on click
 		
 	_this in Button Code is an array of values formatted as:
 		INPUT			- [@InputText (STRING)]
@@ -291,7 +291,7 @@ with uiNamespace do {
 						_xOffset + 0.01*_widthMultiplier
 						, _yOffset
 						, 0.99*_widthMultiplier
-						, _ySize - 0.005
+						, _ySize - 0.001
 					];
 					_item ctrlSetBackgroundColor _tileStyle;
 					_item ctrlSetActiveColor _activeStyle;

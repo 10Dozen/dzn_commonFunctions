@@ -6,8 +6,8 @@
 	Item types and syntax:
 	
 	[ 0@LineNo, 1@Type("HEADER"), 2@Title, 3@(optional)TextStyling, 4@(optional)TileStyling ]
-	[ 0@LineNo, 1@Type("LABEL"), 2@Title, 3(optional)@TextStyling, 4(optional)@TileStyling ]
-	[ 0@LineNo, 1@Type("BUTTON"), 2@Title, 3@Code, 4@(optional)TextStyling, 5@(optional)TileStyling, 6@(optional)ActiveTileStyling ]
+	[ 0@LineNo, 1@Type("LABEL"), 2@Title, 3(optional)@TextStyling]
+	[ 0@LineNo, 1@Type("BUTTON"), 2@Title, 3@Code, 4@(optional)Arguments, 5@(optional)TextStyling, 6@(optional)TileStyling, 7@(optional)ActiveTileStyling ]
 	[ 0@LineNo, 1@Type("DROPDOWN"), 2@ListItems, 3@(optional)ExpressionsPerItem, 4@(optional)TextStyling, 5@(optional)TileStyling ]
 	[ 0@LineNo, 1@Type("LISTBOX"), 2@ListItems, 3@(optional)ExpressionsPerItem, 4@(optional)TextStyling, 5@(optional)TileStyling ]
 	[ 0@LineNo, 1@Type("CHECKBOX"), 2@(optional)TextStyling, 3@(optional)TileStyling ]	
@@ -20,9 +20,10 @@
 		ListItems (ARRAY)		- array of elements names for DROPDOWN and LISTBOX
 		[@Min,@Max,@Current]	- scalar values for SLIDER
 		Code (CODE)			- code to execute on button click (all dialog values are available as _this. To close dialog - use closeDialog 2)
+		Argument (CODE)			- arguments that available in button code as _args
 		ExpressionsPerItem (ARRAY)	- array of code for each item in list for DROPDOWN or LISTBOX
 		TextStyling (ARRAY)		- [@ColorRGBA, @Font, @Size] of element
-		TileStyling (ARRAY)		- [@ColorRGBA, @Height] of element's background
+		TileStyling (ARRAY)		- @ColorRGBA of element's background
 		ActiveTileStyling (ARRAY)	- [@ColorRGBA, @Size, @Font] of element (INPUT) on click
 		
 	_this in Button Code is an array of values formatted as:
@@ -66,7 +67,15 @@
 
 	] call dzn_fnc_ShowAdvDialog
 
+	[
+		[0, "HEADER", "Dynamic Advanced Dialog",  [[1,0,1,1], "PuristaBold", 0.04],[1,0,1,1] ]
+		, [1, "LABEL", "Select teleport position",[[1,0,1,1], "PuristaBold", 0.04],[1,0,1,1]]
+		, [1, "DROPDOWN", ["Airfield", "Mike-26", "Kamino Firing range"], [tp1,tp2,tp3],[[1,0,0,1], "PuristaBold", 0.04],[1,0,1,1]]
+		, [1, "LISTBOX", ["Airfield", "Mike-26", "Kamino Firing range"], [tp1,tp2,tp3],[[1,0,0,1], "PuristaBold", 0.04],[1,0,1,1]]
+		, [2, "BUTTON", "End mission", {hint _args}, "ARgument", [[1,0,0,1], "PuristaBold", 0.04],[0,0,1,1]]
+		, [2, "INPUT", [[1,0,0,1], "PuristaBold", 0.04],[0,0,1,1]]
 
+	] call dzn_fnc_ShowAdvDialog
 */
 
 disableSerialization;
@@ -80,7 +89,6 @@ disableSerialization;
 private _defaultTextStyling 		= [[1,1,1,1], "PuristaLight", 0.04];
 private _defaultElementStyling 		= [0,0,0,0.7];
 private _defaultHeaderStyling 		= [0.77, 0.51, 0.08, 0.8];
-private _defaultActiveElementStyling 	= [1,1,1,0.7];
 
 private _itemsProperties = [];
 private _itemsVerticalOffsets = [];
@@ -92,8 +100,8 @@ private _itemsVerticalOffsets = [];
 	private _data = "";
 	private _textParams = _defaultTextStyling;
 	private _tileParams = _defaultElementStyling;
-	private _activeTileParams = _defaultActiveElementStyling;
 	private _expression = "true";
+	private _args = [];
 	
 	switch (_type) do {
 		case "HEADER": {
@@ -113,7 +121,6 @@ private _itemsVerticalOffsets = [];
 			_data = _x select 2;
 			if !(isNil {_x select 3}) then {
 				_textParams = _x select 3;
-				if !(isNil {_x select 4}) then { _tileParams = _x select 4 };
 			};
 		};
 		case "BUTTON": {		
@@ -121,11 +128,11 @@ private _itemsVerticalOffsets = [];
 			_data = _x select 2;
 			if !(isNil {_x select 3}) then {
 				_expression = ((str(_x select 3) splitString "") select [1, count str(_x select 3) - 2]) joinString "";
-				if !(isNil {_x select 4}) then { 
-					_textParams = _x select 4;
+				if !(isNil {_x select 4}) then {
+					_args = _x select 4;
 					if !(isNil {_x select 5}) then { 
-						_tileParams = _x select 5;
-						if !(isNil {_x select 6}) then { _activeTileParams = _x select 6 };
+						_textParams = _x select 5;
+						if !(isNil {_x select 6}) then { _tileParams = _x select 6; };
 					};
 				};
 			};
@@ -181,7 +188,7 @@ private _itemsVerticalOffsets = [];
 	};
 	
 	private _widthMultiplier = 1 / ( {(_x select 0 )== _line} count _this );
-	private _lineProperties = [_line, _type, _data, _textParams, _tileParams, _activeTileParams, _expression, _widthMultiplier];
+	private _lineProperties = [_line, _type, _data, _textParams, _tileParams, _expression, _widthMultiplier, [_args, ["STRING"]] call dzn_fnc_stringify];
 	
 	if (isNil {_itemsProperties select _line}) then {
 		_itemsProperties set [_line, [ _lineProperties ]];
@@ -218,9 +225,9 @@ with uiNamespace do {
 			private _data = _x select 2;
 			private _textStyle = _x select 3;	// [ 0@Color, 1@Font, 2@Size ]	
 			private _tileStyle = _x select 4;	// 0@Color
-			private _activeStyle = _x select 5; // @Color
-			private _expression = _x select 6;
-			private _widthMultiplier = _x select 7;		
+			private _expression = _x select 5;
+			private _widthMultiplier = _x select 6;
+			private _args = _x select 7;
 			
 			private _item = -1;
 			switch (_type) do {
@@ -243,14 +250,19 @@ with uiNamespace do {
 				case "DROPDOWN";
 				case "LISTBOX": {				
 					_item = _dialog ctrlCreate [if (_type == "DROPDOWN") then { "RscCombo" } else { "RscXListBox" }, _ctrlId];
-					_item ctrlSetPosition [_xOffset, _yOffset, _widthMultiplier, _ySize];		
-					_data apply { _item lbAdd (if (typename _x == "STRING") then { _x } else { str(_x) }); };
+					_item ctrlSetPosition [_xOffset, _yOffset, _widthMultiplier, _ySize];
+					_item ctrlSetBackgroundColor _tileStyle;					
+					{ 
+						_item lbAdd (if (typename _x == "STRING") then { _x } else { str(_x) }); 
+						_item lbSetColor [_forEachIndex, _textStyle select 0];
+					} forEach _data; 
 					_item lbSetCurSel 0;
 					
 					missionNamespace setVariable [
 						format["dzn_DynamicAdvDialog_DropdownExpressions_%1",_ctrlId]
 						,_expression
 					];
+					
 					
 					_ctrlId = _ctrlId + 1;
 				};
@@ -294,16 +306,17 @@ with uiNamespace do {
 						, _ySize - 0.001
 					];
 					_item ctrlSetBackgroundColor _tileStyle;
-					_item ctrlSetActiveColor _activeStyle;
 					
 					_item ctrlSetEventHandler [
 						"ButtonClick"
 						, format[ 
 							"with missionNamespace do {
 								private _this = call dzn_fnc_DynamicAdvDialog_getValues;
+								private _args = %2;
 								%1
 							}"
 							, _expression
+							, _args
 						]
 					];
 				};

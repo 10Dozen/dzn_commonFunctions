@@ -27,7 +27,7 @@ private _keypointsList = +_keypoints;
 private "_wp";
 for "_i" from 1 to _numberOfPoints do {	
 	private _keypoint = _keypointsList call dzn_fnc_selectAndRemove;
-	_wp = _grp addWaypoint [_keypoint, 100];
+	_wp = _grp addWaypoint [_keypoint, 0];
 	_wp setWaypointTimeout _timeouts;
 };
 

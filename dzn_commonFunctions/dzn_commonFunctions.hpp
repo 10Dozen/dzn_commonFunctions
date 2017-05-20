@@ -31,7 +31,7 @@ class CfgFunctions
 		{
 			file = "dzn_commonFunctions\functions\commonFunctions";
 			
-			class getMissionParametes {};
+			class getMissionParameters {};
 			class getValueByKey {};
 			class setValueByKey {};	
 			class setVars {};

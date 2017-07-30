@@ -36,6 +36,7 @@ class CfgFunctions
 			class setValueByKey {};	
 			class setVars {};
 			class selectAndRemove {};
+			class runLoop {};
 
 			class assignInVehicle {};
 			class createVehicle  {};

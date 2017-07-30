@@ -18,7 +18,7 @@ _zoneRoads = [];
 		_locPos = locationPosition _loc;
 		_locSize = [size _loc select 0, size _loc select 1];
 	} else { 
-		_locPos = getPosASL _loc;
+		_locPos = getPosATL _loc;
 		_locSize = [triggerArea  _loc select 0, triggerArea  _loc select 1];
 	};	
 	

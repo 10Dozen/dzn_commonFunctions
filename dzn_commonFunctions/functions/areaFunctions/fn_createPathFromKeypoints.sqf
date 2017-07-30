@@ -32,7 +32,7 @@ for "_i" from 1 to _numberOfPoints do {
 };
 
 if (_cycle) then {
-	_wp = _grp addWaypoint [getPosASL (units _grp select 0), 0];
+	_wp = _grp addWaypoint [getPosATL (units _grp select 0), 0];
 	_wp setWaypointType "CYCLE";	
 };
 

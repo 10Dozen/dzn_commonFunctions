@@ -8,4 +8,4 @@ if (call _exitOn) exitWith {};
 _args spawn _code;
 sleep _delay;
 
-_this spawn fn_runLoop;
+_this spawn dzn_fnc_runLoop;

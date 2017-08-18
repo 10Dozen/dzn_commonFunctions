@@ -1,6 +1,6 @@
 /*
  * [@Unit, @Animation, @Condition, @IsGlobal] call dzn_fnc_playAnimLoop
- * Run looped animation until condition returns True.
+ * Run looped animation while condition returns True.
  * 
  * INPUT:
  * 0: OBJECT - Unit animation will be applied to

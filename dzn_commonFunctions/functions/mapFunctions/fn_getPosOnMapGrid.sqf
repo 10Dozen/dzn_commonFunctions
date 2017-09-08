@@ -12,6 +12,6 @@ private _offsets = [
 
 [
 	parseNumber (_pos select [0,4]) * 10 - (_offsets select 0)
-	, parseNumber (_pos select [5,4]) * 10 - (_offsets select 1)
+	, parseNumber (_pos select [4,4]) * 10 - (_offsets select 1)
 	, 0
 ]

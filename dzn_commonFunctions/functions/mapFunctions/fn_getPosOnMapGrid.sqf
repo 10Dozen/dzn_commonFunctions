@@ -9,6 +9,8 @@ private _offsets = [
 	, parseNumber(mapGridPosition [0,0,0] select [5,5])
 ];
 
+_this = _this splitString " " joinString "";
+
 [
 	parseNumber (_this select [0,4]) * 10 - (_offsets select 0)
 	, parseNumber (_this select [5,4]) * 10 - (_offsets select 1)

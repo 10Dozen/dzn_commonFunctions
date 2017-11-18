@@ -13,7 +13,7 @@
  */	
 	
 params["_assets", ["_removeType", "none"]];
-private _assetLogics = if (typename _assets == "ARRAY") then { _assets } else { _synchronizedObjects _logic };
+private _assetLogics = if (typename _assets == "ARRAY") then { _assets } else { synchronizedObjects _logic };
 private _selectedAssetLogic = selectRandom _assetLogics;
 
 if (toLower(_removeType) == "none") exitWith { _selectedAssetLogic };

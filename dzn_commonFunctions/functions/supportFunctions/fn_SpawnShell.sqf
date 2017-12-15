@@ -17,5 +17,11 @@ _shell setVectorDirandUp [[0,0,-1],[0.1,0.1,1]];
 _shell setVelocity [0, 0, _v];
 
 // handle flare shells
+/*
+	Velocity of flare is -4.42868
+	
+	[ [0,1,2,3,4,_shell], "mortar"/"howitzer"] call dzn_fnc_flares_setFlareEffectGlobal 
+
+*/
 
 _shell

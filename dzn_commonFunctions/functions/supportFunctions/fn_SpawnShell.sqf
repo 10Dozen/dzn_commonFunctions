@@ -1,9 +1,9 @@
 /*
  *	Spawn artillery shell of given type over the position in given heigth with given vertical speed.
- *	@ShellObj = [@Pos2d/3d, @ShellType, @Height, @Velocity] call dzn_fnc_spawnShell
+ *	@ShellObj = [@Pos2d/3d, (opt)@ShellType, (opt)@Height, (opt)@Velocity] call dzn_fnc_spawnShell
  *
  *
- 	"Sh_82mm_AMOS"
+ 	"Sh_82mm_AMOS" (default)
 	,"Smoke_82mm_AMOS_White"
 	,"Flare_82mm_AMOS_White"
 */

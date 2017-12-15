@@ -16,12 +16,13 @@ private _shell = _type createVehicle _pos;
 _shell setVectorDirandUp [[0,0,-1],[0.1,0.1,1]]; 
 
 if (_type isKindOf "FlareCore") then {
+	if (isNil "dzn_fnc_flares_setFlareEffectGlobal") exitWith { deleteVehicle _shell; objNull };
 	_shell setPosATL [
 		_pos select 0
 		, _pos select 1
 		, 300
 	];
-		
+	
 	[[0,0,0,0,0,_shell], "mortar"] call dzn_fnc_flares_setFlareEffectGlobal;
 	
 	_shell setVelocity [0,0,1];

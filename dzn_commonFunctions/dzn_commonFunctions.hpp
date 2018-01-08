@@ -73,6 +73,7 @@ class CfgFunctions
 			class getLocationBuildings {};
 			class getLocationRoads {};
 			class assignInBuilding {};
+			class selectRandomAsset {};
 		};
 		
 		class mapFunctions

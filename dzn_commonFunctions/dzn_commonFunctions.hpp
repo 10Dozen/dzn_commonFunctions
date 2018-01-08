@@ -43,6 +43,8 @@ class CfgFunctions
 			
 			class setVelocityDirAndUp {};
 			class stringify {};
+			
+			class getVersion {};
 		};
 		
 		class areaFunctions

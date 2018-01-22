@@ -13,7 +13,7 @@
  *      [_shell, [800, 25, 40], false] call dzn_fnc_setShellFlareEffect;
  */
  
- params ["_o", ["_flareSettings", [400,25,10]], ["_isMortar", true]];
+params ["_o", ["_flareSettings", [400,25,10]], ["_isMortar", true]];
 
 private _range = _flareSettings select 0;
 private _intensity = _flareSettings select 1;
@@ -30,9 +30,11 @@ for "_i" from 1 to (if (_isMortar) then { 1 } else { 2 }) do {
 	_flareStars pushBack _flareStar;
 };
 
+sleep 3;
+
 private _flare = "#lightpoint" createVehicleLocal (getPosVisual _o);
-_flare setLightAmbient _color;
-_flare setLightColor _color;
+_flare setLightAmbient [1,1,1];
+_flare setLightColor [1,1,1];
 _flare setLightIntensity _intensity;
 _flare setLightUseFlare true;
 _flare setLightAttenuation [_range, 1, 100, 0, 50, (_range - 10)];

@@ -35,7 +35,7 @@ if (_type isKindOf "FlareCore") then {
 			[600,25,10]
 		}
 		, _isMortar
-	] call dzn_fnc_setShellFlareEffecGlobal;
+	] call dzn_fnc_setShellFlareEffectGlobal;
 
 	_shell setVelocity [0,0,0.1];
 	_shell spawn {

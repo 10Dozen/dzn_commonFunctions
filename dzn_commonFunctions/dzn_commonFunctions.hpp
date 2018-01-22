@@ -1,6 +1,6 @@
 // *************************************
 // DZN COMMON FUNCTIONS 
-// v1.1
+// v1.2
 // *************************************
 // Common functions are very common and useful for any missions
 // Area functions provide support of creating locations from triggers, getting points and building inside given areas. It is required for DZN_DYNAI
@@ -112,6 +112,10 @@ class CfgFunctions
 			class ArtilleryFiremission {};
 			class SelectFiremissionCharge {};
 			class CancelFiremission {};
+			class SpawnShell {};
+			class setShellFlareEffect {};
+			class setShellFlareEffectGlobal {};
+			class StartVirtualFiremission {};
 		};
 		
 		class uiFunctions

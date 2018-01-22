@@ -112,6 +112,7 @@ class CfgFunctions
 			class SpawnShell {};
 			class setShellFlareEffect {};
 			class setShellFlareEffectGlobal {};
+			class StartVirtualFiremission {};
 		};
 		
 		class uiFunctions

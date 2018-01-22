@@ -26,16 +26,16 @@ private _shell = _type createVehicle _pos;
 _shell setVectorDirandUp [[0,0,-1],[0.1,0.1,1]];
 
 if (_type isKindOf "FlareCore") then {
-	private _flare = objNull;
-	for "_i" from 1 to (if (_isMortar) then { 1 } else { 2 }) do {
-		_flare = "F_40mm_White" createVehicle [0,0,0];
-		_flare attachTo [_shell, [0,0,0]];
-	};
-
-	if (isNil "dzn_fnc_flares_setFlareEffectGlobal") exitWith { deleteVehicle _shell; objNull };
-
 	_shell setPosATL [_pos select 0, _pos select 1, 280];
-	[_shell, "mortar"] call dzn_fnc_flares_setFlareEffectGlobal;
+	[
+		_shell
+		, if (_isMortar) then {
+			[400,25,10]
+		} else {
+			[600,25,10]
+		}
+		, _isMortar
+	] call dzn_fnc_setShellFlareEffecGlobal;
 
 	_shell setVelocity [0,0,0.1];
 	_shell spawn {

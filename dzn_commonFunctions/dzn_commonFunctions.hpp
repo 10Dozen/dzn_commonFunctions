@@ -109,6 +109,9 @@ class CfgFunctions
 			class ArtilleryFiremission {};
 			class SelectFiremissionCharge {};
 			class CancelFiremission {};
+			class SpawnShell {};
+			class setShellFlareEffect {};
+			class setShellFlareEffectGlobal {};
 		};
 		
 		class uiFunctions

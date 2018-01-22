@@ -1,6 +1,6 @@
 
 /*
- * [@Shell, @FlareSettings, @IsMortar] call dzn_fnc_setShellFlareEffecGlobal
+ * [@Shell, @FlareSettings, @IsMortar] call dzn_fnc_setShellFlareEffectGlobal
  * Executes Flare effect script for given shell on all clients.
  * 
  * INPUT:
@@ -10,8 +10,8 @@
  * OUTPUT: NONE
  * 
  * EXAMPLES:
- *      [_shell] call dzn_fnc_setShellFlareEffecGlobal;
- *      [_shell, [800, 25, 40], false] call dzn_fnc_setShellFlareEffecGlobal;
+ *      [_shell] call dzn_fnc_setShellFlareEffectGlobal;
+ *      [_shell, [800, 25, 40], false] call dzn_fnc_setShellFlareEffectGlobal;
  */
  
 params ["_o", ["_flareSettings", [400,25,10]], ["_isMortar", true]];

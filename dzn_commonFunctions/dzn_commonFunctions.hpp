@@ -43,6 +43,8 @@ class CfgFunctions
 			
 			class setVelocityDirAndUp {};
 			class stringify {};
+			
+			class getVersion {};
 		};
 		
 		class areaFunctions
@@ -71,6 +73,7 @@ class CfgFunctions
 			class getLocationBuildings {};
 			class getLocationRoads {};
 			class assignInBuilding {};
+			class selectRandomAsset {};
 		};
 		
 		class mapFunctions

@@ -28,7 +28,7 @@
 		
 	_this in Button Code is an array of values formatted as:
 		INPUT			- [@InputText (STRING)]
-		DROPDOWN or LISTBOX	- [@SelectedItemID (SCALAR), @SelectedItemText (STRING), @ExpressionPerItem (ARRAY of CODE)]
+		DROPDOWN or LISTBOX	- [@SelectedItemID (SCALAR), @SelectedItemText (STRING), @ExpressionPerItem (ARRAY of CODE), @SelectedExpression]
 		CHECKBOX		- [@IsChecked (BOOL)]
 		SLIDER			- [@SelectedValue (SCALAR), [@MinimumValue (SCALAR), @MaximumValues (SCALAR)]]
 	Values are listed in order they where added (e.g. from line 0 to 5) and can be reffered as _this select 0 for 1st input item, _this select 6 for 7th input item and so on.	
@@ -354,10 +354,10 @@ if (isNil "dzn_fnc_DynamicAdvDialog_getValues") then {
 			
 			private _value = "";
 			private _valueData = "";
-			private _expressions = [];			
+			private _expressions = [];
+			private _selectedValue = -1;
 			private _needCollectOutput = true;
-			
-			
+
 			switch (ctrlClassName _ctrl) do {
 				case "RscEdit": { _value = ctrlText  _ctrl; };
 				case "RscCheckBox": { _value = cbChecked _ctrl;	};
@@ -365,7 +365,8 @@ if (isNil "dzn_fnc_DynamicAdvDialog_getValues") then {
 				case "RscCombo": {
 					_value = lbCurSel _ctrl;
 					_valueData = _ctrl lbText _value;
-					_expressions = call compile format ["dzn_DynamicAdvDialog_DropdownExpressions_%1", _i]
+					_expressions = call compile format ["dzn_DynamicAdvDialog_DropdownExpressions_%1", _i];
+					_selectedValue = if (typename _value == "SCALAR" && count _expressions > 0) then { _expressions select _value } else { -1 };
 				};
 				case "RscSlider": {
 					_value = sliderPosition _ctrl;
@@ -379,6 +380,9 @@ if (isNil "dzn_fnc_DynamicAdvDialog_getValues") then {
 				if (typename _valueData == "STRING" && {_valueData != ""}) then {
 					_resultData pushBack _valueData;
 					_resultData pushBack _expressions;
+					if !(typename _selectedValue == "SCALAR" && {_selectedValue == -1}) then {
+						_resultData pushBack _selectedValue;
+					};
 				};
 				
 				if (typename _valueData == "ARRAY") then { _resultData pushBack _valueData; };

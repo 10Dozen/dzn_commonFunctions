@@ -8,7 +8,7 @@
  * 2: ARRAY of strings - array of roles in vehicle: "driver", "gunner", "commander", "cargo", "turret1" (e.g. ["driver", "gunner"])
  * 3: STRING - (optional) name of the dzn_gear kit
  * 4: NUMBER - (optional) skill level of the crew
- * 5: STRING - (optional) classname of crewmans
+ * 5: STRING - (optional) classname of crewmen
  * OUTPUT: GROUP (crew group)
  * 
  * EXAMPLES:
@@ -18,7 +18,7 @@
 params ["_vehicle","_side","_roles",["_kit",""],["_skill",0.9],["_class",""]];
 
 private _grp = createGroup _side;
-if (_class isEqualTo []) then {
+if (_class isEqualTo "") then {
 	_class = switch (_side) do {
 		case west: { "B_crew_F" };
 		case east: { "O_crew_F" };

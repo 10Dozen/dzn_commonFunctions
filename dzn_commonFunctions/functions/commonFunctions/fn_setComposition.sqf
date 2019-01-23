@@ -1,7 +1,7 @@
 /*
 	[ @BasicPointObject or [@Pos, @Direction], @CompositionArray] call dzn_fnc_setComposition
 	EXAMPLE 1:	 [ player, [...] ] call dzn_fnc_setComposition
-	EXAMPLE 2:	 [ [[232, 421,124], 180], [...] ] call dzn_fnc_setComposition
+	EXAMPLE 2:	 [ [1232, 1421, 0], 180], [...] ] call dzn_fnc_setComposition
 	
 	0 (OBJECT) or [@Pos3d, @Direction] - basic point (and direction)
 	1 (ARRAY) - composition array in format [ 
@@ -40,7 +40,7 @@ if (typename (_this select 0) == "ARRAY") then {
 	
 	// Spawn object
 	_obj = (_x select 0) createVehicle _pos;
-	_obj enableSimulationGlobal false;
+	[_obj, false] remoteExec ["enableSimulationGlobal",2];
 	_spawnedObjects pushBack _obj;
 	
 	// Place object
@@ -62,7 +62,7 @@ if (typename (_this select 0) == "ARRAY") then {
 
 {
 	_x allowDamage false;
-	_x enableSimulationGlobal (_x getVariable ["dzn_simulation", true]); 
+	[_x, _x getVariable ["dzn_simulation", true]] remoteExec ["enableSimulationGlobal",2];
 	_x spawn { 
 		sleep 2;
 		_this allowDamage true; 

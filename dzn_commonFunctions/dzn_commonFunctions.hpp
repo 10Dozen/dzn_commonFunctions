@@ -126,6 +126,9 @@ class CfgFunctions
 			class ShowBasicDialog {};
 			class ShowAdvDialog {};
 			class ShowChooseDialog {};
+
+			class CreateControl {};
+			class GetDisplay {};
 			
 			class ShowMessage {};			
 			class ShowProgressBar {};

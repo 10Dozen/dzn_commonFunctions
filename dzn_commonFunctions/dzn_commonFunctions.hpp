@@ -1,6 +1,6 @@
 // *************************************
-// DZN COMMON FUNCTIONS 
-// v1.2
+// DZN COMMON FUNCTIONS
+// v1.3
 // *************************************
 // Common functions are very common and useful for any missions
 // Area functions provide support of creating locations from triggers, getting points and building inside given areas. It is required for DZN_DYNAI
@@ -19,10 +19,10 @@ class CfgFunctions
 		class commonFunctions
 		{
 			file = "dzn_commonFunctions\functions\commonFunctions";
-			
+
 			class getMissionParameters {};
 			class getValueByKey {};
-			class setValueByKey {};	
+			class setValueByKey {};
 			class setVars {};
 			class selectAndRemove {};
 			class runLoop {};
@@ -32,83 +32,84 @@ class CfgFunctions
 			class createVehicleCrew {};
 			class isCombatCrewAlive {};
 			class getPosOnGivenDir  {};
-			
+
 			class getComposition {};
 			class setComposition {};
-			
+
 			class inString {};
-			
+
 			class addAction {};
 			class playAnimLoop {};
-			
+
 			class setVelocityDirAndUp {};
 			class stringify {};
-			
+
 			class getVersion {};
 		};
-		
+
 		class areaFunctions
 		{
 			file = "dzn_commonFunctions\functions\areaFunctions";
-			
+
 			class convertTriggerToLocation {};
 			class isInLocation {};
 			class isInWater {};
 			class isInArea2d {};
-			
+
 			class isPlayerNear {};
 			class isPlayerInArea {};
 			class ccUnits {};
 			class ccPlayers {};
-			
+
 			class getRandomPoint {};
 			class getRandomPointInZone {};
 			class getZonePosition {};
 			class createPathFromKeypoints {};
 			class createPathFromRandom {};
 			class createPathFromRoads {};
-			
-			class getHousesNear {};	
+
+			class getHousesNear {};
 			class getHousePositions {};
 			class getLocationBuildings {};
 			class getLocationRoads {};
 			class assignInBuilding {};
 			class selectRandomAsset {};
 		};
-		
+
 		class mapFunctions
 		{
 			file = "dzn_commonFunctions\functions\mapFunctions";
-			
+
 			class createMarkerIcon {};
 			class getMapGrid {};
 			class getPosOnMapGrid {};
 		};
-		
+
 		class envFunctions
 		{
 			file = "dzn_commonFunctions\functions\envFunctions";
-			
+
 			class setDateTime {};
+			class randomizeTime {};
 			class setFog {};
 			class setWeather {};
 			class addViewDistance {};
 			class reduceViewDistance {};
 		};
-		
+
 		class invFunctions
 		{
 			file = "dzn_commonFunctions\functions\invFunctions";
-			
+
 			class getItemDisplayName {};
 			class getVehicleDisplayName {};
 			class addWhitelistedArsenal {};
 		};
-		
+
 		class supportFunctions
 		{
 			file = "dzn_commonFunctions\functions\supportFunctions";
-			
+
 			class ArtilleryFiremission {};
 			class SelectFiremissionCharge {};
 			class CancelFiremission {};
@@ -117,11 +118,11 @@ class CfgFunctions
 			class setShellFlareEffectGlobal {};
 			class StartVirtualFiremission {};
 		};
-		
+
 		class uiFunctions
 		{
 			file = "dzn_commonFunctions\functions\uiFunctions";
-			
+
 			class CountTextLines {};
 			class ShowBasicDialog {};
 			class ShowAdvDialog {};
@@ -129,10 +130,10 @@ class CfgFunctions
 
 			class CreateControl {};
 			class GetDisplay {};
-			
-			class ShowMessage {};			
+
+			class ShowMessage {};
 			class ShowProgressBar {};
-			
+
 			class AddDraw3d {};
 			class RemoveDraw3d {};
 		};

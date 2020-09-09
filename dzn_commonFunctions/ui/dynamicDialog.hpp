@@ -13,7 +13,7 @@ class dzn_Dynamic_Dialog_Advanced
 	idd = 134800;
 	movingEnable = false;
 	class controls {};
-}
+};
 
 class RscTitles 
 {

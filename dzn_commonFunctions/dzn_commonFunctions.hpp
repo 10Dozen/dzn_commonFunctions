@@ -16,9 +16,9 @@ class CfgFunctions
 {
     class dzn
     {
-        class commonFunctions
+        class common
         {
-            file = "dzn_commonFunctions\functions\commonFunctions";
+            file = "dzn_commonFunctions\functions\common";
 
             class getMissionParameters {};
             class getValueByKey {};
@@ -48,9 +48,9 @@ class CfgFunctions
             class getVersion {};
         };
 
-        class areaFunctions
+        class area
         {
-            file = "dzn_commonFunctions\functions\areaFunctions";
+            file = "dzn_commonFunctions\functions\area";
 
             class convertTriggerToLocation {};
             class isInLocation {};
@@ -77,18 +77,18 @@ class CfgFunctions
             class selectRandomAsset {};
         };
 
-        class mapFunctions
+        class map
         {
-            file = "dzn_commonFunctions\functions\mapFunctions";
+            file = "dzn_commonFunctions\functions\map";
 
             class createMarkerIcon {};
             class getMapGrid {};
             class getPosOnMapGrid {};
         };
 
-        class envFunctions
+        class env
         {
-            file = "dzn_commonFunctions\functions\envFunctions";
+            file = "dzn_commonFunctions\functions\env";
 
             class setDateTime {};
             class randomizeTime {};
@@ -98,18 +98,18 @@ class CfgFunctions
             class reduceViewDistance {};
         };
 
-        class invFunctions
+        class inventory
         {
-            file = "dzn_commonFunctions\functions\invFunctions";
+            file = "dzn_commonFunctions\functions\inventory";
 
             class getItemDisplayName {};
             class getVehicleDisplayName {};
             class addWhitelistedArsenal {};
         };
 
-        class supportFunctions
+        class support
         {
-            file = "dzn_commonFunctions\functions\supportFunctions";
+            file = "dzn_commonFunctions\functions\support";
 
             class ArtilleryFiremission {};
             class SelectFiremissionCharge {};
@@ -120,9 +120,9 @@ class CfgFunctions
             class StartVirtualFiremission {};
         };
 
-        class uiFunctions
+        class ui
         {
-            file = "dzn_commonFunctions\functions\uiFunctions";
+            file = "dzn_commonFunctions\functions\ui";
 
             class CountTextLines {};
             class ShowBasicDialog {};

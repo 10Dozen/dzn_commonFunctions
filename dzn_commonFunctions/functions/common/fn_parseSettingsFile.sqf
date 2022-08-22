@@ -1,33 +1,40 @@
 /*
- * [@Filename, @Preprocess?] call dzn_fnc_parseSettingsFile
+ * [@Input, @Mode] call dzn_fnc_parseSettingsFile
  * Parses YAML-like settinsg file to HashMap..
  *
  * INPUT:
- * 0: STRING - path to file to parse
- * 1: BOOL - flag to preprocess file and apply SQF preprocesor commands (e.g. includes, defines, etc.)
+ * 0: STRING - path to file to parse (for FILE_LOAD and FILE_PREPROCESS modes) OR comma-separated oneliner with properties to parse.
+ * 1: STRING - mode to apply:
+ *              1) "FILE_LOAD" -- tries to load file from path given in @Input and parse it. Default.
+ *              2) "FILE_PREPROCESS" -- tries to load & preprocess file from given path (using Arma 3 preprocessor) and parse
+ *              3) "PARSE_LINE" -- parse given Input string
  *
  * OUTPUT:
  * 0: HASHMAP - map of the parsed settings. Each section will be available under it's key.
- *               Special keys are "#ERRORS" and "#SOURCE".
+ *               Special keys:
  *
- *              '#ERRORS' key - array of parsing errors in format:
+ *              a) '#SOURCE' key - string with path to parsed file (same as function argument).
+ *
+ *              b) '#ERRORS' key - array of parsing errors in format:
  *              [_errorCode, _lineNo, _lineContent, _reason, (optional) _param1, ... , _paramN].
  *              where:
  *              _errorCode - (number) error code from \dzn_commonFunctions\functions\common\SettingsFileParser.hpp
  *              _lineNo - (number) line number (approximate)
  *              _lineContent - (string) content of the parsed line
  *              _reason - (string) human readable reason of the error
- *              _param1 - (any) additional parameter of the error. Optional.
- *
- *              '#SOURCE' key - string with path to parsed file (same as function argument).
+ *              _param1..n - (any) additional parameter of the error. Optional.
  *
  * EXAMPLES:
- *      _settings = ["dzn_tSFramework\Modules\Chatter\Settings.yaml"] call dzn_fnc_parseSettingsFile
+ *      _settings = ["dzn_tSFramework\Modules\Chatter\Settings.yaml"] call dzn_fnc_parseSettingsFile;
+ *
+ *      _props = ["myStr: Some text, myNum: 22", "PARSE_LINE"] call dzn_fnc_parseSettingsFile;
+ *      // (_props get "myNum") = 22
+ *      // (_props get "myStr") = "Some text"
  */
 
 #include "SettingsFileParser.hpp"
 
-#define DEBUG true
+//#define DEBUG true
 #ifdef DEBUG
     #define LOG_PREFIX '[dzn_fnc_parseSettingsFile] PARSER: '
     #define LOG(MSG) diag_log text (LOG_PREFIX + MSG)
@@ -35,17 +42,34 @@
     #define LOG_2(MSG,ARG1,ARG2) diag_log text format [LOG_PREFIX + MSG,ARG1,ARG2]
     #define LOG_3(MSG,ARG1,ARG2,ARG3) diag_log text format [LOG_PREFIX + MSG,ARG1,ARG2,ARG3]
     #define LOG_4(MSG,ARG1,ARG2,ARG3,ARG4) diag_log text format [LOG_PREFIX + MSG,ARG1,ARG2,ARG3,ARG4]
+#else
+    #define LOG_PREFIX
+    #define LOG(MSG)
+    #define LOG_1(MSG,ARG1)
+    #define LOG_2(MSG,ARG1,ARG2)
+    #define LOG_3(MSG,ARG1,ARG2,ARG3)
+    #define LOG_4(MSG,ARG1,ARG2,ARG3,ARG4)
 #endif
 
+// Parser mode
 #define MODE_ROOT 0
 #define MODE_NESTED 10
+#define MODE_MULTILINE_TEXT 20
+
+// Multiline settings
+#define MULTILINE_MODE_NEWLINES "NEWLINES"
+#define MULTILINE_MODE_FOLDED "FOLDED_LINES"
+#define MULTILINE_MODE_CODE "MULTILINE_CODE"
 
 #define ONELINER_ARRAY 1000
 #define ONELINER_HASHMAP 1001
 
+#define EOF "#EOF"
+
 #define CURRENT_NODE_KEY (if (count _hashNodesRoute > 0) then {_hashNodesRoute select (count _hashNodesRoute - 1)} else {""})
 #define STRIP(X) (X select [1, count X - 2])
 #define IS_REF_VALUE(X) (X select [0,1] == toString [REF_PREFIX])
+#define IS_MULTILINE_START(X) ((toArray X select 0) in [ASCII_VERTICAL_LINE, ASCII_GT, ASCII_CARET])
 
 // Error reporting
 #define REPORT_ERROR_NOLINE(ERROR_CODE, MSG) (_hash get ERRORS_NODE) pushBack [ERROR_CODE, -1, '', MSG];
@@ -57,19 +81,26 @@
 #define REPORT_ERROR_1(ERROR_CODE, LINE_NO, MSG, ARG1) (_hash get ERRORS_NODE) pushBack [ERROR_CODE,LINE_NO+1,FORMAT_LINE_INFO(LINE_NO+1,_lines select LINE_NO),MSG,ARG1]
 #define REPORT_ERROR_2(ERROR_CODE, LINE_NO, MSG, ARG1, ARG2) (_hash get ERRORS_NODE) pushBack [ERROR_CODE,LINE_NO+1,FORMAT_LINE_INFO(LINE_NO+1,_lines select LINE_NO),MSG,ARG2]
 
-params ["_file", ["_preprocess", false]];
+params ["_input", ["_dataMode", MODE_FILE_LOAD]];
 
-private _data = if (_preprocess) then {
-    preprocessFile _file
-} else {
-    loadFile _file
+LOG_1("Params: %1", _this);
+LOG_1("Mode: %1", _dataMode);
+
+_dataMode = toUpper _dataMode;
+private _data = switch _dataMode do {
+    case MODE_FILE_LOAD: { loadFile _input };
+    case MODE_FILE_PREPROCESS: { preprocessFile _input };
+    case MODE_PARSE_LINE: { format ["%1: (%2)", DATA_NODE, _input] };
 };
+
+LOG_1("Data: %1", _data);
+
 private _hash = createHashMap;
-_hash set [SOURCE_NODE, _file];
+_hash set [SOURCE_NODE, _input];
 _hash set [ERRORS_NODE, []];
 
 if (count _data == 0) exitWith {
-    diag_log text format ["[dzn_fnc_parseSettingsFile] Warning! File %1 is empty!", _file];
+    diag_log text format ["[dzn_fnc_parseSettingsFile] Warning! Input %1 is empty!", _file];
     REPORT_ERROR_NOLINE(ERR_FILE_EMPTY, 'File is empty!');
     _hash
 };
@@ -93,6 +124,8 @@ private _fnc_splitLines = {
         };
         _line pushBack (_chars # _i);
     };
+
+    _lines pushBack EOF;
 
     _lines
 };
@@ -230,6 +263,26 @@ private _fnc_calculateExpectedIndent = {
     } forEach _hashNodesRoute;
 
     _expected
+};
+
+private _fnc_initMultilineBuffer = {
+    params ["_key", "_indent", "_initLine"];
+    LOG_1("(fnc_initMultilineBuffer) Params: %1", _this);
+
+    private _mode = switch (toArray _initLine # 0) do {
+        case ASCII_VERTICAL_LINE: { MULTILINE_MODE_NEWLINES };
+        case ASCII_GT: { MULTILINE_MODE_FOLDED };
+        case ASCII_CARET: { MULTILINE_MODE_CODE };
+    };
+
+    _hash set [MULTILINE_KEY_NODE, _key];
+    _hash set [MULTILINE_VALUE_NODE, []];
+    _hash set [MULTILINE_INDENT_NODE, INDENT_MULTILINE + _indent];
+    _hash set [MULTILINE_MODE_NODE, _mode];
+
+    LOG_1("(fnc_initMultilineBuffer) Key set to: %1", _hash get MULTILINE_KEY_NODE);
+    LOG_1("(fnc_initMultilineBuffer) Indent set to: %1", _hash get MULTILINE_INDENT_NODE);
+    LOG_1("(fnc_initMultilineBuffer) Mode set to: %1", _hash get MULTILINE_MODE_NODE);
 };
 
 private _fnc_parseOnelinerStructure = {
@@ -483,11 +536,12 @@ private _fnc_parseValueType = {
 };
 
 private _fnc_addSetting = {
-    params ["_key", "_value"];
+    // Adds Key-Value pair to current node
+    params ["_key", "_value", ["_parseType", true]];
     private _node = [] call _fnc_getNode;
     LOG_3("(addSettings) Adding: %1 = %2 to node %3", _key, _value, CURRENT_NODE_KEY);
 
-    private _parsedValue = [_value] call _fnc_parseValueType;
+    private _parsedValue = if (_parseType) then { [_value] call _fnc_parseValueType } else { _value };
     _node set [_key, _parsedValue];
 };
 
@@ -648,18 +702,75 @@ private _fnc_findAndConvertToArray = {
     (_isArray)
 };
 
+private _fnc_removeEscaping = {
+    params ["_str"];
+    private _chars = toArray _str;
+    private _size = count _chars - 2;
+    private _escapedSymbols = [
+        ASCII_ASTERISK, // * - Reference
+        ASCII_LT, ASCII_GT, // < > - Variable
+        ASCII_SQUARE_BRACKET_OPEN, ASCII_SQUARE_BRACKET_CLOSE, // [ ] - array block
+        ASCII_PARENTHESES_OPEN, ASCII_PARENTHESES_CLOSE, // ( ) - hashmap block
+        ASCII_CURLY_BRACKET_OPEN, ASCII_CURLY_BRACKET_CLOSE, // { } - Code block
+        ASCII_GRAVE, // ` - Evaluation
+        ASCII_VERTICAL_LINE, ASCII_CARET // |, ^ - Multiline block start
+    ];
+    private _escapingsAt = [];
+
+    // Find escpaing symbols (the one that placed in front of escaped symbols)
+    for "_i" from 0 to _size do {
+        private _char = _chars # _i;
+        private _nextChar = _chars # (_i + 1);
+        if (_char == ASCII_BACKSLASH && { _nextChar in _escapedSymbols }) then {
+            LOG_1("(fnc_removeEscaping) Escaping found at %1", _i);
+            _escapingsAt pushBack _i;
+        };
+    };
+
+    // Remove escaping symbols
+    reverse _escapingsAt;
+    { _chars deleteAt _x; } forEach _escapingsAt;
+
+    LOG_1("(fnc_removeEscaping) Result: %1", (toString _chars));
+    (toString _chars)
+};
+
+private _fnc_findAndRemoveEscaping = {
+    params ["_node"];
+    LOG_1("(fnc_findAndRemoveEscaping) Params: %1", _this);
+    {
+        private _key = _x;
+        private _val = _node get _key;
+        private _valType = typename _val;
+        LOG_3("(fnc_findAndRemoveEscaping) Key: %1. Value: %2 (type: %3)", _key, _val, _valType);
+
+        if (_valType == "HASHMAP") then {
+            [_val] call _fnc_findAndRemoveEscaping;
+        } else {
+            if (_valType == "STRING") then {
+                _val = [_val] call _fnc_removeEscaping;
+                LOG_1("(fnc_findAndRemoveEscaping) Escapings removed: [%1]", _val);
+                _node set [_key, _val];
+            };
+        };
+    } forEach (keys _node) - [ERRORS_NODE, SOURCE_NODE];
+};
+
 private _fnc_parseLine = {
-    // params ["_line", "_chars", "_startsWith", "_expectedIndent", "_actualIndent"];
     switch _mode do {
         case MODE_ROOT: {
+            if (_line == EOF) exitWith {};
             if (_actualIndent != 0) exitWith {
-                LOG_1("(ROOT) Error - unexpected indent: %1", _actualIndent);
+                LOG_1("(ROOT) [ERROR:ERR_INDENT_UNEXPECTED_ROOT] Error - unexpected indent: %1", _actualIndent);
                 REPORT_ERROR(ERR_INDENT_UNEXPECTED_ROOT, _forEachIndex, "Unexpected indent on parsing root element")
             };
 
+            LOG_1("(ROOT) Line: [%1]", _line);
             private _parsed = [_line] call _fnc_parseKeyValuePair;
+            LOG_1("(ROOT) Parsed: %1", _parsed);
             if (_parsed isEqualTo []) exitWith {
-                REPORT_ERROR(ERR_DATA_MALFORMED, _forEachIndex, "Unknown markup in line (not a key-value pair/section/array).")
+                LOG_1("(ROOT) [ERROR:ERR_DATA_MALFORMED] Unknown markup at index: %1", _forEachIndex);
+                REPORT_ERROR(ERR_DATA_MALFORMED, _forEachIndex, "Unknown markup in line (not a key-value pair/section/array)");
             };
             _parsed params ["_key", "_value"];
 
@@ -670,11 +781,79 @@ private _fnc_parseLine = {
                 [_key] call _fnc_addNode
             };
 
+            // Multiline text is found - add node and switch to multiline mode
+            if (IS_MULTILINE_START(_value)) exitWith {
+                LOG("(ROOT) #PARSED# Start of the multiline text section. Switching to MODE_MULTILINE_TEXT");
+                _mode = MODE_MULTILINE_TEXT;
+                [_key, _actualIndent, _value] call _fnc_initMultilineBuffer;
+            };
+
             // Simple key-value pair
             LOG("(ROOT) #PARSED# Adding key-value pair to hash.");
             [_key, _value] call _fnc_addSetting;
         };
+        case MODE_MULTILINE_TEXT: {
+            private _expectedIndent = _hash get MULTILINE_INDENT_NODE;
+            if (_actualIndent < _expectedIndent) exitWith {
+                LOG("(MULTILINE) End of the multiline text.");
+
+                // Saving multiline data
+
+                private _key = _hash get MULTILINE_KEY_NODE;
+                private _linesList = _hash get MULTILINE_VALUE_NODE;
+
+                // Clean tailing empty lines
+                for "_i" from (count _linesList - 1) to 0 step -1 do {
+                    if (_linesList # _i == "") then {
+                        _linesList deleteAt _i;
+                    } else {
+                        break;
+                    };
+                };
+                // Compose lines according to selected mode
+                private _value = switch (_hash get MULTILINE_MODE_NODE) do {
+                    case MULTILINE_MODE_NEWLINES: { _linesList joinString endl };
+                    case MULTILINE_MODE_FOLDED: { _linesList joinString " " };
+                    case MULTILINE_MODE_CODE: { compile (_linesList joinString endl) };
+                };
+                LOG_2("(MULTILINE) Key: %1, Composed: %2", _key, _value);
+
+                if (_key isEqualTo "") then {
+                    // Multiline in array item
+                    private _arrayKey = [_value, false] call _fnc_addArrayItem;
+                    LOG_1("(MULTILINE.ARRAY) Simple array item added with index %1", _arrayKey);
+                } else {
+                    // Multiline in key
+                    [_key, _value, false] call _fnc_addSetting;
+                    LOG_1("(MULTILINE.PAIR) Added to key %1", _key);
+                };
+
+                // Drop multiline buffer
+                _hash deleteAt MULTILINE_KEY_NODE;
+                _hash deleteAt MULTILINE_VALUE_NODE;
+                _hash deleteAt MULTILINE_INDENT_NODE;
+                _hash deleteAt MULTILINE_MODE_NODE;
+
+                // Change mode of the parser
+                if (_actualIndent == 0) then {
+                    LOG("(MULTILINE) Returning to MODE_ROOT");
+                    _hashNodesRoute = [];
+                    _mode = MODE_ROOT;
+                } else {
+                    LOG("(MULTILINE) Returning to MODE_NESTED");
+                    _mode = MODE_NESTED;
+                };
+
+                [] call _fnc_parseLine;
+            };
+
+            // Trim left for a number of the expected indent chars
+            private _trimmed = _line select [_expectedIndent, count _line];
+            LOG_1("(MULTILINE) Adding trimmed line [%1] to buffer", _trimmed);
+            (_hash get MULTILINE_VALUE_NODE) pushBack _trimmed;
+        };
         case MODE_NESTED: {
+            if (_line == EOF) exitWith {};
             if (_actualIndent == 0) exitWith {
                 LOG("(NESTED) End of the all nested objects");
                 _hashNodesRoute = [];
@@ -683,18 +862,18 @@ private _fnc_parseLine = {
             };
 
             if (_actualIndent % 2 > 0) exitWith {
-                LOG_1("(NESTED) [ERROR:%1] Indent malformed (%2 is not a multiple of 2)", ERR_INDENT_MALFORMED, _actualIndent);
+                LOG_1("(NESTED) [ERROR:ERR_INDENT_MALFORMED] Indent malformed (%1 is not a multiple of 2)", _actualIndent);
                 REPORT_ERROR(ERR_INDENT_MALFORMED, _forEachIndex, "Indent malformed (not a multiple of 2)");
             };
 
             private _calculated = call _fnc_calculateExpectedIndent;
-            LOG_1("(NESTED) Calcualted indent: %1", _calculated);
             private _indentDiff = _calculated - _actualIndent;
-            LOG_1("(NESTED) Indent diff = %1", _indentDiff);
+
+            LOG_1("(NESTED) Calcualted indent: %1 (diff: %2)", _calculated, _indentDiff);
 
             private _closedCount = floor (_indentDiff / 4);
             if (_indentDiff < 0 || (_indentDiff > 0 && _closedCount == 0)) exitWith {
-                LOG_3("(NESTED) [ERROR:%1] Unexpected indent for nested item (expected %2, but actual is %3) ", ERR_INDENT_UNEXPECTED_NESTED, _calculated, _actualIndent);
+                LOG_2("(NESTED) [ERROR:ERR_INDENT_UNEXPECTED_NESTED] Unexpected indent for nested item (expected %1, but actual is %2) ", _calculated, _actualIndent);
                 REPORT_ERROR(ERR_INDENT_UNEXPECTED_NESTED, _forEachIndex, "Unexpected indent for nested item (expected " + str _calculated + ", but actual is " + str _actualIndent);
             };
 
@@ -702,23 +881,6 @@ private _fnc_parseLine = {
                 LOG_1("(NESTED) End of the current %1 nested object(s).", _closedCount);
                 _hashNodesRoute deleteAt (count _hashNodesRoute - 1 * _closedCount);
             };
-
-            /*
-            private _indentClosed = floor ((_actualIndent - _expectedIndent) / 4);
-            LOG_1("(NESTED) Closed indent: %1.", _indentClosed);
-            if (_indentClosed > 1) exitwith {
-                LOG_2("(NESTED) Error - unexpected indent: %1 expected, but %2 found. Switching to MODE_ROOT.", _expectedIndent, _actualIndent);
-                REPORT_ERROR(ERR_INDENT_UNEXPECTED_NESTED, _forEachIndex, "Unexpected indent on parsing nested element");
-                _hashNodesRoute = [];
-                _mode = MODE_ROOT;
-                call _fnc_parseLine;
-            };
-
-            if (_indentClosed != 0) then {
-                LOG_1("(NESTED) End of the current nested object. Closing %1 sections.", _indentClosed);
-                _hashNodesRoute deleteAt (count _hashNodesRoute - 1 * abs(_indentClosed));
-            };
-            */
 
             _line = [_line] call CBA_fnc_trim;
             _chars = toArray _line;
@@ -731,24 +893,34 @@ private _fnc_parseLine = {
                 _line = [_line, "- "] call CBA_fnc_leftTrim;
                 private _parsed = [_line] call _fnc_parseKeyValuePair;
                 if (_parsed isEqualTo []) exitWith {
-                    // Simple array item: - itemX
-                    private _arrayKey = [[_line] call _fnc_parseValueType] call _fnc_addArrayItem;
-                    LOG_1("(NESTED.ARRAY) #PARSED# Simple array item: %1", _arrayKey);
+                    if (IS_MULTILINE_START(_line)) then {
+                        // Nested Multiline text is found in array
+                        LOG("(NESTED.ARRAY) #PARSED# Start of the multiline text section. Swtiching to MODE_MULTILINE_TEXT");
+                        _mode = MODE_MULTILINE_TEXT;
+                        ["", _actualIndent + INDENT_ARRAY_NESTED, _line] call _fnc_initMultilineBuffer;
+                    } else {
+                        // Simple array item: - itemX
+                        private _arrayKey = [[_line] call _fnc_parseValueType] call _fnc_addArrayItem;
+                        LOG_1("(NESTED.ARRAY) #PARSED# Simple array item: %1", _arrayKey);
+                    };
                 };
 
                 // Otherwise -- assosiated value or another nested thing: - item: ???
                 _parsed params ["_key", "_value"];
 
-                // Nested array/object: - weapons:
-                //                          - some item1
+                // Nested object: - weapons:
+                //                    - some item1
                 if (_value isEqualTo "") exitWith {
                     [_key] call _fnc_addNode;
                     LOG_1("(NESTED.ARRAY.SECTION) Nested section found. Nodes are: %1", _hashNodesRoute);
                 };
 
                 // Array-Nested object found: - item: value
+                // ---
+
                 if (typename CURRENT_NODE_KEY == "SCALAR") then {
-                    /* - key: value1
+                    /* Next array item found:
+                       - key: value1
                          key2: value2
                        - key: value3    <--- thsi case - new array item detected
                     */
@@ -760,6 +932,12 @@ private _fnc_parseLine = {
                 private _arrayKey = [_nestedNode] call _fnc_addArrayItem;
                 _hashNodesRoute pushBack _arrayKey;
 
+                if (IS_MULTILINE_START(_value)) exitWith {
+                    LOG("(NESTED.ARRAY.OBJECT) #PARSED# Start of the multiline text section. Swtiching to MODE_MULTILINE_TEXT");
+                    _mode = MODE_MULTILINE_TEXT;
+                    [_key, _actualIndent + INDENT_ARRAY_NESTED, _value] call _fnc_initMultilineBuffer;
+                };
+
                 LOG("(NESTED.ARRAY.OBJECT) #PARSED# Key-value pair found.");
                 [_key, _value] call _fnc_addSetting;
             };
@@ -767,6 +945,7 @@ private _fnc_parseLine = {
             // Object case
             private _parsed = [_line] call _fnc_parseKeyValuePair;
             if (_parsed isEqualTo []) exitWith {
+                LOG("(NESTED) [ERROR:ERR_DATA_MALFORMED] Unknown markup in nested line (not a key-value pair/section/array)");
                 REPORT_ERROR(ERR_DATA_MALFORMED, _forEachIndex, "Unknown markup in nested line (not a key-value pair/section/array).");
             };
 
@@ -777,6 +956,13 @@ private _fnc_parseLine = {
                 LOG_1("(NESTED.SECTION) #PARSED# This is the header of new nested object: %1", _line);
             };
 
+            // Multiline text is found - add node and switch to multiline mode
+            if (IS_MULTILINE_START(_value)) exitWith {
+                LOG("(NESTED) #PARSED# Start of the multiline text section. Swtiching to MODE_MULTILINE_TEXT");
+                _mode = MODE_MULTILINE_TEXT;
+                [_key, _actualIndent, _value] call _fnc_initMultilineBuffer;
+            };
+
             // Item is key-value, just nested:
             LOG_1("(NESTED.SECTION) #PARSED# Nested key-value for node: %1", _hashNodesRoute);
             [_key, _value] call _fnc_addSetting;
@@ -785,7 +971,11 @@ private _fnc_parseLine = {
 };
 
 // --- Main programm body
-private _lines = [_data] call _fnc_splitLines;
+private _lines = if (_dataMode == MODE_PARSE_LINE) then {
+    [_data]
+} else {
+    [_data] call _fnc_splitLines;
+};
 LOG_1("Lines: %1", _lines);
 
 if !(_lines findIf { _x != "" } > -1) exitWith {
@@ -800,26 +990,49 @@ private _mode = MODE_ROOT;
     private _line = _x;
     private _chars = toArray _line;
     private _startsWith = _chars # 0;
-    private _expectedIndent = 4 * ({ typename _x != "SCALAR" } count _hashNodesRoute);
     private _actualIndent = 0;
     for "_i" from 0 to (count _chars)-1 do {
         if (_chars # _i != ASCII_SPACE) exitWith { _actualIndent = _i; };
     };
     LOG_3("Line %1: %2 [Indents: %3]", _forEachIndex+1, _line, _actualIndent);
 
-    if (([_line] call CBA_fnc_trim) isEqualTo "") then {
-        LOG_1("Line %1: Is empty. Skipped.", _forEachIndex+1);
-        continue
+    if ([_line] call CBA_fnc_trim isEqualTo "") then {
+        if (_mode == MODE_MULTILINE_TEXT) then {
+            if (_forEachIndex == count _lines - 1) exitWith {}; // Last line in file - not a piece of multiline
+
+            private _multilineIndentCount = _hash get MULTILINE_INDENT_NODE;
+            LOG("Empty line in multiline mode. Possible newline!");
+            if (_actualIndent < _multilineIndentCount) then {
+                for "_i" from 1 to _multilineIndentCount do { _chars pushBack ASCII_SPACE };
+                _line = toString _chars;
+                _actualIndent = _multilineIndentCount;
+                LOG_1("Empty line adjusted: [%1]", _line);
+            };
+        } else {
+            LOG_1("Line %1: Is empty. Skipped.", _forEachIndex+1);
+            continue
+        };
     };
 
     [] call _fnc_parseLine;
 } forEach _lines;
 
-// Trigger conversion to array for last nested array in the file
-[_hash] call _fnc_findAndConvertToArray;
+if (_dataMode == MODE_PARSE_LINE) then {
+    // Move data from DATA_NODE to main hash, and remove data node
+    private _node = _hash get DATA_NODE;
+    _hash deleteAt DATA_NODE;
+    _hash merge _node;
+    // { _hash set [_x, _node get _x]; } forEach (keys _node);
+} else {
+    // Trigger conversion to array for last nested array in the file
+    [_hash] call _fnc_findAndConvertToArray;
 
-// Link reference values
-[_hash] call _fnc_findAndLinkRefValues;
+    // Link reference values
+    [_hash] call _fnc_findAndLinkRefValues;
+
+    // Remove escapings
+    [_hash] call _fnc_findAndRemoveEscaping;
+};
 
 
 LOG("----------------------------------- FINISHED -----------------------------");

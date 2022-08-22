@@ -4,12 +4,30 @@
     - Multi-line text ?
     - Ability to use string as data parameter (call modes: FILE_LOAD, FILE_PREPROCESS, RAW)
 
+    ["dir\myFile.sqf", "FILE_LOAD"] call dzn_fnc_parseSettingsFile
+    ["myVar: 1, myArr:[blue, yellow]", "PARSE_LINE"] call dzn_fnc_parseSettingsFile
+
 */
+
+// Function modes
+#define MODE_FILE_LOAD "FILE_LOAD"
+#define MODE_FILE_PREPROCESS "FILE_PREPROCESS"
+#define MODE_PARSE_LINE "PARSE_LINE"
 
 #define RECURSIVE_COUNTER_LIMIT 5
 
+#define INDENT_ARRAY_NESTED 2
+#define INDENT_MULTILINE 4
+
+// System nodes of the hash
 #define ERRORS_NODE "#ERRORS"
 #define SOURCE_NODE "#SOURCE"
+#define MULTILINE_KEY_NODE "#MULTILINE_BUFFER_KEY"
+#define MULTILINE_VALUE_NODE "#MULTILINE_BUFFER_VALUE"
+#define MULTILINE_INDENT_NODE "#MULTILINE_INDENT"
+#define MULTILINE_MODE_NODE "#MULTILINE_MODE"
+#define DATA_NODE "#DATA"
+
 
 // ASCII char codes
 #define ASCII_MINUS 45
@@ -30,6 +48,8 @@
 #define ASCII_CURLY_BRACKET_OPEN 123
 #define ASCII_CURLY_BRACKET_CLOSE 125
 #define ASCII_GRAVE 96
+#define ASCII_VERTICAL_LINE 124
+#define ASCII_CARET 94
 
 // Data types
 #define INTEGER_REGEX "\d+"

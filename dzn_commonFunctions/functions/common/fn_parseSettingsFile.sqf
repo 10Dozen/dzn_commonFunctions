@@ -1,19 +1,19 @@
 /*
- * [@Input, @Mode] call dzn_fnc_parseSettingsFile
+ * @Hash = [@Input, @Mode] call dzn_fnc_parseSettingsFile
  * Parses YAML-like settinsg file to HashMap..
  *
  * INPUT:
- * 0: STRING - path to file to parse (for FILE_LOAD and FILE_PREPROCESS modes) OR comma-separated oneliner with properties to parse.
- * 1: STRING - mode to apply:
- *              1) "FILE_LOAD" -- tries to load file from path given in @Input and parse it. Default.
- *              2) "FILE_PREPROCESS" -- tries to load & preprocess file from given path (using Arma 3 preprocessor) and parse
- *              3) "PARSE_LINE" -- parse given Input string
+ * 0: STRING - path to file to parse (for LOAD_FILE and PREPROCESS_FILE modes) OR comma-separated oneliner with properties to parse (PARSE_LINE mode).
+ * 1: STRING - mode to apply (optional):
+ *              1) "LOAD_FILE" -- tries to load file from path given in @Input and parse it. Default mode.
+ *              2) "PREPROCESS_FILE" -- tries to load & preprocess file from given path (using Arma 3 preprocessor) and parse.
+ *              3) "PARSE_LINE" -- parse given Input string.
  *
  * OUTPUT:
- * 0: HASHMAP - map of the parsed settings. Each section will be available under it's key.
+ * HASHMAP - map of the parsed settings. Each section will be available under it's key.
  *               Special keys:
  *
- *              a) '#SOURCE' key - string with path to parsed file (same as function argument).
+ *              a) '#SOURCE' key - string with path to parsed file or inpuit (same as function argument).
  *
  *              b) '#ERRORS' key - array of parsing errors in format:
  *              [_errorCode, _lineNo, _lineContent, _reason, (optional) _param1, ... , _paramN].
@@ -26,6 +26,7 @@
  *
  * EXAMPLES:
  *      _settings = ["dzn_tSFramework\Modules\Chatter\Settings.yaml"] call dzn_fnc_parseSettingsFile;
+ *      // (_settings get "key")
  *
  *      _props = ["myStr: Some text, myNum: 22", "PARSE_LINE"] call dzn_fnc_parseSettingsFile;
  *      // (_props get "myNum") = 22
@@ -109,6 +110,7 @@ forceUnicode 1;
 
 // --- Functions
 private _fnc_splitLines = {
+    // Splits input data into array of lines. It also removes comments if present.
     params ["_data"];
     private _chars = toArray _data + [10,13];
     private _lines = [];
@@ -131,6 +133,8 @@ private _fnc_splitLines = {
 };
 
 private _fnc_removeComment = {
+    // Removes comments (text after # char) from the line.
+    // Do nothing if # char is shadowed by \ or / symbol
     params ["_chars"];
     private _size = count _chars;
     private _commentStartedIndex = -1;
@@ -197,6 +201,12 @@ private _fnc_removeComment = {
 };
 
 private _fnc_parseKeyValuePair = {
+    /* Parses line data into key and value by ":" char.
+       Return one of the results:
+        [] -- line doesn't contain ":" char
+        [_key, ""] -- line contain only key (start of the nested section)
+        [_key, _value] -- line is key-value pair
+    */
     params ["_line"];
     if !(":" in _line) exitWith {
         LOG("(parseKeyValuePair) -----------# No key definition found, this is not an key-value pair");
@@ -212,6 +222,7 @@ private _fnc_parseKeyValuePair = {
 };
 
 private _fnc_addArrayItem = {
+    // Adds new item to current active array hash node in format [index, value]
     params ["_item"];
     private _node = [] call _fnc_getNode;
     private _key = count keys _node;
@@ -226,6 +237,7 @@ private _fnc_addArrayItem = {
 };
 
 private _fnc_getNode = {
+    // Return current active node
     params [["_nodes", _hashNodesRoute]];
 
     LOG_1("(getCurrentNode) Nodes: %1", _nodes);
@@ -236,6 +248,7 @@ private _fnc_getNode = {
 };
 
 private _fnc_addNode = {
+    // Adds new node and makes it active
     params ["_key"];
 
     LOG_1("(addNode) Adding node: %1", _key);
@@ -250,6 +263,7 @@ private _fnc_addNode = {
 };
 
 private _fnc_calculateExpectedIndent = {
+    // Returns expected indent, according to current active node position
     private _expected = 0;
     {
         if (typename _x == "SCALAR") then {
@@ -266,6 +280,7 @@ private _fnc_calculateExpectedIndent = {
 };
 
 private _fnc_initMultilineBuffer = {
+    // Initializes multiline variables and buffer
     params ["_key", "_indent", "_initLine"];
     LOG_1("(fnc_initMultilineBuffer) Params: %1", _this);
 
@@ -536,7 +551,7 @@ private _fnc_parseValueType = {
 };
 
 private _fnc_addSetting = {
-    // Adds Key-Value pair to current node
+    // Adds Key-Value pair to current active node
     params ["_key", "_value", ["_parseType", true]];
     private _node = [] call _fnc_getNode;
     LOG_3("(addSettings) Adding: %1 = %2 to node %3", _key, _value, CURRENT_NODE_KEY);
@@ -669,6 +684,11 @@ private _fnc_findAndLinkRefValues = {
 };
 
 private _fnc_findAndConvertToArray = {
+    /* Recursive search through settings hash, checks for array-like hash map (all keys are numbers)
+       and convert it into the normal array
+       _node -- (HashMap) hashmap to search
+       Return: _isArray -- (boolean) flag that given node is array-like hashmap.
+    */
     params ["_node"];
     LOG_1("(fnc_findAndConvertToArray) Params: %1", _this);
 
@@ -703,6 +723,7 @@ private _fnc_findAndConvertToArray = {
 };
 
 private _fnc_removeEscaping = {
+    // Removes escaping char (backslash \ in front of the escapable char) from the given line
     params ["_str"];
     private _chars = toArray _str;
     private _size = count _chars - 2;
@@ -736,6 +757,10 @@ private _fnc_removeEscaping = {
 };
 
 private _fnc_findAndRemoveEscaping = {
+    /* Recursive search through settings hash, checks for strings and remove escaping if present.
+       _node -- (HashMap) hashmap to search
+       Return: none
+    */
     params ["_node"];
     LOG_1("(fnc_findAndRemoveEscaping) Params: %1", _this);
     {
@@ -757,6 +782,7 @@ private _fnc_findAndRemoveEscaping = {
 };
 
 private _fnc_parseLine = {
+    // Parses given line according to current mode
     switch _mode do {
         case MODE_ROOT: {
             if (_line == EOF) exitWith {};

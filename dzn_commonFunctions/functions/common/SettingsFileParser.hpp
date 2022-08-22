@@ -1,17 +1,7 @@
 
-/*
-    TODO:
-    - Multi-line text ?
-    - Ability to use string as data parameter (call modes: FILE_LOAD, FILE_PREPROCESS, RAW)
-
-    ["dir\myFile.sqf", "FILE_LOAD"] call dzn_fnc_parseSettingsFile
-    ["myVar: 1, myArr:[blue, yellow]", "PARSE_LINE"] call dzn_fnc_parseSettingsFile
-
-*/
-
 // Function modes
-#define MODE_FILE_LOAD "FILE_LOAD"
-#define MODE_FILE_PREPROCESS "FILE_PREPROCESS"
+#define MODE_FILE_LOAD "LOAD_FILE"
+#define MODE_FILE_PREPROCESS "PREPROCESS_FILE"
 #define MODE_PARSE_LINE "PARSE_LINE"
 
 #define RECURSIVE_COUNTER_LIMIT 5

@@ -35,7 +35,7 @@
 
 #include "SFMLParser.hpp"
 
-//#define DEBUG true
+// #define DEBUG true
 #ifdef DEBUG
     #define LOG_PREFIX '[dzn_fnc_parseSettingsFile] PARSER: '
     #define LOG(MSG) diag_log text (LOG_PREFIX + MSG)
@@ -71,6 +71,7 @@
 #define STRIP(X) (X select [1, count X - 2])
 #define IS_REF_VALUE(X) (X select [0,1] == toString [REF_PREFIX])
 #define IS_MULTILINE_START(X) ((toArray X select 0) in [ASCII_VERTICAL_LINE, ASCII_GT, ASCII_CARET])
+#define IS_IN_ARRAY_NODE (typename CURRENT_NODE_KEY == "SCALAR")
 
 // Error reporting
 #define REPORT_ERROR_NOLINE(ERROR_CODE, MSG) (_hash get ERRORS_NODE) pushBack [ERROR_CODE, -1, '', MSG];
@@ -971,6 +972,8 @@ private _fnc_parseLine = {
 
                 private _parsed = [_line] call _fnc_parseKeyValuePair;
                 if (_isOneliner || _parsed isEqualTo []) exitWith {
+
+                    LOG("(NESTED.ARRAY) Nested array item case");
                     if (IS_MULTILINE_START(_line)) then {
                         // Nested Multiline text is found in array
                         LOG("(NESTED.ARRAY) #PARSED# Start of the multiline text section. Swtiching to MODE_MULTILINE_TEXT");
@@ -978,6 +981,10 @@ private _fnc_parseLine = {
                         ["", _actualIndent + INDENT_ARRAY_NESTED, _line] call _fnc_initMultilineBuffer;
                     } else {
                         // Simple array item: - itemX
+                        if (IS_IN_ARRAY_NODE) then {
+                            _hashNodesRoute deleteAt (count _hashNodesRoute - 1);
+                            LOG_1("(NESTED.ARRAY) New array item, step back to array node. Nodes are: %1", _hashNodesRoute);
+                        };
                         private _arrayKey = [[_line] call _fnc_parseValueType] call _fnc_addArrayItem;
                         LOG_1("(NESTED.ARRAY) #PARSED# Simple array item: %1", _arrayKey);
                     };
@@ -996,7 +1003,7 @@ private _fnc_parseLine = {
                 // Array-Nested object found: - item: value
                 // ---
 
-                if (typename CURRENT_NODE_KEY == "SCALAR") then {
+                if (IS_IN_ARRAY_NODE) then {
                     /* Next array item found:
                        - key: value1
                          key2: value2

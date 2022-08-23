@@ -1,5 +1,5 @@
 /*
- * @Hash = [@Input, @Mode] call dzn_fnc_parseSettingsFile
+ * @Hash = [@Input, @Mode] call dzn_fnc_parseSFML
  * Parses YAML-like settinsg file to HashMap.
  *
  * INPUT:
@@ -25,17 +25,17 @@
  *              _param1..n - (any) additional parameter of the error. Optional.
  *
  * EXAMPLES:
- *      _settings = ["dzn_tSFramework\Modules\Chatter\Settings.yaml"] call dzn_fnc_parseSettingsFile;
+ *      _settings = ["dzn_tSFramework\Modules\Chatter\Settings.yaml"] call dzn_fnc_parseSFML;
  *      // (_settings get "key")
  *
- *      _props = ["myStr: Some text, myNum: 22", "PARSE_LINE"] call dzn_fnc_parseSettingsFile;
+ *      _props = ["myStr: Some text, myNum: 22", "PARSE_LINE"] call dzn_fnc_parseSFML;
  *      // (_props get "myNum") = 22
  *      // (_props get "myStr") = "Some text"
  */
 
 #include "SFMLParser.hpp"
 
-#define DEBUG true
+//#define DEBUG true
 #ifdef DEBUG
     #define LOG_PREFIX '[dzn_fnc_parseSettingsFile] PARSER: '
     #define LOG(MSG) diag_log text (LOG_PREFIX + MSG)
@@ -239,7 +239,7 @@ private _fnc_addArrayItem = {
     params ["_item"];
     private _node = [] call _fnc_getNode;
     private _key = count keys _node;
-    _node set [_key, _item];
+    _node set [_key, if (isNil "_item") then { nil } else { _item }];
     LOG_2("(addArrayItem) Adding array node %1. Nodes: %2", _key, _hashNodesRoute);
 
     LOG("----------- Add array item to hash node -------------");
@@ -325,7 +325,7 @@ private _fnc_parseOnelinerStructure = {
     LOG_2("(parseOnelinerStructure) Oneliner: %1. Mode: %2", _oneliner, _mode);
 
     private _chars = toArray STRIP(_oneliner) + [ASCII_COMMA];
-    private _lenght = count _chars;
+    private _lenght = count _chars - 1;
     private _onelinerConverted = [];
     private _item = [];
 
@@ -340,10 +340,9 @@ private _fnc_parseOnelinerStructure = {
         [ASCII_CURLY_BRACKET_OPEN, ASCII_CURLY_BRACKET_CLOSE],
         [ASCII_SQUARE_BRACKET_OPEN, ASCII_SQUARE_BRACKET_CLOSE]
     ];
-    private ["_char"];
 
-    for "_i" from 0 to _lenght - 1 do {
-        _char = _chars # _i;
+    for "_i" from 0 to _lenght do {
+        private _char = _chars # _i;
         switch _char do {
             // Item separator
             case ASCII_COMMA: {
@@ -375,8 +374,9 @@ private _fnc_parseOnelinerStructure = {
                     };
                 };
 
-                _item = [];
+                _item resize 0;
                 _char = nil;
+                continue;
             };
             // Quotes
             case ASCII_GRAVE;
@@ -443,12 +443,40 @@ private _fnc_parseOnelinerStructure = {
     (_onelinerConverted)
 };
 
+private _fnc_checkIsOneliner = {
+    // Checks value to be a onliner structure (array, hashmap, expression or code)
+
+    params ["_value"];
+    LOG_1("(checkIsOneliner) Params: %1", _this);
+
+    if (_value isEqualTo "") exitWith { "STRING" };
+
+    private _asChars = toArray _value;
+    private _first = _asChars # 0;
+    private _last = _asChars select (count _asChars - 1);
+    private _sameChars = _first == _last;
+
+    LOG_3("(checkIsOneliner) Value: %1. First: %2. Last: %3", _value, toString [_first], toString [_last]);
+
+    // Quoted STRING case - unwrap quotes and return: "My string"
+    (_sameChars && _first in STRING_QUOTES_ASCII)
+    // Code case: { hint "Kek" }
+    || (_first == CODE_PREFIX && _last == CODE_POSTIFX)
+    // Array case: [item1, item2]
+    || (_first == ARRAY_PREFIX && _last == ARRAY_POSTFIX)
+    // HashMap case: (john: Doe, age: 33)
+    || (_first == HASHMAP_PREFIX && _last == HASHMAP_POSTFIX)
+    // Expression case: `date select 2`
+    || (_sameChars && _first == EXPRESSION_PERFIX_ASCII)
+};
+
 private _fnc_parseValueType = {
     // Parse setting value. Rules:
     // - String --> quoted OR any text that not match rules below
     // - Boolean --> value is equal to true/false AND not quoted
     // - Scalar --> consists of only digit symbols or separators AND not quoted
     // - Code --> first and last symbol are { } AND not quoted
+    // - Expression --> first and last symbols are ` AND not quoted
     // - Array --> first and last symbols are [ ] AND not quoted
     // - HashMap --> first and last symbols are ( ) AND not quoted
     // - Variable --> first and last symbols are <> OR (missionNamespace has value AND not quoted)
@@ -519,9 +547,9 @@ private _fnc_parseValueType = {
         };
     };
 
-    // Evaluiate case: `date select 2`
-    if (_sameChars && _first == EVAL_PERFIX_ASCII) exitWith {
-        LOG("(parseValueType) Value parsed to EVALUATE.");
+    // Expression case: `date select 2`
+    if (_sameChars && _first == EXPRESSION_PERFIX_ASCII) exitWith {
+        LOG("(parseValueType) Value parsed to EXPRESSION.");
         (call compile STRIP(_value))
     };
 
@@ -570,7 +598,7 @@ private _fnc_addSetting = {
     LOG_3("(addSettings) Adding: %1 = %2 to node %3", _key, _value, CURRENT_NODE_KEY);
 
     private _parsedValue = if (_parseType) then { [_value] call _fnc_parseValueType } else { _value };
-    _node set [_key, _parsedValue];
+    _node set [_key, if (isNil "_parsedValue") then { nil } else { _parsedValue }];
 };
 
 private _fnc_linkRefValue = {
@@ -657,6 +685,7 @@ private _fnc_findRefValues = {
     LOG_1("(fnc_findRefValues) Params: %1", _this);
 
     private _data = if (typename _node == "HASHMAP") then { _node get _key } else { _node select _key };
+    if (isNil "_data") exitWith {};
     private _type = typename _data;
 
     LOG_4("(fnc_findRefValues) Node type: %1. Key: %2. Data: %3 (type: %4)", typename _node, _key, _data, _type);
@@ -710,6 +739,9 @@ private _fnc_findAndConvertToArray = {
         private _key = _x;
         private _keyType = typename _key;
         private _val = _node get _key;
+        if (isNil "_val") then {
+            continue
+        };
         private _valType = typename _val;
         LOG_4("(fnc_findAndConvertToArray) Key: %1 (type: %2). Value: %3 (type: %4)", _key, _keyType, _val, _valType);
 
@@ -722,7 +754,7 @@ private _fnc_findAndConvertToArray = {
                 // Replace nested map with array
                 private _arr = [];
                 for "_i" from 0 to (count _val) - 1 do {
-                    _arr pushBack (_val get _i);
+                    _arr set [_i, (_val get _i)];
                 };
                 _node set [_key, _arr];
             };
@@ -746,7 +778,7 @@ private _fnc_removeEscaping = {
         ASCII_SQUARE_BRACKET_OPEN, ASCII_SQUARE_BRACKET_CLOSE, // [ ] - array block
         ASCII_PARENTHESES_OPEN, ASCII_PARENTHESES_CLOSE, // ( ) - hashmap block
         ASCII_CURLY_BRACKET_OPEN, ASCII_CURLY_BRACKET_CLOSE, // { } - Code block
-        ASCII_GRAVE, // ` - Evaluation
+        ASCII_GRAVE, // ` - Expression
         ASCII_VERTICAL_LINE, ASCII_CARET // |, ^ - Multiline block start
     ];
     private _escapingsAt = [];
@@ -779,6 +811,7 @@ private _fnc_findAndRemoveEscaping = {
     {
         private _key = _x;
         private _val = _node get _key;
+        if (isNil "_val") then { continue; };
         private _valType = typename _val;
         LOG_3("(fnc_findAndRemoveEscaping) Key: %1. Value: %2 (type: %3)", _key, _val, _valType);
 
@@ -930,8 +963,14 @@ private _fnc_parseLine = {
                 LOG("(NESTED.ARRAY) Nested element is array item");
 
                 _line = [_line, "- "] call CBA_fnc_leftTrim;
+
+                LOG("(NESTED.ARRAY) Check for oneliner structure");
+                private _isOneliner = [_line] call _fnc_checkIsOneliner;
+                LOG_1("(NESTED.ARRAY) Is oneliner?: %1", _isOneliner);
+
+
                 private _parsed = [_line] call _fnc_parseKeyValuePair;
-                if (_parsed isEqualTo []) exitWith {
+                if (_isOneliner || _parsed isEqualTo []) exitWith {
                     if (IS_MULTILINE_START(_line)) then {
                         // Nested Multiline text is found in array
                         LOG("(NESTED.ARRAY) #PARSED# Start of the multiline text section. Swtiching to MODE_MULTILINE_TEXT");

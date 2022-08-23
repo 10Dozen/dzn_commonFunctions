@@ -1,6 +1,6 @@
 /*
  * @Hash = [@Input, @Mode] call dzn_fnc_parseSettingsFile
- * Parses YAML-like settinsg file to HashMap..
+ * Parses YAML-like settinsg file to HashMap.
  *
  * INPUT:
  * 0: STRING - path to file to parse (for LOAD_FILE and PREPROCESS_FILE modes) OR comma-separated oneliner with properties to parse (PARSE_LINE mode).
@@ -18,7 +18,7 @@
  *              b) '#ERRORS' key - array of parsing errors in format:
  *              [_errorCode, _lineNo, _lineContent, _reason, (optional) _param1, ... , _paramN].
  *              where:
- *              _errorCode - (number) error code from \dzn_commonFunctions\functions\common\SettingsFileParser.hpp
+ *              _errorCode - (number) error code from \dzn_commonFunctions\functions\common\SFMLParser.hpp
  *              _lineNo - (number) line number (approximate)
  *              _lineContent - (string) content of the parsed line
  *              _reason - (string) human readable reason of the error
@@ -33,9 +33,9 @@
  *      // (_props get "myStr") = "Some text"
  */
 
-#include "SettingsFileParser.hpp"
+#include "SFMLParser.hpp"
 
-//#define DEBUG true
+#define DEBUG true
 #ifdef DEBUG
     #define LOG_PREFIX '[dzn_fnc_parseSettingsFile] PARSER: '
     #define LOG(MSG) diag_log text (LOG_PREFIX + MSG)
@@ -87,18 +87,23 @@ params ["_input", ["_dataMode", MODE_FILE_LOAD]];
 LOG_1("Params: %1", _this);
 LOG_1("Mode: %1", _dataMode);
 
+private _hash = createHashMap;
+_hash set [SOURCE_NODE, _input];
+_hash set [ERRORS_NODE, []];
+
 _dataMode = toUpper _dataMode;
 private _data = switch _dataMode do {
     case MODE_FILE_LOAD: { loadFile _input };
     case MODE_FILE_PREPROCESS: { preprocessFile _input };
     case MODE_PARSE_LINE: { format ["%1: (%2)", DATA_NODE, _input] };
+    default {
+        LOG_1("[ERROR:ERR_MODE_UNDEFINED] Data mode [%1] is unknown!", _dataMode);
+        REPORT_ERROR_NOLINE_1(ERR_MODE_UNDEFINED, "Data mode [%1] is unknown!", _dataMode);
+        ""
+    };
 };
 
 LOG_1("Data: %1", _data);
-
-private _hash = createHashMap;
-_hash set [SOURCE_NODE, _input];
-_hash set [ERRORS_NODE, []];
 
 if (count _data == 0) exitWith {
     diag_log text format ["[dzn_fnc_parseSettingsFile] Warning! Input %1 is empty!", _file];
@@ -112,19 +117,27 @@ forceUnicode 1;
 private _fnc_splitLines = {
     // Splits input data into array of lines. It also removes comments if present.
     params ["_data"];
-    private _chars = toArray _data + [10,13];
-    private _lines = [];
-    private _line = [];
 
-    for "_i" from 0 to (count _chars - 1) do {
-        private _lineSize = count _line;
-        if (_lineSize > 1 && { (_line select [_lineSize - 2, 2]) isEqualTo [13,10] }) then {
-            private _normalizedLine = toString ([_line select [0, _lineSize - 2]] call _fnc_removeComment);
+    private _linebreaks = [ [[10,10],[10,124]], [[13,10]] ] select (_dataMode == MODE_FILE_LOAD);
+    private _chars = toArray _data + (_linebreaks # 0);
+    private _lineChars = [];
+    private _lines = [];
+
+    for "_i" from 0 to (count _chars - 2) do {
+        private _char = _chars # _i;
+        private _nextChar = _chars # (_i + 1);
+
+        if ([_char, _nextChar] in _linebreaks) then {
+            private _normalizedLine = toString ([_lineChars] call _fnc_removeComment);
             LOG_1("(splitLines) Found and normalized: %1", _normalizedLine);
             _lines pushBack _normalizedLine;
-            _line deleteRange [0, _lineSize];
+
+            // Drop buffer and skip next char
+            _lineChars resize 0;
+            _i = _i + 1;
+        } else {
+            _lineChars pushBack _char;
         };
-        _line pushBack (_chars # _i);
     };
 
     _lines pushBack EOF;

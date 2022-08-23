@@ -43,7 +43,7 @@ class CfgFunctions
 
             class setVelocityDirAndUp {};
             class stringify {};
-            class parseSettingsFile {};
+            class parseSFML {};
 
             class getVersion {};
         };

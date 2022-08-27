@@ -1,4 +1,6 @@
 /*
+    @Value = [@Hash, @Path, @DefaultValue, @DefaultOnError] call dzn_fnc_getByPath
+
     Return value from given path in hashmap.
     Function walks through given path of nested hashmaps or arrays and
     selects specific node/index on each step until reaches target key.
@@ -22,7 +24,7 @@
     - For scalar (numeric) hashmap keys use numbers as is (e.g. ['NODE_A', 1337])
 
     EXAMPLE:
-    [_hash, "NodeA > NodeB > Key1", 10] call dzn_fnc_getPosOnGivenDir
+    [_hash, "NodeA > NodeB > Key1", 10] call dzn_fnc_getByPath
     INPUT:
         0: HashMap or Array - HashMap to search
         1: String

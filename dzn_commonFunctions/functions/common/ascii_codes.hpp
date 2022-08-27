@@ -19,3 +19,6 @@
 #define ASCII_GRAVE 96
 #define ASCII_VERTICAL_LINE 124
 #define ASCII_CARET 94
+
+#define ASCII_NL 10
+#define ASCII_CR 13

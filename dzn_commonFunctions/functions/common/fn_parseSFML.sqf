@@ -35,7 +35,7 @@
 
 #include "SFMLParser.hpp"
 
-//#define DEBUG true
+// #define DEBUG true
 #ifdef DEBUG
     #define LOG_PREFIX '[dzn_fnc_parseSFML] PARSER: '
     #define LOG(MSG) diag_log text (LOG_PREFIX + MSG)
@@ -121,26 +121,47 @@ private _fnc_splitLines = {
     // Splits input data into array of lines. It also removes comments if present.
     params ["_data"];
 
-    private _linebreaks = [ [[10,10],[10,124]], [[13,10]] ] select (_dataMode == MODE_FILE_LOAD);
-    private _chars = toArray _data + (_linebreaks # 0);
+    private _isRawFile = _dataMode == MODE_FILE_LOAD;
+    private _linebreak = [[ASCII_NL], [ASCII_CR, ASCII_NL]] select _isRawFile;
+    private _linebreakSize = count _linebreak;
+    private _chars = toArray _data + _linebreak;
     private _lineChars = [];
     private _lines = [];
+    LOG_1("(splitLines) Linebreaks size: %1", _linebreakSize);
 
-    LOG_1("(splitLines) Split by Linebreaks: %1", _linebreaks);
-    for "_i" from 0 to (count _chars - 2) do {
+    for "_i" from 0 to (count _chars - _linebreakSize) do {
         private _char = _chars # _i;
-        private _nextChar = _chars # (_i + 1);
+        if (_isRawFile) then {
+            private _nextChar = _chars # (_i + 1);
+            if ([_char, _nextChar] isEqualTo _linebreak) then {
+                private _normalizedLine = toString ([_lineChars] call _fnc_removeComment);
 
-        if ([_char, _nextChar] in _linebreaks) then {
-            private _normalizedLine = toString ([_lineChars] call _fnc_removeComment);
-            LOG_1("(splitLines) Found and normalized: %1", _normalizedLine);
-            _lines pushBack _normalizedLine;
+                LOG_1("(splitLines) Found and normalized: %1", _normalizedLine);
+                _lines pushBack _normalizedLine;
 
-            // Drop buffer and skip next char
-            _lineChars resize 0;
-            _i = _i + 1;
+                _lineChars resize 0; // Drop buffer and skip next char
+                _i = _i + 1;
+            } else {
+                _lineChars pushBack _char;
+            };
         } else {
-            _lineChars pushBack _char;
+            switch _char do {
+                case ASCII_NL: {
+                    LOG_1("(splitLines) Found and normalized: %1", toString _lineChars);
+                    _lines pushBack toString _lineChars;
+                    _lineChars resize 0; // Drop buffer
+                };
+                case ASCII_VERTICAL_LINE: {
+                    if (_lineChars isEqualTo []) then {
+                        continue; // Skip | in the beginning of the line
+                    } else {
+                        _lineChars pushBack _char;
+                    };
+                };
+                default {
+                    _lineChars pushBack _char;
+                };
+            };
         };
     };
 

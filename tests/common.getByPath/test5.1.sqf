@@ -6,7 +6,7 @@
     Path is maps only..
 */
 
-INIT_STEP_FAILS_COUNTER;
+INIT_FAILED_STEPS_COUNTER;
 LOG_TEST_START;
 
 // Before

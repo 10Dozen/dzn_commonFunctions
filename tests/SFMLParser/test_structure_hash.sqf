@@ -37,7 +37,7 @@ private _passed = true
 && assert ((_s get "Oneliner" get "age") EQ 32)
 && assert ((_s get "Oneliner" get "roles") EQ ["Admin", "GSO"]);
 
-if (!_passed) exitWith {
+if (isNil "_passed" || !_passed) exitWith {
     LOG_TEST_FAILED;
     false
 };

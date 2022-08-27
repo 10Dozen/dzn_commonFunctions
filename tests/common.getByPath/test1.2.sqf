@@ -5,7 +5,7 @@
 /* Tests access to key when path is mixed hashmaps & arrays
 */
 
-INIT_STEP_FAILS_COUNTER;
+INIT_FAILED_STEPS_COUNTER;
 LOG_TEST_START;
 
 // Before

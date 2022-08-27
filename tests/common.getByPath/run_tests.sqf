@@ -20,4 +20,4 @@ private _tests = [
     "test6.3"
 ];
 
-RUN_SUITE;
+RUN_SUITE

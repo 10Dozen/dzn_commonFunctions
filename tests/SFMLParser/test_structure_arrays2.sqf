@@ -2,6 +2,7 @@
 #define TEST test_structure_arrays2
 
 LOG_TEST_START;
+INIT_FAILED_STEPS_COUNTER;
 
 test_var = 123;
 
@@ -58,11 +59,15 @@ private _passed = true;
     && assert (isNil "_nil" && count _x == 14)
     && assert (_null EQ objNull);
 
+    if (isNil "_passed" || !_passed) then {
+        FAIL_STEP;
+        ERROR_ "Failed!" _EOL;
+    };
 } forEach [_plain, _oneliner];
 
 test_var = nil;
 
-if (isNil "_passed" || { !_passed }) exitWith {
+if (FAILED_STEPS_EXISTS) exitWith {
     LOG_TEST_FAILED;
     false
 };

@@ -3,18 +3,17 @@
 # Hash
 Str: String # with comment
 StrEscaped: String \# with hash         # Not escpaed for some reason...
-StrEscaped2: String /# with hash        # Not escpaed for some reason...
+StrNotEscaped: String /# with hash
 QStr: 'String # with hash'
 DQStr: "String # with hash"
 Code: { [0,1,2] # 2 } # Looks commented in YAML highlight, but actually works
-CodeEscaped: { [1,2,3] \# 2 }
+Code2: { '\#' + '3' }
 Exp: `[4,5,6] # 2`
-ExpEscaped: `[7,8,9] \# 2`              # Not escpaed for some reason... Should it?
 
 # Reference sign
 StrRef: \*Str
-StrRefQ: '*Str'    # Not escaped... Should?
-StrRefDQ: "*Str"   # Not escaped... Shoud?
+StrRefQ: '*Str'
+StrRefDQ: "*Str"
 
 # Variable signs
 StrVar: \<Str\>

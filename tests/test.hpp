@@ -19,13 +19,14 @@
     diag_log text format ['[COMPONENT] RESULT: %1', ["PASSED", "FAILED"] select (false in _results)]; \
     diag_log text format ['[COMPONENT]   Passed: %1', {_x} count _results]; \
     diag_log text format ['[COMPONENT]   Failed: %1', {!_x} count _results]; \
-    diag_log text '[COMPONENT] ---------------------------------------------'
+    diag_log text '[COMPONENT] ---------------------------------------------'; \
+    ["PASSED", "FAILED"] select (false in _results)
 
 #define LOG_ diag_log text ('[COMPONENT.TEST] ' + format [
 #define INFO_ diag_log text ('[COMPONENT.TEST] (info) ' + format [
 #define ERROR_ diag_log text ('[COMPONENT.TEST] (error) ' + format [
 #define _EOL ])
 
-#define INIT_STEP_FAILS_COUNTER private _fails = 0
+#define INIT_FAILED_STEPS_COUNTER private _fails = 0
 #define FAIL_STEP _fails = _fails + 1
 #define FAILED_STEPS_EXISTS _fails > 0

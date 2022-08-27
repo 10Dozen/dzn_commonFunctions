@@ -13,9 +13,9 @@ if ((_s get ERRORS_NODE) NEQ []) exitWith {
 };
 
 private _passed = true
-&& assert ((_s get "objNull") isEqualTo objNull)
-&& assert ((_s get "grpNull") isEqualTo grpNull)
-&& assert ((_s get "locationNull") isEqualTo locationNull);
+&& assert ((_s get "objNull") EQ objNull)
+&& assert ((_s get "grpNull") EQ grpNull)
+&& assert ((_s get "locationNull") EQ locationNull);
 
 
 if (!_passed) exitWith {

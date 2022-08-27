@@ -1,5 +1,5 @@
 #include "script_component.hpp"
-#define TEST __FILE__
+#define TEST test_references
 
 LOG_TEST_START;
 

@@ -21,4 +21,8 @@ Code: ^
         3
     ];
 
+    diag_log text ('Multiline code result = ' + str (_t select 1));
+
     (_t select 1)
+
+# ee

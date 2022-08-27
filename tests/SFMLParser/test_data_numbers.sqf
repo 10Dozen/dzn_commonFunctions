@@ -13,18 +13,18 @@ if ((_s get ERRORS_NODE) NEQ []) exitWith {
 };
 
 private _passed = true
-&& assert ((_s get "Int") isEqualTo 1245)
-&& assert ((_s get "Float") isEqualTo 12.345)
-&& assert ((_s get "Scientific") isEqualTo 12.3e4)
-&& assert ((_s get "NegInt") isEqualTo -96)
-&& assert ((_s get "NegFloat") isEqualTo -12.345)
-&& assert ((_s get "Sum") isEqualTo (2 + 2))
-&& assert ((_s get "Minus") isEqualTo (5 - 2))
-&& assert ((_s get "Multiply") isEqualTo (5*2))
-&& assert ((_s get "Div") isEqualTo (4/2))
-&& assert ((_s get "Modulo") isEqualTo (5 % 2))
-&& assert ((_s get "Pow") isEqualTo (4 ^ 2))
-&& assert ((_s get "Equation") isEqualTo (-3 * ((2.36-3)/2 + 2.13 % 2)));
+&& assert ((_s get "Int") EQ 1245)
+&& assert ((_s get "Float") EQ 12.345)
+&& assert ((_s get "Scientific") EQ 12.3e4)
+&& assert ((_s get "NegInt") EQ -96)
+&& assert ((_s get "NegFloat") EQ -12.345)
+&& assert ((_s get "Sum") EQ (2 + 2))
+&& assert ((_s get "Minus") EQ (5 - 2))
+&& assert ((_s get "Multiply") EQ (5*2))
+&& assert ((_s get "Div") EQ (4/2))
+&& assert ((_s get "Modulo") EQ (5 % 2))
+&& assert ((_s get "Pow") EQ (4 ^ 2))
+&& assert ((_s get "Equation") EQ (-3 * ((2.36-3)/2 + 2.13 % 2)));
 
 if (!_passed) exitWith {
     LOG_TEST_FAILED;

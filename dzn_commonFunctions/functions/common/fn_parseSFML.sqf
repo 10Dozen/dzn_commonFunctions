@@ -13,7 +13,7 @@
  * HASHMAP - map of the parsed settings. Each section will be available under it's key.
  *               Special keys:
  *
- *              a) '#SOURCE' key - string with path to parsed file or inpuit (same as function argument).
+ *              a) '#SOURCE' key - string with path to parsed file or input (same as function argument).
  *
  *              b) '#ERRORS' key - array of parsing errors in format:
  *              [_errorCode, _lineNo, _lineContent, _reason, (optional) _param1, ... , _paramN].
@@ -35,7 +35,7 @@
 
 #include "SFMLParser.hpp"
 
-// #define DEBUG true
+//#define DEBUG true
 #ifdef DEBUG
     #define LOG_PREFIX '[dzn_fnc_parseSFML] PARSER: '
     #define LOG(MSG) diag_log text (LOG_PREFIX + MSG)
@@ -55,12 +55,14 @@
 // Parser mode
 #define MODE_ROOT 0
 #define MODE_NESTED 10
+#define MODE_NESTED_ARRAY 11
+#define MODE_NESTED_OBJECT 12
 #define MODE_MULTILINE_TEXT 20
 
 // Multiline settings
-#define MULTILINE_MODE_NEWLINES "NEWLINES"
-#define MULTILINE_MODE_FOLDED "FOLDED_LINES"
-#define MULTILINE_MODE_CODE "MULTILINE_CODE"
+#define MULTILINE_MODE_NEWLINES 300
+#define MULTILINE_MODE_FOLDED 310
+#define MULTILINE_MODE_CODE 320
 
 #define ONELINER_ARRAY 1000
 #define ONELINER_HASHMAP 1001
@@ -69,8 +71,8 @@
 
 #define CURRENT_NODE_KEY (if (count _hashNodesRoute > 0) then {_hashNodesRoute select (count _hashNodesRoute - 1)} else {""})
 #define STRIP(X) (X select [1, count X - 2])
-#define IS_REF_VALUE(X) (X select [0,1] == toString [REF_PREFIX])
-#define IS_MULTILINE_START(X) ((toArray X select 0) in [ASCII_VERTICAL_LINE, ASCII_GT, ASCII_CARET])
+#define IS_REF_VALUE(X) (X select [0, REF_PREFIX_PROCESSED_LENGTH] == REF_PREFIX_PROCESSED)
+#define IS_MULTILINE_START(X) ((toArray X select 0) in [MULTILINE_NEWLINES_PREFIX, MULTILINE_FOLDED_PREFIX, MULTILINE_CODE_PREFIX])
 #define IS_IN_ARRAY_NODE (typename CURRENT_NODE_KEY == "SCALAR")
 
 // Error reporting
@@ -124,6 +126,7 @@ private _fnc_splitLines = {
     private _lineChars = [];
     private _lines = [];
 
+    LOG_1("(splitLines) Split by Linebreaks: %1", _linebreaks);
     for "_i" from 0 to (count _chars - 2) do {
         private _char = _chars # _i;
         private _nextChar = _chars # (_i + 1);
@@ -159,17 +162,27 @@ private _fnc_removeComment = {
     private _inCodeDepth = 0;
     private ["_char"];
 
+
+    LOG_1("(removeComment) Line: %1", toString _chars);
+
     for "_j" from 0 to _size-1 do {
         _char = _chars # _j;
 
         switch _char do {
             case ASCII_HASH: {
-                if (_inQuotes || _inCode) exitWith { }; // Ignore hashes inside the quotes or code
-                if (_j == 0) exitWith { _commentStartedIndex = _j; };
-                if (_chars # (_j - 1) in [ASCII_SLASH, ASCII_BACKSLASH]) then {
-                    _escapedHashes pushBack [_j - 1];
+                if (_inQuotes || _inCode) exitWith {
+                    LOG_1("(removeComment) Found nested hash at %1. Ignored.", _j);
+                }; // Ignore hashes inside the quotes or code
+                if (_j == 0) exitWith {
+                    _commentStartedIndex = _j;
+                    LOG_1("(removeComment) Found hash at : %1", _j);
+                };
+                if (_chars # (_j - 1) == ASCII_BACKSLASH) then {
+                    _escapedHashes pushBack _j - 1;
+                    LOG_1("(removeComment) Found escaped hash at : %1", _j - 1);
                 } else {
                     _commentStartedIndex = _j;
+                    LOG_1("(removeComment) Found hash at : %1", _j);
                 };
             };
             case ASCII_GRAVE;
@@ -209,7 +222,8 @@ private _fnc_removeComment = {
     };
 
     // Unwrap escaped hashes: \# -> #
-    { _chars deleteAt _x } forEach (reverse _escapedHashes);
+    reverse _escapedHashes;
+    { _chars deleteAt _x } forEach _escapedHashes;
 
     _chars
 };
@@ -482,6 +496,7 @@ private _fnc_parseValueType = {
     // - HashMap --> first and last symbols are ( ) AND not quoted
     // - Variable --> first and last symbols are <> OR (missionNamespace has value AND not quoted)
     // - Side --> value is one of the sides list AND not quoted
+    // - Reference --> first symbol is * AND not quoted
     // - nil --> 'nil' value
     // - null --> one of null types names (objNull, grpNull, locationNull)
 
@@ -557,7 +572,7 @@ private _fnc_parseValueType = {
     // Reference values - skip processing, as it should be resolved to actual value later
     if (_first == REF_PREFIX) exitWith {
         LOG("(parseValueType) Value parsed to REFERENCE.");
-        _value
+        (format ["%1%2", REF_PREFIX_PROCESSED, _value select [1, count _value]])
     };
 
     // Side case: west
@@ -627,7 +642,9 @@ private _fnc_linkRefValue = {
 
     // Search for referenced key
     private _pair = format ["%1: %2", _key, _value];
-    private _refPath = ((_value select [1, count _value]) splitString toString [REF_INFIX]) apply { [_x] call CBA_fnc_trim};
+    private _refPath = ((_value select [REF_PREFIX_PROCESSED_LENGTH, count _value]) splitString toString [REF_INFIX]) apply {
+        [_x] call CBA_fnc_trim
+    };
     private _refValue = _hash;
     LOG_1("(fnc_linkRefValue) Reference path: %1", _refPath);
     {
@@ -830,9 +847,10 @@ private _fnc_findAndRemoveEscaping = {
 
 private _fnc_parseLine = {
     // Parses given line according to current mode
+    if (_mode != MODE_MULTILINE_TEXT && _line == EOF) exitWith {};
+
     switch _mode do {
         case MODE_ROOT: {
-            if (_line == EOF) exitWith {};
             if (_actualIndent != 0) exitWith {
                 LOG_1("(ROOT) [ERROR:ERR_INDENT_UNEXPECTED_ROOT] Error - unexpected indent: %1", _actualIndent);
                 REPORT_ERROR(ERR_INDENT_UNEXPECTED_ROOT, _forEachIndex, "Unexpected indent on parsing root element")
@@ -849,9 +867,9 @@ private _fnc_parseLine = {
 
             // Object found
             if (_value isEqualTo "") exitWith {
-                LOG("(ROOT) #PARSED# Is start of the section. Switching to MODE_NESTED");
+                [_key] call _fnc_addNode;
                 _mode = MODE_NESTED;
-                [_key] call _fnc_addNode
+                LOG("(ROOT) #PARSED# Is start of the section. Switching to MODE_NESTED");
             };
 
             // Multiline text is found - add node and switch to multiline mode
@@ -926,7 +944,6 @@ private _fnc_parseLine = {
             (_hash get MULTILINE_VALUE_NODE) pushBack _trimmed;
         };
         case MODE_NESTED: {
-            if (_line == EOF) exitWith {};
             if (_actualIndent == 0) exitWith {
                 LOG("(NESTED) End of the all nested objects");
                 _hashNodesRoute = [];
@@ -961,72 +978,90 @@ private _fnc_parseLine = {
 
             // Array case
             if (_startsWith == ASCII_MINUS) exitWith {
-                LOG("(NESTED.ARRAY) Nested element is array item");
+                LOG("(NESTED) Nested element is array item");
+                _mode = MODE_NESTED_ARRAY;
+                call _fnc_parseLine;
+            };
 
-                _line = [_line, "- "] call CBA_fnc_leftTrim;
+            // Object case
+            LOG("(NESTED) Nested element is object");
+            _mode = MODE_NESTED_OBJECT;
+            call _fnc_parseLine;
+        };
+        case MODE_NESTED_ARRAY: {
+            LOG_1("(NESTED.ARRAY) Line: %1", _line);
+            _mode = MODE_NESTED;
 
-                LOG("(NESTED.ARRAY) Check for oneliner structure");
-                private _isOneliner = [_line] call _fnc_checkIsOneliner;
-                LOG_1("(NESTED.ARRAY) Is oneliner?: %1", _isOneliner);
+            _line = [_line, "- "] call CBA_fnc_leftTrim;
+            LOG("(NESTED.ARRAY) Check for oneliner structure");
+            private _isOneliner = [_line] call _fnc_checkIsOneliner;
+            LOG_1("(NESTED.ARRAY) Is oneliner?: %1", _isOneliner);
 
-                private _parsed = [_line] call _fnc_parseKeyValuePair;
-                if (_isOneliner || _parsed isEqualTo []) exitWith {
-
-                    LOG("(NESTED.ARRAY) Nested array item case");
-                    if (IS_MULTILINE_START(_line)) then {
-                        // Nested Multiline text is found in array
-                        LOG("(NESTED.ARRAY) #PARSED# Start of the multiline text section. Swtiching to MODE_MULTILINE_TEXT");
-                        _mode = MODE_MULTILINE_TEXT;
-                        ["", _actualIndent + INDENT_ARRAY_NESTED, _line] call _fnc_initMultilineBuffer;
-                    } else {
-                        // Simple array item: - itemX
-                        if (IS_IN_ARRAY_NODE) then {
-                            _hashNodesRoute deleteAt (count _hashNodesRoute - 1);
-                            LOG_1("(NESTED.ARRAY) New array item, step back to array node. Nodes are: %1", _hashNodesRoute);
-                        };
-                        private _arrayKey = [[_line] call _fnc_parseValueType] call _fnc_addArrayItem;
-                        LOG_1("(NESTED.ARRAY) #PARSED# Simple array item: %1", _arrayKey);
+            private _parsed = [_line] call _fnc_parseKeyValuePair;
+            if (_isOneliner || _parsed isEqualTo []) exitWith {
+                LOG("(NESTED.ARRAY) Nested array item case");
+                if (IS_MULTILINE_START(_line)) then {
+                    // Nested Multiline text is found in array
+                    LOG("(NESTED.ARRAY) #PARSED# Start of the multiline text section. Swtiching to MODE_MULTILINE_TEXT");
+                    _mode = MODE_MULTILINE_TEXT;
+                    ["", _actualIndent + INDENT_ARRAY_NESTED, _line] call _fnc_initMultilineBuffer;
+                } else {
+                    // Simple array item: - itemX
+                    if (IS_IN_ARRAY_NODE) then {
+                        _hashNodesRoute deleteAt (count _hashNodesRoute - 1);
+                        LOG_1("(NESTED.ARRAY) New array item, step back to array node. Nodes are: %1", _hashNodesRoute);
                     };
+                    private _arrayKey = [[_line] call _fnc_parseValueType] call _fnc_addArrayItem;
+                    LOG_1("(NESTED.ARRAY) #PARSED# Simple array item: %1", _arrayKey);
                 };
+            };
 
-                // Otherwise -- assosiated value or another nested thing: - item: ???
-                _parsed params ["_key", "_value"];
+            // Otherwise -- assosiated value or another nested thing: - item: ???
+            _parsed params ["_key", "_value"];
 
-                // Nested object: - weapons:
-                //                    - some item1
-                if (_value isEqualTo "") exitWith {
-                    [_key] call _fnc_addNode;
-                    LOG_1("(NESTED.ARRAY.SECTION) Nested section found. Nodes are: %1", _hashNodesRoute);
-                };
-
-                // Array-Nested object found: - item: value
-                // ---
-
-                if (IS_IN_ARRAY_NODE) then {
-                    /* Next array item found:
-                       - key: value1
-                         key2: value2
-                       - key: value3    <--- thsi case - new array item detected
-                    */
-                    _hashNodesRoute deleteAt (count _hashNodesRoute - 1);
-                    LOG_1("(NESTED.ARRAY.OBJECT) New array item, step back to array node. Nodes are: %1", _hashNodesRoute);
-                };
+            // Nested object: - weapons:
+            //                    - some item1
+            if (_value isEqualTo "") exitWith {
+                LOG("(NESTED.ARRAY.SECTION) Nested section found. Creating array and add subnode to it");
 
                 private _nestedNode = createHashMap;
                 private _arrayKey = [_nestedNode] call _fnc_addArrayItem;
                 _hashNodesRoute pushBack _arrayKey;
 
-                if (IS_MULTILINE_START(_value)) exitWith {
-                    LOG("(NESTED.ARRAY.OBJECT) #PARSED# Start of the multiline text section. Swtiching to MODE_MULTILINE_TEXT");
-                    _mode = MODE_MULTILINE_TEXT;
-                    [_key, _actualIndent + INDENT_ARRAY_NESTED, _value] call _fnc_initMultilineBuffer;
-                };
-
-                LOG("(NESTED.ARRAY.OBJECT) #PARSED# Key-value pair found.");
-                [_key, _value] call _fnc_addSetting;
+                [_key] call _fnc_addNode;
+                LOG_1("(NESTED.ARRAY.SECTION) Nested section found. Nodes are: %1", _hashNodesRoute);
             };
 
-            // Object case
+            // Array-Nested object found: - item: value
+            // ---
+
+            if (IS_IN_ARRAY_NODE) then {
+                /* Next array item found:
+                   - key: value1
+                     key2: value2
+                   - key: value3    <--- thsi case - new array item detected
+                */
+                _hashNodesRoute deleteAt (count _hashNodesRoute - 1);
+                LOG_1("(NESTED.ARRAY.OBJECT) New array item, step back to array node. Nodes are: %1", _hashNodesRoute);
+            };
+
+            private _nestedNode = createHashMap;
+            private _arrayKey = [_nestedNode] call _fnc_addArrayItem;
+            _hashNodesRoute pushBack _arrayKey;
+
+            if (IS_MULTILINE_START(_value)) exitWith {
+                LOG("(NESTED.ARRAY.OBJECT) #PARSED# Start of the multiline text section. Swtiching to MODE_MULTILINE_TEXT");
+                _mode = MODE_MULTILINE_TEXT;
+                [_key, _actualIndent + INDENT_ARRAY_NESTED, _value] call _fnc_initMultilineBuffer;
+            };
+
+            LOG("(NESTED.ARRAY.OBJECT) #PARSED# Key-value pair found.");
+            [_key, _value] call _fnc_addSetting;
+        };
+        case MODE_NESTED_OBJECT: {
+            LOG_1("(NESTED.OBJECT) Line: %1", _line);
+            _mode = MODE_NESTED;
+
             private _parsed = [_line] call _fnc_parseKeyValuePair;
             if (_parsed isEqualTo []) exitWith {
                 LOG("(NESTED) [ERROR:ERR_DATA_MALFORMED] Unknown markup in nested line (not a key-value pair/section/array)");
@@ -1094,7 +1129,7 @@ private _mode = MODE_ROOT;
             };
         } else {
             LOG_1("Line %1: Is empty. Skipped.", _forEachIndex+1);
-            continue
+            continue;
         };
     };
 

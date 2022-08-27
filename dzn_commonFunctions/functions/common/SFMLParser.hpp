@@ -1,3 +1,19 @@
+/*
+Fails in test:
+call compile preprocessFileLineNumbers "tests\SFMLParser\test_structure_arrays.sqf"
+
+NestedInObject2:
+    - arr:
+        - 1
+        - 2
+        - 3
+      key1: 1  # <- Fails ["ERR_INDENT_UNEXPECTED_NESTED","Unexpected indent for nested item (expected 8 but actual is 6"]
+    - key2: 2
+
+*/
+
+// ASCII char codes
+#include "ascii_codes.hpp"
 
 // Function modes
 #define MODE_FILE_LOAD "LOAD_FILE"
@@ -19,27 +35,7 @@
 #define DATA_NODE "#DATA"
 
 
-// ASCII char codes
-#define ASCII_MINUS 45
-#define ASCII_HASH 35
-#define ASCII_BACKSLASH 92
-#define ASCII_SLASH 47
-#define ASCII_SPACE 32
-#define ASCII_DOUBLE_QUOTE 34
-#define ASCII_QUOTE 39
-#define ASCII_ASTERISK 42
-#define ASCII_COMMA 44
-#define ASCII_LT 60
-#define ASCII_GT 62
-#define ASCII_PARENTHESES_OPEN 40
-#define ASCII_PARENTHESES_CLOSE 41
-#define ASCII_SQUARE_BRACKET_OPEN 91
-#define ASCII_SQUARE_BRACKET_CLOSE 93
-#define ASCII_CURLY_BRACKET_OPEN 123
-#define ASCII_CURLY_BRACKET_CLOSE 125
-#define ASCII_GRAVE 96
-#define ASCII_VERTICAL_LINE 124
-#define ASCII_CARET 94
+
 
 // Data types
 #define INTEGER_REGEX "\d+"

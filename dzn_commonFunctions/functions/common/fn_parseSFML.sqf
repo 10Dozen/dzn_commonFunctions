@@ -37,7 +37,7 @@
 
 // #define DEBUG true
 #ifdef DEBUG
-    #define LOG_PREFIX '[dzn_fnc_parseSettingsFile] PARSER: '
+    #define LOG_PREFIX '[dzn_fnc_parseSFML] PARSER: '
     #define LOG(MSG) diag_log text (LOG_PREFIX + MSG)
     #define LOG_1(MSG,ARG1) diag_log text format [LOG_PREFIX + MSG,ARG1]
     #define LOG_2(MSG,ARG1,ARG2) diag_log text format [LOG_PREFIX + MSG,ARG1,ARG2]
@@ -453,7 +453,7 @@ private _fnc_checkIsOneliner = {
     if (_value isEqualTo "") exitWith { "STRING" };
 
     private _asChars = toArray _value;
-    private _first = _asChars # 0;
+    private _first = _asChars select 0;
     private _last = _asChars select (count _asChars - 1);
     private _sameChars = _first == _last;
 
@@ -968,7 +968,6 @@ private _fnc_parseLine = {
                 LOG("(NESTED.ARRAY) Check for oneliner structure");
                 private _isOneliner = [_line] call _fnc_checkIsOneliner;
                 LOG_1("(NESTED.ARRAY) Is oneliner?: %1", _isOneliner);
-
 
                 private _parsed = [_line] call _fnc_parseKeyValuePair;
                 if (_isOneliner || _parsed isEqualTo []) exitWith {

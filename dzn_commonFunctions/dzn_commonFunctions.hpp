@@ -21,6 +21,7 @@ class CfgFunctions
             file = "dzn_commonFunctions\functions\common";
 
             class getMissionParameters {};
+            class getByPath {};
             class getValueByKey {};
             class setValueByKey {};
             class setVars {};

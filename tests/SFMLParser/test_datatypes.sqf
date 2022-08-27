@@ -6,12 +6,7 @@ LOG_TEST_START;
 test_var = 123;
 private _s = ["tests\SFMLParser\data_types.yml"] call dzn_fnc_parseSFML;
 LOG_PARSING_ERRORS(_s);
-
-if ((_s get ERRORS_NODE) NEQ []) exitWith {
-    ERROR_ "There are parsing errors detected!" _EOL;
-    LOG_TEST_FAILED;
-    false;
-};
+FAIL_IF_PARSING_ERRORS(_s);
 
 private _passed = true
 && assert ((_s get "KeyStr") EQ "I am a String")

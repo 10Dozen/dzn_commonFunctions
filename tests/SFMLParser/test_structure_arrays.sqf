@@ -5,12 +5,7 @@ LOG_TEST_START;
 
 private _s = ["tests\SFMLParser\structure_arrays.yml"] call dzn_fnc_parseSFML;
 LOG_PARSING_ERRORS(_s);
-
-if ((_s get ERRORS_NODE) NEQ []) exitWith {
-    ERROR_ "There are parsing errors detected!" _EOL;
-    LOG_TEST_FAILED;
-    false;
-};
+FAIL_IF_PARSING_ERRORS(_s);
 
 private _passed = true
 && assert ((_s get "Plain") EQ [1,2,3])

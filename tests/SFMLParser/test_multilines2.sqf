@@ -6,13 +6,7 @@ INIT_FAILED_STEPS_COUNTER;
 
 private _s = ["tests\SFMLParser\multilines2.yml"] call dzn_fnc_parseSFML;
 LOG_PARSING_ERRORS(_s);
-TEST_MAP = _s;
-
-if ((_s get ERRORS_NODE) NEQ []) exitWith {
-    ERROR_ "There are parsing errors detected!" _EOL;
-    LOG_TEST_FAILED;
-    false;
-};
+FAIL_IF_PARSING_ERRORS(_s);
 
 private _newline = "This is a text of newlines." + endl
 + "Each lines is a separate line." + endl

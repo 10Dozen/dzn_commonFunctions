@@ -8,15 +8,13 @@ test_var = 123;
 
 private _s = ["tests\SFMLParser\structure_arrays2.yml"] call dzn_fnc_parseSFML;
 LOG_PARSING_ERRORS(_s);
+FAIL_IF_PARSING_ERRORS(_s);
 
 private _plain = _s get "PlainDataTypes";
 private _oneliner = _s get "OnelinerDataTypes";
 
-if ((_s get ERRORS_NODE) isNotEqualTo []
-    || isNil "_plain"
-    || isNil "_oneliner"
-) exitWith {
-    ERROR_ "There are parsing errors detected!" _EOL;
+if (isNil "_plain" || isNil "_oneliner") exitWith {
+    ERROR_ "Failed to find nodes! Keys: %1", keys _s _EOL;
     LOG_TEST_FAILED;
     false
 };

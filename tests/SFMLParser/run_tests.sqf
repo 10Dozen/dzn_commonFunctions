@@ -20,6 +20,9 @@ private _tests = [
     "test_multilines2",
     /* "test_errors"  */
     /*"test_preprocess_file_mode"*/
+    "test_modes_loadfile",
+    "test_modes_preprocessfile",
+    "test_modes_parseline",
     "test_parse_line_mode",
     "test_parse_line_mode2"
 ];

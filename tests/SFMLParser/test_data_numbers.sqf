@@ -5,12 +5,7 @@ LOG_TEST_START;
 
 private _s = ["tests\SFMLParser\data_numbers.yml"] call dzn_fnc_parseSFML;
 LOG_PARSING_ERRORS(_s);
-
-if ((_s get ERRORS_NODE) NEQ []) exitWith {
-    ERROR_ "There are parsing errors detected!" _EOL;
-    LOG_TEST_FAILED;
-    false;
-};
+FAIL_IF_PARSING_ERRORS(_s);
 
 private _passed = true
 && assert ((_s get "Int") EQ 1245)

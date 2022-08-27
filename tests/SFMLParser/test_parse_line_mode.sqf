@@ -45,12 +45,7 @@ private _index = 1;
 
     private _s = [_input, "PARSE_LINE"] call dzn_fnc_parseSFML;
     LOG_PARSING_ERRORS(_s);
-
-    if ((_s get ERRORS_NODE) NEQ []) exitWith {
-        ERROR_ "There are parsing errors detected!" _EOL;
-        LOG_TEST_FAILED;
-        false;
-    };
+    FAIL_IF_PARSING_ERRORS(_s);
 
     private _results = (keys _expected) apply {
         INFO_ "  Checking for key [%1]", _x _EOL;

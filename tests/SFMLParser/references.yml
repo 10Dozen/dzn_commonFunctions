@@ -1,0 +1,35 @@
+
+RootNode: 1337
+RefToRoot: *RootNode
+
+NestedA:
+    NestedB:
+        NestedC:
+            NestedNode: 999
+
+RefToNested: *NestedA > NestedB > NestedC > NestedNode
+NestedX:
+    NestedY:
+        NestedZ:
+            NestedRefToNested: *NestedA > NestedB > NestedC > NestedNode
+
+Arr:
+    - 1
+    - 2
+    - 435
+
+RefToArr: *Arr > 2
+
+ArrayOfObjects:
+    - name: John
+      age: 33
+    - name: Alice
+      age: 31
+
+RefToArrayObjects: *ArrayOfObjects > 1 > name
+RefInArray:
+    - 1
+    - *RootNode
+    - 2
+    - *Arr > 2
+    - *NestedA > NestedB > NestedC > NestedNode

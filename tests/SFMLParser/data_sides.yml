@@ -1,0 +1,59 @@
+
+west:
+    - west
+    - WEST
+    - West
+    - weSt
+
+blufor:
+    - blufor
+    - BLUFOR
+    - Blufor
+    - BLUFor
+
+east:
+    - east
+    - EAST
+    - East
+    - eaST
+
+opfor:
+    - opfor
+    - OPFOR
+    - Opfor
+    - OPFor
+
+indep:
+    - indep
+    - INDEP
+    - Indep
+    - indEP
+
+independent:
+    - independent
+    - INDEPENDENT
+    - Independent
+
+resistance:
+    - resistance
+    - Resistance
+    - RESISTANCE
+    - resiSTAnce
+
+guer:
+    - guer
+    - GUER
+    - Guer
+    - guER
+
+civilian:
+    - civilian
+    - CIVILIAN
+    - Civilian
+    - CiviliaN
+
+civ:
+    - civ
+    - CIV
+    - Civ
+    - ciV

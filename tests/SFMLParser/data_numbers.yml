@@ -1,0 +1,13 @@
+
+Int: 1245
+Float: 12.345
+Scientific: 12.3e4
+NegInt: -96
+NegFloat: -12.345
+Sum: 2 + 2
+Minus: 5 - 2
+Multiply: 5*2
+Div: 4/2
+Modulo: 5 % 2
+Pow: 4 ^ 2
+Equation: -3 * ((2.36-3)/2 + 2.13 % 2)

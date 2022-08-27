@@ -1,0 +1,45 @@
+# General arrays syntax check
+Plain:
+    - 1
+    - 2
+    - 3
+
+Nested:
+    - [1,2,3]
+    - [4,5,6]
+    - [7,8,9]
+
+Oneliner: [1,2,3]
+NestedInOneliner: [[1,2,3], [4,5,6]]
+
+NestedInObject:
+    - key1: 1
+      arr:
+        - 1
+        - 2
+        - 3
+    - key2: 2
+
+NestedInObject2:
+    - arr:
+        - 1
+        - 2
+        - 3
+      key1: 1  # Fails 
+    - key2: 2
+
+ArrayOfObjects:
+    - callsign: PAPA BEAR
+    - callsign: Spearhead-1
+      unit: spearhead
+    - callsign: CCP
+
+ArrayOfObjects2:
+    - a: 1
+      b: 2
+    - c: 3
+
+ArrayOfObjects3:
+    - a: 1
+    - b: 2
+      c: 3

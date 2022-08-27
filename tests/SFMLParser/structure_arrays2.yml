@@ -1,0 +1,18 @@
+# Check data types in arrays
+PlainDataTypes:
+    - String
+    - "String"
+    - 123
+    - 23 + 23
+    - `12 min 3`
+    - true
+    - { hint "Code!"; }
+    - <test_var>
+    - test_var
+    - blufor
+    - (name: John, age: 32)
+    - [1,2,3]
+    - nil
+    - objNull
+
+OnelinerDataTypes: [String, "String", 123, 23+23, `12 min 3`, true, { hint "Code!"; }, <test_var>, test_var, blufor, (name: John, age: 32), [1,2,3], nil, objNull]

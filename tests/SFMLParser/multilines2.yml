@@ -1,0 +1,45 @@
+# Test of multilines inside structures
+
+Section:
+    Newline: |
+        This is a text of newlines.
+        Each lines is a separate line.
+
+        Empty lines are also a new line.
+           extra spaicing is saved.
+    Folded: >
+        This is a single line.
+        Merged by one space symbol.
+
+        Empty lines are just empty palce.
+            extra spacing is saved.
+    Code: ^
+        private _t = [
+            1,
+            2,
+            3
+        ];
+
+        (_t select 1)
+
+Array:
+    - |
+          This is a text of newlines.
+          Each lines is a separate line.
+
+          Empty lines are also a new line.
+             extra spaicing is saved.
+    - >
+          This is a single line.
+          Merged by one space symbol.
+
+          Empty lines are just empty palce.
+              extra spacing is saved.
+    - ^
+          private _t = [
+              1,
+              2,
+              3
+          ];
+
+          (_t select 1)

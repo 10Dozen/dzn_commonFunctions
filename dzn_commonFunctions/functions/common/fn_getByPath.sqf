@@ -21,7 +21,6 @@
     - Each node should be separate element of the array (e.g. ['NODE_A', 'Key'])
     - For nested hashmap use key name (e.g. ['NODE_A', 'NODE_B', 'Key'])
     - For nested array use index (e.g. ['NestedArray', 1])
-    - For scalar (numeric) hashmap keys use numbers as is (e.g. ['NODE_A', 1337])
 
     EXAMPLE:
     [_hash, "NodeA > NodeB > Key1", 10] call dzn_fnc_getByPath

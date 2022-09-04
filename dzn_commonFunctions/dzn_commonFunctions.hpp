@@ -22,6 +22,7 @@ class CfgFunctions
 
             class getMissionParameters {};
             class getByPath {};
+            class setByPath {};
             class getValueByKey {};
             class setValueByKey {};
             class setVars {};

@@ -1,6 +1,5 @@
+#define QUOTE(X) #X
 
-#define EQ isEqualTo
-#define NEQ isNotEqualTo
 
 #define LOG_TEST_START diag_log text '[COMPONENT.TEST] Started'
 #define LOG_TEST_PASSED diag_log text '[COMPONENT.TEST]           OK!'
@@ -20,6 +19,11 @@
     diag_log text format ['[COMPONENT]   Passed: %1', {_x} count _results]; \
     diag_log text format ['[COMPONENT]   Failed: %1', {!_x} count _results]; \
     diag_log text '[COMPONENT] ---------------------------------------------'; \
+    if (false in _results) then {\
+        diag_log text '[COMPONENT] Failed tests:';\
+        { if (!_x) then { diag_log text format ['[COMPONENT]   %1', _tests select _forEachIndex]; }; } forEach _results;\
+        diag_log text '[COMPONENT] ---------------------------------------------'; \
+    };\
     ["PASSED", "FAILED"] select (false in _results)
 
 #define LOG_ diag_log text ('[COMPONENT.TEST] ' + format [
@@ -30,3 +34,33 @@
 #define INIT_FAILED_STEPS_COUNTER private _fails = 0
 #define FAIL_STEP _fails = _fails + 1
 #define FAILED_STEPS_EXISTS _fails > 0
+
+#define _VALIDATION_ while {
+#define _VALIDATION_END_ false } do {};
+
+#define EQ isEqualTo
+#define NEQ isNotEqualTo
+
+#define ASSERT_NOT_NIL(VAR) \
+    if (isNil QUOTE(VAR)) exitWith { \
+        FAIL_STEP; \
+        ERROR_ "Variable %1 is nil!", QUOTE(VAR) _EOL \
+    }
+
+#define ASSERT_TRUE(COND,MSG) \
+    if !(COND) exitWith { \
+        FAIL_STEP; \
+        ERROR_ MSG _EOL; \
+    }
+
+#define ASSERT_FALSE(COND,MSG) \
+    if (COND) exitWith { \
+        FAIL_STEP; \
+        ERROR_ MSG _EOL; \
+    }
+
+#define ASSERT_EQUALS(VAR1,VAR2) \
+    if (!(VAR1 isEqualType VAR2) || {VAR1 isNotEqualTo VAR2}) exitWith {\
+        FAIL_STEP; \
+        ERROR_ "Variable [%1] expected to be [%2], but actual [%3]", QUOTE(VAR1), VAR1, VAR2 _EOL; \
+    }

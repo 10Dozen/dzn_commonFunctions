@@ -9,7 +9,7 @@ KeyBoolFalse: false # With inline comment
 KeyBoolTrue: true
 KeyCode: { hint "Code"; }
 KeyVar: <test_var>
-KeyVarImpl: test_var
+KeyVarImpl: test_var   # Not supported, should be resolved to string 'test_var'
 KeySide: east
 KeyEval: `12 min 2`
 KeyArray: [1,2,3]

@@ -1,0 +1,108 @@
+
+# Comment
+KeyStr: I am a String
+KeyStrDoubleQ: "String double quoted"
+KeyStrQ: 'String single quote'
+KeyNum: 12
+KeyNumEq: (23*2 + 32)/2
+KeyBoolFalse: false # With inline comment
+KeyBoolTrue: true
+KeyCode: { hint "Code"; }
+KeyVar: <test_var>
+KeyVarImpl: test_var   # Not supported, should be resolved to string 'test_var'
+KeySide: east
+KeyEval: `12 min 2`
+KeyArray: [1,2,3]
+KeyHash: (name: John, age: 32)
+KeyNil: nil
+KeyNull: objNull
+
+
+Plain:
+    Key1: 5000
+    Key2: 35000
+
+Nested:
+    Section:
+        Key1: 100
+        Key2: 200
+    Key3: 300
+
+Nested2:
+    Key1: 100
+    Section:
+        Key2: 200
+    Key3: 300
+
+Nested3:
+    Key1: 100
+    Key2: 200
+    Section:
+        Key3: 300
+
+
+NestedInArray:
+    - 1
+    - name: John
+      age: 32
+    - 3
+
+NestedInArray2:
+    - 1
+    - 2
+    - name: John
+      age: 32
+
+NestedInArray3:
+    - name: John
+      age: 32
+    - 1
+    - 2
+
+Oneliner: (name: John, age: 32, roles: [Admin, GSO])
+
+
+
+KeyZZ: 1
+SectionSSS:
+    KeyZZZ: 2
+
+Array:
+    - 1
+    - 2
+    - 3
+
+RootNode: 1337
+RefToRoot: *RootNode
+
+NestedA:
+    NestedB:
+        NestedC:
+            NestedNode: 999
+
+RefToNested: *NestedA > NestedB > NestedC > NestedNode
+NestedX:
+    NestedY:
+        NestedZ:
+            NestedRefToNested: *NestedA > NestedB > NestedC > NestedNode
+
+Arr:
+    - 1
+    - 2
+    - 435
+
+RefToArr: *Arr > 2
+
+ArrayOfObjects:
+    - name: John
+      age: 33
+    - name: Alice
+      age: 31
+
+RefToArrayObjects: *ArrayOfObjects > 1 > name
+RefInArray:
+    - 1
+    - *RootNode
+    - 2
+    - *Arr > 2
+    - *NestedA > NestedB > NestedC > NestedNode

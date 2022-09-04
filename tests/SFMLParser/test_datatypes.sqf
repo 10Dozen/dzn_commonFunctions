@@ -18,7 +18,7 @@ private _passed = true
 && assert ((_s get "KeyBoolTrue"))
 && assert ((_s get "KeyHash") EQ (createHashMapFromArray [["name","John"],["age", 32]]))
 && assert ((_s get "KeyVar") EQ test_var)
-&& assert ((_s get "KeyVarImpl") EQ test_var)
+&& assert ((_s get "KeyVarImpl") EQ 'test_var')
 && assert ((_s get "KeySide") EQ east)
 && assert ((_s get "KeyEval") EQ 2)
 && assert ((_s get "KeyCode") EQ { hint "Code"; })

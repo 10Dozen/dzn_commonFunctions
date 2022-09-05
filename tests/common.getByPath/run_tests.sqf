@@ -17,7 +17,10 @@ private _tests = [
     "test5.3",
     "test6.1",
     "test6.2",
-    "test6.3"
+    "test6.3",
+    "test7.1",
+    "test7.2",
+    "test8"
 ];
 
 RUN_SUITE

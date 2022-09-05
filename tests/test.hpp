@@ -41,10 +41,16 @@
 #define EQ isEqualTo
 #define NEQ isNotEqualTo
 
+#define ASSERT_NIL(VAR) \
+    if (!isNil QUOTE(VAR)) exitWith { \
+        FAIL_STEP; \
+        ERROR_ "Variable %1 is not nil!", QUOTE(VAR) _EOL; \
+    }
+
 #define ASSERT_NOT_NIL(VAR) \
     if (isNil QUOTE(VAR)) exitWith { \
         FAIL_STEP; \
-        ERROR_ "Variable %1 is nil!", QUOTE(VAR) _EOL \
+        ERROR_ "Variable %1 is nil!", QUOTE(VAR) _EOL; \
     }
 
 #define ASSERT_TRUE(COND,MSG) \

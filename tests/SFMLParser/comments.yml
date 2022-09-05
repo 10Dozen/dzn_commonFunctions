@@ -42,3 +42,5 @@ StrMultiFolded: \>
 StrMultiFoldedQ: '>'
 StrMultiCode: \^
 StrMultiCodeQ: '^'
+MultilineInline: |
+    Some multiline \# \\() without comment

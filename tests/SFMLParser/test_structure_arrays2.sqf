@@ -50,7 +50,7 @@ private _passed = true;
     && assert (_bool)
     && assert (_code EQ { hint "Code!"; })
     && assert (_varExp EQ test_var)
-    && assert (_varImp EQ test_var)
+    && assert (_varImp EQ "test_var")
     && assert (_side EQ blufor)
     && assert (_hash EQ _mapToCheck)
     && assert (_arr EQ [1,2,3])

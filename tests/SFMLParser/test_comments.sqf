@@ -8,6 +8,8 @@ private _s = ["tests\SFMLParser\comments.yml"] call dzn_fnc_parseSFML;
 LOG_PARSING_ERRORS(_s);
 FAIL_IF_PARSING_ERRORS(_s);
 
+TEST_MAP = _s;
+
 // Hash # escapings
 private _hashPassed = true
 && assert ((_s get "Str") EQ "String")
@@ -17,8 +19,9 @@ private _hashPassed = true
 && assert ((_s get "DQStr") EQ "String # with hash")
 && assert ((_s get "Code") EQ { [0,1,2] # 2 })
 && assert ((_s get "Code2") EQ { '\#' + '3' })
-&& assert ((_s get "Exp") EQ  ([4,5,6] # 2));
-// && assert ((_s get "Multilined" EQ "Some # text with hashes"));
+&& assert ((_s get "Exp") EQ  ([4,5,6] # 2))
+&& assert ((_s get "MultilineInline" EQ "Some multiline # \\() without comment"));
+
 
 if (isNil "_hashPassed" || !_hashPassed) then {
     ERROR_ "Escaping HASH (#) tests failed!" _EOL;

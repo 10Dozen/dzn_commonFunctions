@@ -1,8 +1,8 @@
 
 #include "script_component.hpp"
-#define TEST test1.1_HashMapChain
+#define TEST test3_FalsOnNilNode
 
-/* Tests access to key when path consists out of hashmaps only
+/*  Tests false result if middle node is nil
 */
 
 INIT_FAILED_STEPS_COUNTER;
@@ -11,17 +11,17 @@ LOG_TEST_START;
 // Before
 private _pathArr = ["NestedA", "NestedB", "Key"];
 private _expectedValue = 999;
+private _defaultValue = _expectedValue;
 
-private _nestedB = createHashMapFromArray [["Key", _expectedValue]];
-private _nestedA = createHashMapFromArray [["NestedB", _nestedB]];
+private _nestedA = createHashMapFromArray [["NestedB", nil]];
 private _hash = createHashMapFromArray [["NestedA", _nestedA]];
 
 // Test
-private _val = [_hash, _pathArr] call dzn_fnc_getByPath;
+private _result = [_hash, _pathArr, _expectedValue] call dzn_fnc_setByPath;
 
 _VALIDATION_
-    ASSERT_NOT_NIL(_val);
-    ASSERT_EQUALS(_val, _expectedValue);
+    ASSERT_NOT_NIL(_result);
+    ASSERT_FALSE(_result, "Result is not false! Operation failed!");
 _VALIDATION_END_
 
 // Finish

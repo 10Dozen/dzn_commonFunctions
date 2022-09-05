@@ -1,8 +1,9 @@
 
 #include "script_component.hpp"
-#define TEST test1.1_HashMapChain
+#define TEST test7.1_NilOnNotNil
 
-/* Tests access to key when path consists out of hashmaps only
+/*  Test nil result if key in the middle contain nil value.
+    Path is maps only..
 */
 
 INIT_FAILED_STEPS_COUNTER;
@@ -11,17 +12,16 @@ LOG_TEST_START;
 // Before
 private _pathArr = ["NestedA", "NestedB", "Key"];
 private _expectedValue = 999;
+private _defaultValue = _expectedValue;
 
-private _nestedB = createHashMapFromArray [["Key", _expectedValue]];
-private _nestedA = createHashMapFromArray [["NestedB", _nestedB]];
+private _nestedA = createHashMapFromArray [["NestedC", nil]];
 private _hash = createHashMapFromArray [["NestedA", _nestedA]];
 
 // Test
 private _val = [_hash, _pathArr] call dzn_fnc_getByPath;
 
 _VALIDATION_
-    ASSERT_NOT_NIL(_val);
-    ASSERT_EQUALS(_val, _expectedValue);
+    ASSERT_NIL(_val);
 _VALIDATION_END_
 
 // Finish

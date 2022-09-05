@@ -35,7 +35,7 @@
 
 #include "SFMLParser.hpp"
 
-// #define DEBUG true
+//#define DEBUG true
 #ifdef DEBUG
     #define LOG_PREFIX '[dzn_fnc_parseSFML] PARSER: '
     #define LOG(MSG) diag_log text (LOG_PREFIX + MSG)
@@ -174,6 +174,9 @@ private _fnc_removeComment = {
     // Removes comments (text after # char) from the line.
     // Do nothing if # char is shadowed by \ or / symbol
     params ["_chars"];
+
+    if !(ASCII_HASH in _chars) exitWith { _chars };
+
     private _size = count _chars;
     private _commentStartedIndex = -1;
     private _escapedHashes = [];
@@ -182,7 +185,6 @@ private _fnc_removeComment = {
     private _inCode = false;
     private _inCodeDepth = 0;
     private ["_char"];
-
 
     LOG_1("(removeComment) Line: %1", toString _chars);
 
@@ -318,10 +320,10 @@ private _fnc_calculateExpectedIndent = {
         if (typename _x == "SCALAR") then {
             private _tline = [_line] call CBA_fnc_trim;
             if (_tline select [0,1] != "-") then {
-                _expected = _expected + 2;
+                _expected = _expected + INDENT_ARRAY_NESTED;
             };
         } else {
-            _expected = _expected + 4;
+            _expected = _expected + INDENT_DEFAULT;
         };
     } forEach _hashNodesRoute;
 
@@ -539,7 +541,8 @@ private _fnc_parseValueType = {
     // Quoted STRING case - unwrap quotes and return: "My string"
     if (_sameChars && _first in STRING_QUOTES_ASCII) exitWith {
         LOG("(parseValueType) Value parsed to STRING (explicit).");
-        STRIP(_value)
+        _value = [STRIP(_asChars)] call _fnc_removeEscaping;
+        (_value)
     };
 
     // Boolean case: true
@@ -616,15 +619,10 @@ private _fnc_parseValueType = {
         (call compile _value)
     };
 
-    // Implicit Variable case: spearhead
-    private _var = missionNamespace getVariable [_value, nil];
-    if (!isNil "_var") exitWith {
-        LOG("(parseValueType) Value parsed to VARIABLE (impicit).");
-        (_var)
-    };
-
     // Otherwise - it's just a string without quoting
     LOG("(parseValueType) Value parsed to STRING.");
+
+    _value = [_asChars] call _fnc_removeEscaping;
     (_value)
 };
 
@@ -764,52 +762,28 @@ private _fnc_findAndLinkRefValues = {
     } forEach (keys _node) - [ERRORS_NODE, SOURCE_NODE];
 };
 
-private _fnc_findAndConvertToArray = {
-    /* Recursive search through settings hash, checks for array-like hash map (all keys are numbers)
-       and convert it into the normal array
-       _node -- (HashMap) hashmap to search
-       Return: _isArray -- (boolean) flag that given node is array-like hashmap.
-    */
-    params ["_node"];
-    LOG_1("(fnc_findAndConvertToArray) Params: %1", _this);
-
-    private _isArray = true;
+private _fnc_convertToArray = {
     {
-        private _key = _x;
-        private _keyType = typename _key;
-        private _val = _node get _key;
-        if (isNil "_val") then {
-            continue
+        private _val = [_hash, _x] call dzn_fnc_getByPath;
+        LOG_2("(fnc_findAndConvertToArray) Path: %1. Value: %2", _x, _val);
+
+        private _arr = [];
+        for "_i" from 0 to (count _val)-1 do {
+            _arr set [_i, (_val get _i)];
         };
-        private _valType = typename _val;
-        LOG_4("(fnc_findAndConvertToArray) Key: %1 (type: %2). Value: %3 (type: %4)", _key, _keyType, _val, _valType);
 
-        // For each nested hashmap - check and convert it into the array
-        if (_valType == "HASHMAP") then {
-            LOG("(fnc_findAndConvertToArray) Value is a hashMap -> check for nested array");
-            private _isNestedArray = [_val] call _fnc_findAndConvertToArray;
-            if (_isNestedArray) then {
-                LOG("(fnc_findAndConvertToArray) Value is a nested array! Converting...");
-                // Replace nested map with array
-                private _arr = [];
-                for "_i" from 0 to (count _val) - 1 do {
-                    _arr set [_i, (_val get _i)];
-                };
-                _node set [_key, _arr];
-            };
-        };
-        if (_keyType != "SCALAR") then { _isArray = false; };
-    } forEach (keys _node) - [ERRORS_NODE, SOURCE_NODE];
+        [_hash, _x, _arr] call dzn_fnc_setByPath;
 
-    LOG_1("(fnc_findAndConvertToArray) Node checked. Is Array? %1", _isArray);
-
-    (_isArray)
+        LOG_2("(fnc_findAndConvertToArray) Converted: %1. Value: %2", [_hash, _x] call dzn_fnc_getByPath);
+    } forEach _arrayNodes;
 };
 
 private _fnc_removeEscaping = {
     // Removes escaping char (backslash \ in front of the escapable char) from the given line
-    params ["_str"];
-    private _chars = toArray _str;
+    params ["_chars"];
+
+    if !(ASCII_BACKSLASH in _chars) exitWith { toString _chars };
+
     private _size = count _chars - 2;
     private _escapedSymbols = [
         ASCII_ASTERISK, // * - Reference
@@ -838,32 +812,6 @@ private _fnc_removeEscaping = {
 
     LOG_1("(fnc_removeEscaping) Result: %1", (toString _chars));
     (toString _chars)
-};
-
-private _fnc_findAndRemoveEscaping = {
-    /* Recursive search through settings hash, checks for strings and remove escaping if present.
-       _node -- (HashMap) hashmap to search
-       Return: none
-    */
-    params ["_node"];
-    LOG_1("(fnc_findAndRemoveEscaping) Params: %1", _this);
-    {
-        private _key = _x;
-        private _val = _node get _key;
-        if (isNil "_val") then { continue; };
-        private _valType = typename _val;
-        LOG_3("(fnc_findAndRemoveEscaping) Key: %1. Value: %2 (type: %3)", _key, _val, _valType);
-
-        if (_valType == "HASHMAP") then {
-            [_val] call _fnc_findAndRemoveEscaping;
-        } else {
-            if (_valType == "STRING") then {
-                _val = [_val] call _fnc_removeEscaping;
-                LOG_1("(fnc_findAndRemoveEscaping) Escapings removed: [%1]", _val);
-                _node set [_key, _val];
-            };
-        };
-    } forEach (keys _node) - [ERRORS_NODE, SOURCE_NODE];
 };
 
 private _fnc_parseLine = {
@@ -969,7 +917,7 @@ private _fnc_parseLine = {
                 LOG("(NESTED) End of the all nested objects");
                 _hashNodesRoute = [];
                 _mode = MODE_ROOT;
-                call _fnc_parseLine;
+                [] call _fnc_parseLine;
             };
 
             if (_actualIndent % 2 > 0) exitWith {
@@ -982,7 +930,7 @@ private _fnc_parseLine = {
 
             LOG_1("(NESTED) Calcualted indent: %1 (diff: %2)", _calculated, _indentDiff);
 
-            private _closedCount = floor (_indentDiff / 4);
+            private _closedCount = floor (_indentDiff / INDENT_DEFAULT);
             if (_indentDiff < 0 || (_indentDiff > 0 && _closedCount == 0)) exitWith {
                 LOG_2("(NESTED) [ERROR:ERR_INDENT_UNEXPECTED_NESTED] Unexpected indent for nested item (expected %1, but actual is %2) ", _calculated, _actualIndent);
                 REPORT_ERROR(ERR_INDENT_UNEXPECTED_NESTED, _forEachIndex, "Unexpected indent for nested item (expected " + str _calculated + ", but actual is " + str _actualIndent);
@@ -1001,19 +949,24 @@ private _fnc_parseLine = {
             if (_startsWith == ASCII_MINUS) exitWith {
                 LOG("(NESTED) Nested element is array item");
                 _mode = MODE_NESTED_ARRAY;
-                call _fnc_parseLine;
+                LOG_1("(NESTED) Bookmarking array node %1", _hashNodesRoute);
+                if !(IS_IN_ARRAY_NODE) then {
+                    _arrayNodes pushBackUnique +_hashNodesRoute;
+                };
+                [] call _fnc_parseLine;
             };
 
             // Object case
             LOG("(NESTED) Nested element is object");
             _mode = MODE_NESTED_OBJECT;
-            call _fnc_parseLine;
+            [] call _fnc_parseLine;
         };
         case MODE_NESTED_ARRAY: {
             LOG_1("(NESTED.ARRAY) Line: %1", _line);
             _mode = MODE_NESTED;
 
             _line = [_line, "- "] call CBA_fnc_leftTrim;
+
             LOG("(NESTED.ARRAY) Check for oneliner structure");
             private _isOneliner = [_line] call _fnc_checkIsOneliner;
             LOG_1("(NESTED.ARRAY) Is oneliner?: %1", _isOneliner);
@@ -1123,7 +1076,9 @@ if !(_lines findIf { _x != "" } > -1) exitWith {
     _hash
 };
 
+private _linesCount = count _lines - 1;
 private _hashNodesRoute = [];
+private _arrayNodes = [];
 private _mode = MODE_ROOT;
 
 {
@@ -1138,7 +1093,7 @@ private _mode = MODE_ROOT;
 
     if ([_line] call CBA_fnc_trim isEqualTo "") then {
         if (_mode == MODE_MULTILINE_TEXT) then {
-            if (_forEachIndex == count _lines - 1) exitWith {}; // Last line in file - not a piece of multiline
+            if (_forEachIndex == _linesCount) exitWith {}; // Last line in file - not a piece of multiline
 
             private _multilineIndentCount = _hash get MULTILINE_INDENT_NODE;
             LOG("Empty line in multiline mode. Possible newline!");
@@ -1162,16 +1117,12 @@ if (_dataMode == MODE_PARSE_LINE) then {
     private _node = _hash get DATA_NODE;
     _hash deleteAt DATA_NODE;
     _hash merge _node;
-    // { _hash set [_x, _node get _x]; } forEach (keys _node);
 } else {
     // Trigger conversion to array for last nested array in the file
-    [_hash] call _fnc_findAndConvertToArray;
+    [] call _fnc_convertToArray;
 
     // Link reference values
     [_hash] call _fnc_findAndLinkRefValues;
-
-    // Remove escapings
-    [_hash] call _fnc_findAndRemoveEscaping;
 };
 
 

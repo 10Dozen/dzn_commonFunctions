@@ -1,15 +1,8 @@
 /*
-Fails in test:
-call compile preprocessFileLineNumbers "tests\SFMLParser\test_structure_arrays.sqf"
-
-NestedInObject2:
-    - arr:
-        - 1
-        - 2
-        - 3
-      key1: 1  # <- Fails ["ERR_INDENT_UNEXPECTED_NESTED","Unexpected indent for nested item (expected 8 but actual is 6"]
-    - key2: 2
-
+TODO:
+- [TO TEST] Remove impicit variable definition -- useless and seems to be confusing
+- [TO TEST] Other null types
+- Instead of regex \d+ for RefLink use: (str (parseNumber X) isEqualTo X) -- need to test befor implementation
 */
 
 // ASCII char codes
@@ -22,6 +15,7 @@ NestedInObject2:
 
 #define RECURSIVE_COUNTER_LIMIT 5
 
+#define INDENT_DEFAULT 4
 #define INDENT_ARRAY_NESTED 2
 #define INDENT_MULTILINE 4
 
@@ -66,7 +60,14 @@ NestedInObject2:
 #define NULL_TYPES [ \
     "objNull",\
     "grpNull",\
-    "locationNull"\
+    "controlNull",\
+    "displayNull",\
+    "locationNull",\
+    "taskNull",\
+    "scriptNull",\
+    "configNull",\
+    "diaryRecordNull",\
+    "teamMemberNull"\
 ]
 
 #define REF_PREFIX ASCII_ASTERISK

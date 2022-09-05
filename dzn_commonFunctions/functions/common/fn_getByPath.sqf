@@ -9,13 +9,6 @@
     Optionally return given default if there is no value found under the last key (or given array index is out of range).
     Optionally return given default if some node in path is missing (or given array index is out of range).
 
-    Path (string) format rules:
-    - All path's keys should be STRINGS or SCALAR!
-    - Each node should be separated by ' > ' symbols (e.g. 'NODE_A > Key')
-    - For nested hashmap use key name (e.g. 'NODE_A > NODE_B > Key')
-    - For nested array use index (e.g. 'NestedArray > 1')
-    - If node name is '>' or string of numbers ("1337") - use quotes (e.g. 'NODE_A > ">" > "1337"')
-
     Path (array) format rules:
     - Path's keys may be any data types (see https://community.bistudio.com/wiki/HashMapKey)
     - Each node should be separate element of the array (e.g. ['NODE_A', 'Key'])
@@ -26,8 +19,7 @@
     [_hash, "NodeA > NodeB > Key1", 10] call dzn_fnc_getByPath
     INPUT:
         0: HashMap or Array - HashMap to search
-        1: String
-           or Array         - Path to key as string (e.g. 'Node > Key') or array (e.g. ["Node", "Key"])
+        1: Array            - Path to key as array (e.g. ["Node1", "Node2", "Key"])
         2: Any              - (optional) Default value of target key, if missing
         3: Any              - (optional) Default value to return, if path is incorrect (e.g. some nodes are missing)
 
@@ -56,79 +48,25 @@
 params ["_hash", "_path", "_defaultValue", "_defaultOnMissingValue"];
 
 LOG_1("Params: %1", _this);
-LOG_1("DefaultValue defined? %1", !isNil "_defaultValue");
-LOG_1("DefaultOnMissingValue defined? %1", !isNil "_defaultOnMissingValue");
 
-private _nodes = [];
-if (typename _path == "STRING") then {
-    LOG_1("[PathAsString]: %1", _path);
-
-    // Parse string Path into array
-    private _delimeter = [ASCII_SPACE, ASCII_GT, ASCII_SPACE];
-    private _chars = (toArray _path) + _delimeter;
-    private _nodeChars = [];
-
-    for "_i" from 0 to (count _chars - 3) do {
-        private _char = _chars # _i;
-        private _triplet = _chars select [_i, 3];
-
-        LOG_2("[PathAsString] %1 : Triplet: %2", _i, toString _triplet);
-
-        if (_triplet isEqualTo _delimeter) then {
-            private _node = toString _nodeChars;
-            private _first = _nodeChars select 0;
-            private _last = _nodeChars select (count _nodeChars - 1);
-
-            LOG_2("[PathAsString] %1 : Delimeter found. Node: %2", _i, _node);
-
-            // Extract from quotes ('>' or '1337' case)
-            if (_first == _last && _first in [ASCII_QUOTE, ASCII_DOUBLE_QUOTE]) then {
-                LOG("[PathAsString] Quotation detected");
-                private _nested = toString (_nodeChars select [1, count _nodeChars - 2]);
-                if (_nested isEqualTo toString [ASCII_GT]
-                    || _nested isEqualTo str (parseNumber _nested)
-                ) then {
-                    LOG("[PathAsString] Nested is a '>' or numeric string. Exctracting.");
-                    _node = _nested;
-                };
-            } else {
-                LOG("[PathAsString] Checking for number");
-                if (_node isEqualTo str (parseNumber _node)) then {
-                    LOG("[PathAsString] Is a number!");
-                    _node = parseNumber _node;
-                };
-            };
-
-            if (_nested regexMatch "([\d\.\-e]*)") then {
-                LOG("[PathAsString] Exctracted number");
-                _node = parseNumber toString _nested;
-            };
-
-            LOG_1("[PathAsString] Saving node name [%1]", _node);
-
-            _nodes pushBack _node;
-
-            _i = _i + 2; // Skip delimeter chars
-            _nodeChars resize 0;
-        } else {
-            _nodeChars pushBack _char;
-            LOG_1("[PathAsString] Node chars: %1", toString _nodeChars);
-        };
-    };
-} else {
-    // Use array as path:
-    LOG_1("[PathAsArray]: %1", str(_path));
-    _nodes = _path;
+if (_path isEqualTo []) exitWith {
+    if (!isNil "_defaultOnMissingValue") then { _defaultOnMissingValue };
 };
 
-LOG_1("Path: %1", str(_nodes));
+
+LOG_1("Path: %1", str(_path));
 
 private "_value";
 private _curNode = _hash;
-private _nodesSize = count _nodes - 1;
+private _nodesSize = count _path - 1;
 {
     private _key = _x;
     LOG_1("Key: %1", _key);
+
+    if (isNil "_curNode") exitWith {
+        LOG("(ERROR) Node is not defined (nil)!");
+        if (!isNil "_defaultOnMissingValue") then { _value = _defaultOnMissingValue };
+    };
 
     switch (typename _curNode) do {
         case "HASHMAP": {
@@ -188,7 +126,7 @@ private _nodesSize = count _nodes - 1;
             break;
         };
     };
-} forEach _nodes;
+} forEach _path;
 
 LOG_1("Result: %1", _value);
 

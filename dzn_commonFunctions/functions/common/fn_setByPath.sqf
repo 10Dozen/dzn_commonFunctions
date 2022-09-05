@@ -17,15 +17,17 @@
         - For nested array use index (e.g. ['NestedArray', 1])
         - When using @ForceAdd flag to add new key:
             - to add key to HashMap - use any HashMapKey data type as node name
-            - to add element to Array - use integer as index or -1 to add to the tail of array (push back)
+            - to add element to Array - use integer as index or -1 to push back to the tail of the array
         - When using @ForceAdd flag to add new nodes in the middle:
-            - to add HashMap node - use any HashMapKey data type as node name
-            - to add Array node   - use `[]` in the tail of the node name (e.g. "NodeArray[]")
-            - to add HashMap node into array node
-                                  - use any HashMapKey data type as node name (e.g. ["NodeArray[]", 1, "NestedNode", "Key"])
-            - to add Array node into another array
-                                  - use `index[]` syntax (e.g. ["NodeArray[]", "2[]"]) to add array into specific position
-                                    or use `[]` syntax to add array in the end (push back, e.g. ["NodeArray",[]])
+            - to add HashMap node to hashmap node - use any HashMapKey data type as node name (e.g. ["NodeA", "NodeB" <!>])
+            - to add Array node to hashmap node   - use key name as string with `[]` in the tail of the node
+                                                    name (e.g. ["NodeA", "NodeArray[] <!>, 1]")
+            - to add HashMap node to array node   - use any HashMapKey data type as node name
+                                                    (e.g. ["NodeArray", 1, "NestedNode" <!>, "Key"])
+            - to add Array node to array node     - use `index[]` syntax (e.g. ["NodeArray", "2[]" <!>, -1]) to add
+                                                    array into specific position.
+                                                    Or use `[]` syntax to add array in the end (push back,
+                                                    e.g. ["NodeArray", "[]" <!>, -1])
 
     EXAMPLE:
     [_hash, ["NodeA", "NodeB", "Key1"], 35] call dzn_fnc_setByPath; // Sets Key1 = 35
@@ -36,11 +38,11 @@
 
     _result = [_hash, ["NodeA", "Nested[]", -1], 333, true] call dzn_fnc_setByPath; // true
     // In this example _hash has NodeA key, with hashmap in it. But NodeA doesn't contain "Nested" key.
-    // Adds a new array to HashMap "NodeA" under key "Nested", and then sets it's first element to 333
+    // Functinon adds a new array to HashMap "NodeA" under key "Nested", and then sets it's first element to 333
 
     INPUT:
         0: HashMap or Array - Structure to update
-        1: String or Array  - Path to target key as string (e.g. 'Node > Key') or array (e.g. ["Node", "Key"])
+        1: Array            - Path to target key as array (e.g. ["Node", "Key"])
         2: Any              - Value to set
         3: Boolean          - (optional) On True - will add Key/Index if it is missing in the given structure. Default is false.
         4: Boolean          - (optional) On True - will add all path nodes if any of it is missing in the given structure.
@@ -49,7 +51,7 @@
     OUTPUT: Boolean - operation result (true - on success, false - on fail);
 */
 
-#define DEBUG true
+//#define DEBUG true
 #ifdef DEBUG
     #define LOG_PREFIX '[dzn_fnc_setByPath] '
     #define LOG(MSG) diag_log text (LOG_PREFIX + MSG)

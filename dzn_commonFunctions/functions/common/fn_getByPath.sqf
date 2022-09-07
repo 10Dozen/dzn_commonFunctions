@@ -53,7 +53,6 @@ if (_path isEqualTo []) exitWith {
     if (!isNil "_defaultOnMissingValue") then { _defaultOnMissingValue };
 };
 
-
 LOG_1("Path: %1", str(_path));
 
 private "_value";
@@ -73,8 +72,12 @@ private _nodesSize = count _path - 1;
             LOG("Currnet node is a HashMap");
             if (_forEachIndex == _nodesSize) then {
                 // Last node: return value or default
-                _value = _curNode getOrDefault [_key, _defaultValue];
-                LOG_1("[HashMap.onEnd] Get value on the last node = %1", _value);
+                if (_key in keys _curNode || !isNil "_defaultValue") then {
+                    _value = _curNode getOrDefault [_key, if (isNil "_defaultValue") then { nil } else { _defaultValue }];
+                    LOG_1("[HashMap.onEnd] Get value on the last node = %1", _value);
+                } else {
+                    diag_log text format ["[dzn_fnc_getByPath] (ERROR) Key [%1] is not found in %2", _key, _path];
+                };
             } else {
                 // Node in the middle:
                 // if key exists - switch to node in key
@@ -84,8 +87,13 @@ private _nodesSize = count _path - 1;
                     _curNode = _curNode get _key;
                     LOG_1("[HashMap] New node found. Switching to node", _key);
                 } else {
-                    _value = _defaultOnMissingValue;
-                    LOG_2("[HashMap] (ERROR) There is no node with name [%1]. Exiting with default on missing value [%2]", _key, _value);
+                    LOG_1("[HashMap] (ERROR) There is no node with name [%1].", _key);
+                    if (!isNil "_defaultOnMissingValue") then {
+                        _value = _defaultOnMissingValue;
+                        LOG_1("[HashMap] (ERROR) Exiting with default on missing value [%1]", _value);
+                    } else {
+                        diag_log text format ["[dzn_fnc_getByPath] (ERROR) Node [%1] is not found in %2", _key, _path];
+                    };
                     break;
                 };
             };
@@ -101,6 +109,9 @@ private _nodesSize = count _path - 1;
                     _value = _curNode select _key;
                     LOG_2("[Array.onEnd] Return element at %1 index = %2", _key, _value);
                 } else {
+                    if (isNil "_defaultValue") exitWith {
+                        diag_log text format ["[dzn_fnc_getByPath] (ERROR) Array index [%1] is not found in %2", _key, _path];
+                    };
                     _value = _defaultValue;
                     LOG_2("[Array.onEnd] Index %1 is out of range. Return default value = %2", _key, _value);
                 };
@@ -112,8 +123,14 @@ private _nodesSize = count _path - 1;
                     _curNode = _curNode select _key;
                     LOG("[Array] Switching to next node");
                 } else {
-                    _value = _defaultOnMissingValue;
-                    LOG_2("[HashMap] (ERROR) There is no element with index [%1]. Exiting with default on missing value [%2]", _key, _value);
+                    LOG_1("[HashMap] (ERROR) There is no element with index [%1].", _key);
+                    if (!isNil "_defaultOnMissingValue") then {
+                        _value = _defaultOnMissingValue;
+                        LOG_1("[HashMap] (ERROR) Exiting with default on missing value [%1]", _value);
+                    } else {
+                        diag_log text format ["[dzn_fnc_getByPath] (ERROR) Array index [%1] is not found in %2", _key, _path];
+                    };
+
                     break;
                 };
             };
@@ -121,6 +138,7 @@ private _nodesSize = count _path - 1;
         default {
             // Node appeared to be not an array/hash, but map's key
             // -> break loop and return fallback default
+            if (isNil "_defaultOnMissingValue") exitWith {};
             _value = _defaultOnMissingValue;
             LOG_2("[UNKNOWN] (ERROR) Current Node is not array/hashmap. Exiting with default on missing value [%2]", _key, _value);
             break;
@@ -128,6 +146,6 @@ private _nodesSize = count _path - 1;
     };
 } forEach _path;
 
-LOG_1("Result: %1", _value);
+if (isNil "_value") exitWith { nil };
 
 _value

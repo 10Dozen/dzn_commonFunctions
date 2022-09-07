@@ -395,7 +395,7 @@ private _fnc_parseOnelinerStructure = {
                         private _value = [_itemStr] call _fnc_parseValueType;
 
                         // Make a set, because pushBack ignores 'nil' value (which may be set by user or as result of nil variable reference)
-                        _onelinerConverted set [count _onelinerConverted,  _value];
+                        _onelinerConverted set [count _onelinerConverted,  if (isNil "_value") then { nil } else { _value }];
                     };
                     case ONELINER_HASHMAP: {
                         LOG_1("(parseOnelinerStructure) Converting %1 to HASHMAP key-value pair", _itemStr);
@@ -408,7 +408,7 @@ private _fnc_parseOnelinerStructure = {
 
                         _parsed params ["_key", "_value"];
                         _value = [_value] call _fnc_parseValueType;
-                        _onelinerConverted pushBack [_key, _value];
+                        _onelinerConverted pushBack [_key, if (isNil "_value") then { nil } else { _value }];
                     };
                 };
 
@@ -590,12 +590,13 @@ private _fnc_parseValueType = {
     // Expression case: `date select 2`
     if (_sameChars && _first == EXPRESSION_PERFIX_ASCII) exitWith {
         LOG("(parseValueType) Value parsed to EXPRESSION.");
-        (call compile STRIP(_value))
+        (_hash call compile STRIP(_value))
     };
 
     // Reference values - skip processing, as it should be resolved to actual value later
     if (_first == REF_PREFIX) exitWith {
         LOG("(parseValueType) Value parsed to REFERENCE.");
+        _hasReferences = true;
         (format ["%1%2", REF_PREFIX_PROCESSED, _value select [1, count _value]])
     };
 
@@ -670,7 +671,7 @@ private _fnc_linkRefValue = {
         private _nodeType = typename _refValue;
         LOG_2("(fnc_linkRefValue) -- Key: %1 for %2 node", _x, _nodeType);
         if (_nodeType == "ARRAY") then {
-            if (_x regexMatch INTEGER_REGEX) then {
+            if (_x isEqualTo str(parseNumber _x)) then {
                 // Key is a number (array index)
                 LOG("(fnc_linkRefValue) -- > Next step is Array index");
                 _refValue = _refValue select parseNumber _x;
@@ -733,10 +734,6 @@ private _fnc_findRefValues = {
             [_data] call _fnc_findAndLinkRefValues;
         };
         case "ARRAY": {
-            // [1, {name: Kek}, *Radio > Kek]
-            // 1 -> default root / link
-            // {name: Kek} -> findAndLinkRefValues -> [Name] findRefValues -> defaul/link
-            // *Radio > Kek -> default root / link
             LOG("(fnc_findRefValues) Value is Array. Invoke findRefValues for each array item...");
             {
                 [_data, _forEachIndex] call _fnc_findRefValues;
@@ -1079,6 +1076,7 @@ if !(_lines findIf { _x != "" } > -1) exitWith {
 private _linesCount = count _lines - 1;
 private _hashNodesRoute = [];
 private _arrayNodes = [];
+private _hasReferences = false;
 private _mode = MODE_ROOT;
 
 {
@@ -1122,7 +1120,9 @@ if (_dataMode == MODE_PARSE_LINE) then {
     [] call _fnc_convertToArray;
 
     // Link reference values
-    [_hash] call _fnc_findAndLinkRefValues;
+    if (_hasReferences) then {
+        [_hash] call _fnc_findAndLinkRefValues;
+    };
 };
 
 

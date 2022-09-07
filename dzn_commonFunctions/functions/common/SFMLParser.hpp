@@ -1,10 +1,3 @@
-/*
-TODO:
-- [TO TEST] Remove impicit variable definition -- useless and seems to be confusing
-- [TO TEST] Other null types
-- Instead of regex \d+ for RefLink use: (str (parseNumber X) isEqualTo X) -- need to test befor implementation
-*/
-
 // ASCII char codes
 #include "ascii_codes.hpp"
 
@@ -30,8 +23,6 @@ TODO:
 
 
 // Data types
-#define INTEGER_REGEX "\d+"
-
 #define STRING_QUOTES_ASCII [ASCII_QUOTE, ASCII_DOUBLE_QUOTE]
 #define SCALAR_TYPE_REGEX "^[\s\d\.e()\-+*\/%^]*$"
 #define CODE_PREFIX ASCII_CURLY_BRACKET_OPEN

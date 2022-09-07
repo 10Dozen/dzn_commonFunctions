@@ -13,7 +13,7 @@ Nested2:
     Key1: 100
     Section:
         Key2: 200
-    Key3: 300
+        Key3: 300
 
 Nested3:
     Key1: 100

@@ -13,7 +13,7 @@ LOG_TEST_START;
 private _pathArr = ["NestedA", "NestedB", "Key"];
 private _expectedValue = 999;
 
-private _nestedA = createHashMapFromArray [["NestedC", _nestedB]];
+private _nestedA = createHashMapFromArray [["NestedC", nil]];
 private _hash = createHashMapFromArray [["NestedA", _nestedA]];
 
 // Test

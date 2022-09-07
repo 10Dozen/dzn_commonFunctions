@@ -7,7 +7,7 @@ INIT_FAILED_STEPS_COUNTER;
 // Mode: Load file
 private _src = "tests\SFMLParser\modes_preprocess.yml";
 private _s = [_src, "PREPROCESS_FILE"] call dzn_fnc_parseSFML;
-TEST_MAP = _s;
+
 LOG_PARSING_ERRORS(_s);
 FAIL_IF_PARSING_ERRORS(_s);
 

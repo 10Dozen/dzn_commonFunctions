@@ -28,7 +28,7 @@ private _passed = true
 
 test_var = nil;
 
-if (!_passed) exitWith {
+if (isNil "_passed" || { !_passed }) exitWith {
     LOG_TEST_FAILED;
     _false
 };

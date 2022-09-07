@@ -19,7 +19,7 @@ private _passed = true
 && assert ((_s get "civilian") findIf { _x NEQ civilian} < 0)
 && assert ((_s get "civ") findIf { _x NEQ civilian} < 0);
 
-if (!_passed) exitWith {
+if (isNil "_passed" || { !_passed }) exitWith {
     LOG_TEST_FAILED;
     false
 };

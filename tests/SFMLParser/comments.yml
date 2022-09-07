@@ -6,9 +6,9 @@ StrEscaped: String \# with hash         # Not escpaed for some reason...
 StrNotEscaped: String /# with hash
 QStr: 'String # with hash'
 DQStr: "String # with hash"
-Code: { [0,1,2] # 2 } # Looks commented in YAML highlight, but actually works
+Code: { [0, 1, 2] # 2 } # Looks commented in YAML highlight, but actually works
 Code2: { '\#' + '3' }
-Exp: `[4,5,6] # 2`
+Exp: `[4, 5, 6] # 2`
 
 # Reference sign
 StrRef: \*Str

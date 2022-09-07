@@ -1,7 +1,8 @@
 #include "script_component.hpp"
 
 /*
-call compile preprocessFileLineNumbers "tests\SFMLParser\run_tests.sqf"
+Note: On launching by call from consile - nil variable errors are suppressed!
+[] execVM "tests\SFMLParser\run_tests.sqf"
 */
 
 private _path = "tests\SFMLParser";
@@ -19,7 +20,6 @@ private _tests = [
     "test_multilines",
     "test_multilines2",
     /* "test_errors"  */
-    /*"test_preprocess_file_mode"*/
     "test_modes_loadfile",
     "test_modes_preprocessfile",
     "test_modes_parseline",

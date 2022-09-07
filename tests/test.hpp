@@ -70,3 +70,23 @@
         FAIL_STEP; \
         ERROR_ "Variable [%1] expected to be [%2], but actual [%3]", QUOTE(VAR1), VAR1, VAR2 _EOL; \
     }
+
+#define ASSERT_EQUALS_EXP(EXP1,VAR2,TAG) \
+    if (isNil {EXP1}) exitWith { \
+        FAIL_STEP; \
+        ERROR_ "Assert equals failed [tag: %1] - expression resulted in NIL! Expected [%2]", TAG, VAR2 _EOL; \
+    }; \
+    if (!((EXP1) isEqualType VAR2) || {(EXP1) isNotEqualTo VAR2}) exitWith {\
+        FAIL_STEP;\
+        ERROR_ "Assert equals failed [tag: %1]. Expected [%2], but actual [%3]", TAG, VAR2, EXP1 _EOL;\
+    }
+
+// Utils
+#define ARR_1(ARG1) ARG1
+#define ARR_2(ARG1,ARG2) ARG1, ARG2
+#define ARR_3(ARG1,ARG2,ARG3) ARG1, ARG2, ARG3
+#define ARR_4(ARG1,ARG2,ARG3,ARG4) ARG1, ARG2, ARG3, ARG4
+#define ARR_5(ARG1,ARG2,ARG3,ARG4,ARG5) ARG1, ARG2, ARG3, ARG4, ARG5
+#define ARR_6(ARG1,ARG2,ARG3,ARG4,ARG5,ARG6) ARG1, ARG2, ARG3, ARG4, ARG5, ARG6
+#define ARR_7(ARG1,ARG2,ARG3,ARG4,ARG5,ARG6,ARG7) ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7
+#define ARR_8(ARG1,ARG2,ARG3,ARG4,ARG5,ARG6,ARG7,ARG8) ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8

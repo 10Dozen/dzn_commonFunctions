@@ -1,6 +1,6 @@
 // *************************************
 // DZN COMMON FUNCTIONS
-// v1.3
+// v1.4
 // *************************************
 // Common functions are very common and useful for any missions
 // Area functions provide support of creating locations from triggers, getting points and building inside given areas. It is required for DZN_DYNAI
@@ -14,128 +14,131 @@
 
 class CfgFunctions
 {
-	class dzn
-	{
-		class commonFunctions
-		{
-			file = "dzn_commonFunctions\functions\commonFunctions";
+    class dzn
+    {
+        class common
+        {
+            file = "dzn_commonFunctions\functions\common";
 
-			class getMissionParameters {};
-			class getValueByKey {};
-			class setValueByKey {};
-			class setVars {};
-			class selectAndRemove {};
-			class runLoop {};
+            class getMissionParameters {};
+            class getByPath {};
+            class setByPath {};
+            class getValueByKey {};
+            class setValueByKey {};
+            class setVars {};
+            class selectAndRemove {};
+            class runLoop {};
 
-			class assignInVehicle {};
-			class createVehicle  {};
-			class createVehicleCrew {};
-			class isCombatCrewAlive {};
-			class getPosOnGivenDir  {};
+            class assignInVehicle {};
+            class createVehicle  {};
+            class createVehicleCrew {};
+            class isCombatCrewAlive {};
+            class getPosOnGivenDir  {};
 
-			class getComposition {};
-			class setComposition {};
+            class getComposition {};
+            class setComposition {};
 
-			class inString {};
+            class inString {};
 
-			class addAction {};
-			class playAnimLoop {};
+            class addAction {};
+            class playAnimLoop {};
 
-			class setVelocityDirAndUp {};
-			class stringify {};
+            class setVelocityDirAndUp {};
+            class stringify {};
+            class parseSFML {};
 
-			class getVersion {};
-		};
+            class getVersion {};
+        };
 
-		class areaFunctions
-		{
-			file = "dzn_commonFunctions\functions\areaFunctions";
+        class area
+        {
+            file = "dzn_commonFunctions\functions\area";
 
-			class convertTriggerToLocation {};
-			class isInLocation {};
-			class isInWater {};
-			class isInArea2d {};
+            class convertTriggerToLocation {};
+            class isInLocation {};
+            class isInWater {};
+            class isInArea2d {};
 
-			class isPlayerNear {};
-			class isPlayerInArea {};
-			class ccUnits {};
-			class ccPlayers {};
+            class isPlayerNear {};
+            class isPlayerInArea {};
+            class ccUnits {};
+            class ccPlayers {};
 
-			class getRandomPoint {};
-			class getRandomPointInZone {};
-			class getZonePosition {};
-			class createPathFromKeypoints {};
-			class createPathFromRandom {};
-			class createPathFromRoads {};
+            class getRandomPoint {};
+            class getRandomPointInZone {};
+            class getZonePosition {};
+            class createPathFromKeypoints {};
+            class createPathFromRandom {};
+            class createPathFromRoads {};
 
-			class getHousesNear {};
-			class getHousePositions {};
-			class getLocationBuildings {};
-			class getLocationRoads {};
-			class assignInBuilding {};
-			class selectRandomAsset {};
-		};
+            class getHousesNear {};
+            class getHousePositions {};
+            class getLocationBuildings {};
+            class getLocationRoads {};
+            class assignInBuilding {};
+            class selectRandomAsset {};
+        };
 
-		class mapFunctions
-		{
-			file = "dzn_commonFunctions\functions\mapFunctions";
+        class map
+        {
+            file = "dzn_commonFunctions\functions\map";
 
-			class createMarkerIcon {};
-			class getMapGrid {};
-			class getPosOnMapGrid {};
-		};
+            class createMarkerIcon {};
+            class getMapGrid {};
+            class getPosOnMapGrid {};
+        };
 
-		class envFunctions
-		{
-			file = "dzn_commonFunctions\functions\envFunctions";
+        class env
+        {
+            file = "dzn_commonFunctions\functions\env";
 
-			class setDateTime {};
-			class randomizeTime {};
-			class setFog {};
-			class setWeather {};
-			class addViewDistance {};
-			class reduceViewDistance {};
-		};
+            class setDateTime {};
+            class randomizeTime {};
+            class setFog {};
+            class setWeather {};
+            class addViewDistance {};
+            class reduceViewDistance {};
+        };
 
-		class invFunctions
-		{
-			file = "dzn_commonFunctions\functions\invFunctions";
+        class inventory
+        {
+            file = "dzn_commonFunctions\functions\inventory";
 
-			class getItemDisplayName {};
-			class getVehicleDisplayName {};
-			class addWhitelistedArsenal {};
-		};
+            class getItemDisplayName {};
+            class getVehicleDisplayName {};
+            class addWhitelistedArsenal {};
+        };
 
-		class supportFunctions
-		{
-			file = "dzn_commonFunctions\functions\supportFunctions";
+        class support
+        {
+            file = "dzn_commonFunctions\functions\support";
 
-			class ArtilleryFiremission {};
-			class SelectFiremissionCharge {};
-			class CancelFiremission {};
-			class SpawnShell {};
-			class setShellFlareEffect {};
-			class setShellFlareEffectGlobal {};
-			class StartVirtualFiremission {};
-		};
+            class ArtilleryFiremission {};
+            class SelectFiremissionCharge {};
+            class CancelFiremission {};
+            class SpawnShell {};
+            class setShellFlareEffect {};
+            class setShellFlareEffectGlobal {};
+            class StartVirtualFiremission {};
+        };
 
-		class uiFunctions
-		{
-			file = "dzn_commonFunctions\functions\uiFunctions";
+        class ui
+        {
+            file = "dzn_commonFunctions\functions\ui";
 
-			class CountTextLines {};
-			class ShowBasicDialog {};
-			class ShowAdvDialog {};
-			class ShowChooseDialog {};
+            class CountTextLines {};
+            class ShowBasicDialog {};
+            class ShowAdvDialog {};
+            class ShowChooseDialog {};
 
-			class CreateControl {};
-			class GetDisplay {};
+            class CreateControl {};
+            class GetDisplay {};
 
-			class ShowMessage {};
-			class ShowProgressBar {};
+            class ShowMessage {};
+            class ShowProgressBar {};
 
-			class AddDraw3d {};
-			class RemoveDraw3d {};
-		};
-	};
+            class AddDraw3d {};
+            class RemoveDraw3d {};
+        };
+    };
 };

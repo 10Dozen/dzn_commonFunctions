@@ -13,8 +13,8 @@ FAIL_IF_PARSING_ERRORS(_s);
 private _keys = keys _s;
 
 private _r = true
-    && assert (SOURCE_NODE in _keys)
-    && { assert ((_s get SOURCE_NODE) EQ _src) };
+    && assert ("#SOURCE" in _keys)
+    && { assert ((_s get "#SOURCE") EQ _src) };
 
 if (isNil "_r" || !_r) then {
     FAIL_STEP;

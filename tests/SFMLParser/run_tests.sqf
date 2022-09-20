@@ -24,7 +24,8 @@ private _tests = [
     "test_modes_preprocessfile",
     "test_modes_parseline",
     "test_parse_line_mode",
-    "test_parse_line_mode2"
+    "test_parse_line_mode2",
+    "test_empty_input"
 ];
 
 RUN_SUITE

@@ -98,7 +98,13 @@ _dataMode = toUpper _dataMode;
 private _data = switch _dataMode do {
     case MODE_FILE_LOAD: { loadFile _input };
     case MODE_FILE_PREPROCESS: { preprocessFile _input };
-    case MODE_PARSE_LINE: { format ["%1: (%2)", DATA_NODE, _input] };
+    case MODE_PARSE_LINE: {
+        if ([_input] call CBA_fnc_trim == "") then {
+            ""
+        } else {
+            format ["%1: (%2)", DATA_NODE, _input]
+        }
+    };
     default {
         LOG_1("[ERROR:ERR_MODE_UNDEFINED] Data mode [%1] is unknown!", _dataMode);
         REPORT_ERROR_NOLINE_1(ERR_MODE_UNDEFINED, "Data mode [%1] is unknown!", _dataMode);
@@ -109,7 +115,7 @@ private _data = switch _dataMode do {
 LOG_1("Data: %1", _data);
 
 if (count _data == 0) exitWith {
-    diag_log text format ["[dzn_fnc_parseSettingsFile] Warning! Input %1 is empty!", _file];
+    diag_log text format ["[dzn_fnc_parseSettingsFile] Warning! Input [%1] is empty!", _input];
     REPORT_ERROR_NOLINE(ERR_FILE_EMPTY, 'File is empty!');
     _hash
 };

@@ -10,10 +10,13 @@ _currentFails = 0;
 // ----------
 private _s = ["", "PARSE_LINE"] call dzn_fnc_parseSFML;
 _VALIDATION_
-    if (((_s get "#ERRORS") # 0) isNotEqualTo ["ERR_FILE_EMPTY",-1,"","File is empty!"]) exitWith {
+    if (
+        (_s get  "#ERRORS") isEqualTo []
+        || { ((_s get "#ERRORS") # 0) isNotEqualTo ["ERR_FILE_EMPTY",-1,"","File is empty!"] }
+    ) exitWith {
         FAIL_STEP;
         ERROR_ "Wrong error message on empty line in PARSE_LINE mode" _EOL;
-        ERROR_ (_s get "#ERRORS") _EOL;
+        ERROR_ "Errors: %1", (_s get "#ERRORS") _EOL;
     };
 _VALIDATION_END_
 
@@ -25,15 +28,40 @@ if (_fails - _currentFails > 0) then {
 };
 
 // ----------
+// PARSE_LINE - whitespaces
+// ----------
+private _s = ["                ", "PARSE_LINE"] call dzn_fnc_parseSFML;
+_VALIDATION_
+    if (
+        (_s get  "#ERRORS") isEqualTo []
+        || { ((_s get "#ERRORS") # 0) isNotEqualTo ["ERR_FILE_EMPTY",-1,"","File is empty!"] }
+    ) exitWith {
+        FAIL_STEP;
+        ERROR_ "Wrong error message on empty line in PARSE_LINE mode" _EOL;
+        ERROR_ "Errors: %1", (_s get "#ERRORS") _EOL;
+    };
+_VALIDATION_END_
+
+if (_fails - _currentFails > 0) then {
+    ERROR_ "Empty PARSE_LINE (Whitespaces) tests failed!" _EOL;
+    FAIL_STEP;
+} else {
+    INFO_ "Empty PARSE_LINE (Whitespaces) tests passed!" _EOL;
+};
+
+// ----------
 // LOAD_FILE
 // ----------
 _currentFails = _fails;
 private _s = ["tests\SFMLParser\empty.yml", "LOAD_FILE"] call dzn_fnc_parseSFML;
 _VALIDATION_
-    if (((_s get "#ERRORS") # 0) isNotEqualTo ["ERR_FILE_EMPTY",-1,"","File is empty!"]) exitWith {
+    if (
+        (_s get  "#ERRORS") isEqualTo []
+        || { ((_s get "#ERRORS") # 0) isNotEqualTo ["ERR_FILE_EMPTY",-1,"","File is empty!"] }
+    ) exitWith {
         FAIL_STEP;
         ERROR_ "Wrong error message on empty line in LOAD_FILE mode" _EOL;
-        ERROR_ (_s get "#ERRORS") _EOL;
+        ERROR_ "Errors: %1", (_s get "#ERRORS") _EOL;
     };
 _VALIDATION_END_
 
@@ -45,15 +73,40 @@ if (_fails - _currentFails > 0) then {
 };
 
 // ----------
+// LOAD_FILE (Whitespaces)
+// ----------
+_currentFails = _fails;
+private _s = ["tests\SFMLParser\empty_whitespaces.yml", "LOAD_FILE"] call dzn_fnc_parseSFML;
+_VALIDATION_
+    if (
+        (_s get  "#ERRORS") isNotEqualTo []
+    ) exitWith {
+        FAIL_STEP;
+        ERROR_ "Unexpected Error message on whitespaces line in LOAD_FILE mode" _EOL;
+        ERROR_ "Errors: %1", (_s get "#ERRORS") _EOL;
+    };
+_VALIDATION_END_
+
+if (_fails - _currentFails > 0) then {
+    ERROR_ "Empty LOAD_FILE (Whitespaces) tests failed!" _EOL;
+    FAIL_STEP;
+} else {
+    INFO_ "Empty LOAD_FILE (Whitespaces) tests passed!" _EOL;
+};
+
+// ----------
 // PREPROCESS_FILE
 // ----------
 _currentFails = _fails;
 private _s = ["tests\SFMLParser\empty.yml", "PREPROCESS_FILE"] call dzn_fnc_parseSFML;
 _VALIDATION_
-    if (((_s get "#ERRORS") # 0) isNotEqualTo ["ERR_FILE_EMPTY",-1,"","File is empty!"]) exitWith {
+    if (
+        (_s get  "#ERRORS") isEqualTo []
+        || { ((_s get "#ERRORS") # 0) isNotEqualTo ["ERR_FILE_EMPTY",-1,"","File is empty!"] }
+    ) exitWith {
         FAIL_STEP;
         ERROR_ "Wrong error message on empty line in PREPROCESS_FILE mode" _EOL;
-        ERROR_ (_s get "#ERRORS") _EOL;
+        ERROR_ "Errors: %1", (_s get "#ERRORS") _EOL;
     };
 _VALIDATION_END_
 

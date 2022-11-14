@@ -1,5 +1,5 @@
 /*
- * @Hash = [@Input, @Mode] call dzn_fnc_parseSFML
+ * @Hash = [@Input, @Mode, @Args] call dzn_fnc_parseSFML
  * Parses YAML-like settinsg file to HashMap.
  *
  * INPUT:
@@ -8,6 +8,7 @@
  *              1) "LOAD_FILE" -- tries to load file from path given in @Input and parse it. Default mode.
  *              2) "PREPROCESS_FILE" -- tries to load & preprocess file from given path (using Arma 3 preprocessor) and parse.
  *              3) "PARSE_LINE" -- parse given Input string.
+ * 2: ANY - arguments to pass into parsing scope. Will be available as _this during expression data types parsing (e.g. key: `_this`).
  *
  * OUTPUT:
  * HASHMAP - map of the parsed settings. Each section will be available under it's key.
@@ -85,7 +86,7 @@
 #define REPORT_ERROR_1(ERROR_CODE, LINE_NO, MSG, ARG1) (_hash get ERRORS_NODE) pushBack [ERROR_CODE,LINE_NO+1,FORMAT_LINE_INFO(LINE_NO+1,_lines select LINE_NO),MSG,ARG1]
 #define REPORT_ERROR_2(ERROR_CODE, LINE_NO, MSG, ARG1, ARG2) (_hash get ERRORS_NODE) pushBack [ERROR_CODE,LINE_NO+1,FORMAT_LINE_INFO(LINE_NO+1,_lines select LINE_NO),MSG,ARG2]
 
-params ["_input", ["_dataMode", MODE_FILE_LOAD]];
+params ["_input", ["_dataMode", MODE_FILE_LOAD], ["_args", []]];
 
 LOG_1("Params: %1", _this);
 LOG_1("Mode: %1", _dataMode);
@@ -596,7 +597,7 @@ private _fnc_parseValueType = {
     // Expression case: `date select 2`
     if (_sameChars && _first == EXPRESSION_PERFIX_ASCII) exitWith {
         LOG("(parseValueType) Value parsed to EXPRESSION.");
-        (_hash call compile STRIP(_value))
+        (_args call compile STRIP(_value))
     };
 
     // Reference values - skip processing, as it should be resolved to actual value later

@@ -1,5 +1,5 @@
 /*
-    [@Hash, @Path, @Value, @ForceAdd?] call dzn_fnc_setByPath;
+    @Result = [@Hash, @Path, @Value, @ForceAdd?] call dzn_fnc_setByPath;
 
     Sets given value to given path in hashmap/array.
 
@@ -44,9 +44,7 @@
         0: HashMap or Array - Structure to update
         1: Array            - Path to target key as array (e.g. ["Node", "Key"])
         2: Any              - Value to set
-        3: Boolean          - (optional) On True - will add Key/Index if it is missing in the given structure. Default is false.
-        4: Boolean          - (optional) On True - will add all path nodes if any of it is missing in the given structure.
-                              Default is false.
+        3: Boolean          - (optional) On True - will add Key/Index and expected nodes if some of it is missing in the given structure. Default is false.
 
     OUTPUT: Boolean - operation result (true - on success, false - on fail);
 */

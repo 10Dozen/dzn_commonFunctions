@@ -1,0 +1,7 @@
+
+MyKey: `_this select 0`
+MyArray: `_this select 1`
+MyHashMap: `_this select 2`
+
+MyKeyFromArray: `_this select 1 select 0`
+MyKeyFromHahMap: `(_this select 2) get 'Foo'`

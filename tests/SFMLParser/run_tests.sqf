@@ -13,6 +13,7 @@ private _tests = [
     "test_data_nulls",
     "test_structure_arrays",
     "test_structure_arrays2",
+    "test_structure_arrays3",
     "test_structure_hash",
     /* "test_structure_hash2", */
     "test_comments",

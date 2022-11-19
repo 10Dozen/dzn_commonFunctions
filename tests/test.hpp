@@ -72,13 +72,14 @@
     }
 
 #define ASSERT_EQUALS_EXP(EXP1,VAR2,TAG) \
+    _tagCounter = if (isNil "_tagCounter") then { 1 } else { _tagCounter + 1 }; \
     if (isNil {EXP1}) exitWith { \
         FAIL_STEP; \
-        ERROR_ "Assert equals failed [tag: %1] - expression resulted in NIL! Expected [%2]", TAG, VAR2 _EOL; \
+        ERROR_ "Assert equals failed [tag #%1: %2] - expression resulted in NIL! Expected [%3]", _tagCounter, TAG, VAR2 _EOL; \
     }; \
     if (!((EXP1) isEqualType VAR2) || {(EXP1) isNotEqualTo VAR2}) exitWith {\
         FAIL_STEP;\
-        ERROR_ "Assert equals failed [tag: %1]. Expected [%2], but actual [%3]", TAG, VAR2, EXP1 _EOL;\
+        ERROR_ "Assert equals failed [tag #%1: %2]. Expected [%3], but actual [%4]", _tagCounter, TAG, VAR2, EXP1 _EOL;\
     }
 
 // Utils

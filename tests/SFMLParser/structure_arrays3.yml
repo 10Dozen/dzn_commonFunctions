@@ -19,7 +19,7 @@ RootKey3:
     NestedKey:
         Foo: Bar
 
-RootKey3:
+RootKey4:
     NestedArray2:
         - size: XL
           color: red
@@ -27,3 +27,13 @@ RootKey3:
     NestedArray3:
         - 100
         - 200
+
+    Subsection:
+        SubKey:
+            - x: y
+            - x: z
+            - x: w
+              type: 1
+            - x: q
+
+    NestedKey1: Echo

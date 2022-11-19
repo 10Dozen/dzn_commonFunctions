@@ -3,6 +3,9 @@
 /*
 Note: On launching by call from consile - nil variable errors are suppressed!
 [] execVM "tests\SFMLParser\run_tests.sqf"
+
+TODO:
+    - Duplicate nodes test
 */
 
 private _path = "tests\SFMLParser";

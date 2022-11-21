@@ -15,7 +15,7 @@ _VALIDATION_
         || { ((_s get "#ERRORS") # 0) isNotEqualTo ["ERR_FILE_EMPTY",-1,"","File is empty!"] }
     ) exitWith {
         FAIL_STEP;
-        ERROR_ "Wrong error message on empty line in PARSE_LINE mode" _EOL;
+        ERROR_ "Wrong error message on empty line in PARSE_LINE mode. ERR_FILE_EMPTY was expected." _EOL;
         ERROR_ "Errors: %1", (_s get "#ERRORS") _EOL;
     };
 _VALIDATION_END_
@@ -37,7 +37,7 @@ _VALIDATION_
         || { ((_s get "#ERRORS") # 0) isNotEqualTo ["ERR_FILE_EMPTY",-1,"","File is empty!"] }
     ) exitWith {
         FAIL_STEP;
-        ERROR_ "Wrong error message on empty line in PARSE_LINE mode" _EOL;
+        ERROR_ "Wrong error message on empty line in PARSE_LINE mode. ERR_FILE_EMPTY was expected." _EOL;
         ERROR_ "Errors: %1", (_s get "#ERRORS") _EOL;
     };
 _VALIDATION_END_
@@ -60,7 +60,7 @@ _VALIDATION_
         || { ((_s get "#ERRORS") # 0) isNotEqualTo ["ERR_FILE_EMPTY",-1,"","File is empty!"] }
     ) exitWith {
         FAIL_STEP;
-        ERROR_ "Wrong error message on empty line in LOAD_FILE mode" _EOL;
+        ERROR_ "Wrong error message on empty line in LOAD_FILE mode. ERR_FILE_EMPTY was expected." _EOL;
         ERROR_ "Errors: %1", (_s get "#ERRORS") _EOL;
     };
 _VALIDATION_END_
@@ -79,10 +79,11 @@ _currentFails = _fails;
 private _s = ["tests\SFMLParser\empty_whitespaces.yml", "LOAD_FILE"] call dzn_fnc_parseSFML;
 _VALIDATION_
     if (
-        (_s get  "#ERRORS") isNotEqualTo []
+        (_s get  "#ERRORS") isEqualTo []
+        || { ((_s get "#ERRORS") # 0) isNotEqualTo ["ERR_FILE_NO_CONTENT",-1,"",'File has no content (or commented)!'] }
     ) exitWith {
         FAIL_STEP;
-        ERROR_ "Unexpected Error message on whitespaces line in LOAD_FILE mode" _EOL;
+        ERROR_ "Unexpected Error message on whitespaces line in LOAD_FILE mode. ERR_FILE_NO_CONTENT was expected." _EOL;
         ERROR_ "Errors: %1", (_s get "#ERRORS") _EOL;
     };
 _VALIDATION_END_
@@ -105,7 +106,7 @@ _VALIDATION_
         || { ((_s get "#ERRORS") # 0) isNotEqualTo ["ERR_FILE_EMPTY",-1,"","File is empty!"] }
     ) exitWith {
         FAIL_STEP;
-        ERROR_ "Wrong error message on empty line in PREPROCESS_FILE mode" _EOL;
+        ERROR_ "Wrong error message on empty line in PREPROCESS_FILE mode. ERR_FILE_EMPTY was expected." _EOL;
         ERROR_ "Errors: %1", (_s get "#ERRORS") _EOL;
     };
 _VALIDATION_END_

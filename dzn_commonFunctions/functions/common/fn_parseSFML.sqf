@@ -36,7 +36,7 @@
 
 #include "SFMLParser.hpp"
 
-// #define DEBUG DEBUG
+//#define DEBUG DEBUG
 
 #define LOG_PREFIX '[dzn_fnc_parseSFML] PARSER: '
 #define LOG_1(MSG) diag_log text format [LOG_PREFIX + MSG,ARG1]
@@ -192,8 +192,6 @@ private _fnc_splitLines = {
         };
     };
 
-    _lines pushBack EOF;
-
     _lines
 };
 
@@ -305,7 +303,7 @@ private _fnc_addArrayItem = {
     private _node = [] call _fnc_getNode;
     private _key = count keys _node;
     _node set [_key, if (isNil "_item") then { nil } else { _item }];
-    DBG_3("(addArrayItem) Adding array node %1 with item [%2]. Nodes: %3", _key, _item, _hashNodesRoute);
+    DBG_3("(addArrayItem) Adding array node %1 with item [%2]. Nodes: %3", _key, if (isNil "_item") then { "any" } else { _item }, _hashNodesRoute);
 
     DBG("(addArrayItem) ----------- Add array item to hash node -------------");
     DBG_1("(addArrayItem) %1", values _node);
@@ -964,7 +962,7 @@ private _fnc_parseLine = {
             private _closedCount = ceil (_indentDiff / INDENT_DEFAULT);
             if (_indentDiff < 0 || (_indentDiff > 0 && _closedCount == 0)) exitWith {
                 DBG_2("(NESTED) [ERROR:ERR_INDENT_UNEXPECTED_NESTED] Unexpected indent for nested item (expected %1, but actual is %2) ", _calculated, _actualIndent);
-                REPORT_ERROR(ERR_INDENT_UNEXPECTED_NESTED, _forEachIndex, "Unexpected indent for nested item (expected " + str _calculated + ", but actual is " + str _actualIndent);
+                REPORT_ERROR(ERR_INDENT_UNEXPECTED_NESTED, _forEachIndex, "Unexpected indent for nested item (expected " + str _calculated + ", but actual is " + str _actualIndent + ")");
             };
 
             if (_indentDiff > 0) then {
@@ -1101,16 +1099,29 @@ DBG("----------------------------------- PREPARING -----------------------------
 private _lines = if (_dataMode == MODE_PARSE_LINE) then {
     [_data]
 } else {
-    [_data] call _fnc_splitLines;
+    [_data] call _fnc_splitLines
 };
 DBG_1("Lines count: %1", count _lines);
-DBG("----------------------------------- PARSING -------------------------------");
 
-if !(_lines findIf { _x != "" } > -1) exitWith {
+private _nonEmptyLinesExists = _lines findIf { [_x] call CBA_fnc_trim != "" } > -1;
+DBG_1("Non empty lines found: %1", _nonEmptyLinesExists);
+
+if (!_nonEmptyLinesExists) exitWith {
+    DBG("Failed to find non-empty line in the given input.");
     REPORT_ERROR_NOLINE(ERR_FILE_NO_CONTENT, 'File has no content (or commented)!');
+    if (_printStatistics) then {
+        private _timeSpent = diag_tickTime - _startAt;
+        private _errorCount = count (_hash get ERRORS_NODE);
+        LOG_3("Parsed file [%1] in %2 seconds. Error count: %3.", _input, _timeSpent, _errorCount);
+    };
+
     _hash
 };
 
+
+DBG("----------------------------------- PARSING -------------------------------");
+
+_lines pushBack EOF;
 private _linesCount = count _lines - 1;
 private _hashNodesRoute = [];
 private _arrayNodes = [];

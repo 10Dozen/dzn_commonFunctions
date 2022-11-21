@@ -1,0 +1,39 @@
+
+Array:
+    - name: Foo
+      val: Bar
+
+RootKey: Yammy
+
+Array2:
+    - 1
+    - 2
+
+RootKey2: Yammy2
+
+RootKey3:
+    NestedArray1:
+        - name: Alice
+          age: 30
+
+    NestedKey:
+        Foo: Bar
+
+RootKey4:
+    NestedArray2:
+        - size: XL
+          color: red
+
+    NestedArray3:
+        - 100
+        - 200
+
+    Subsection:
+        SubKey:
+            - x: y
+            - x: z
+            - x: w
+              type: 1
+            - x: q
+
+    NestedKey1: Echo

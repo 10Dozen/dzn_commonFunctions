@@ -36,7 +36,7 @@
 
 #include "SFMLParser.hpp"
 
-//#define DEBUG DEBUG
+// #define DEBUG DEBUG
 
 #define LOG_PREFIX '[dzn_fnc_parseSFML] PARSER: '
 #define LOG_1(MSG) diag_log text format [LOG_PREFIX + MSG,ARG1]
@@ -98,6 +98,7 @@ DBG_1("Params: %1", _this);
 DBG_1("Mode: %1", _dataMode);
 
 private _startAt = diag_tickTime;
+private _printStatistics = true;
 
 private _hash = createHashMap;
 _hash set [SOURCE_NODE, _input];
@@ -108,6 +109,7 @@ private _data = switch _dataMode do {
     case MODE_FILE_LOAD: { loadFile _input };
     case MODE_FILE_PREPROCESS: { preprocessFile _input };
     case MODE_PARSE_LINE: {
+        _printStatistics = false;
         if ([_input] call CBA_fnc_trim == "") then {
             ""
         } else {
@@ -121,7 +123,7 @@ private _data = switch _dataMode do {
     };
 };
 
-DBG_1("Data: %1", _data);
+DBG_1("Data: %1 chars", count _data);
 
 if (count _data == 0) exitWith {
     // diag_log text format ["[dzn_fnc_parseSettingsFile] Warning! Input [%1] is empty!", _input];
@@ -136,47 +138,57 @@ private _fnc_splitLines = {
     // Splits input data into array of lines. It also removes comments if present.
     params ["_data"];
 
+    private _chars = toArray _data;
     private _isRawFile = _dataMode == MODE_FILE_LOAD;
-    private _linebreak = [[ASCII_NL], [ASCII_CR, ASCII_NL]] select _isRawFile;
+    private _linebreak = [[ASCII_NL], [ASCII_CR, ASCII_NL]] select (ASCII_CR in _chars);
     private _linebreakSize = count _linebreak;
-    private _chars = toArray _data + _linebreak;
+    _chars append _linebreak;
     private _lineChars = [];
     private _lines = [];
     DBG_1("(splitLines) Linebreaks size: %1", _linebreakSize);
 
     for "_i" from 0 to (count _chars - _linebreakSize) do {
         private _char = _chars # _i;
-        if (_isRawFile) then {
-            private _nextChar = _chars # (_i + 1);
-            if ([_char, _nextChar] isEqualTo _linebreak) then {
-                private _normalizedLine = toString ([_lineChars] call _fnc_removeComment);
-
-                DBG_1("(splitLines) Found and normalized: %1", _normalizedLine);
-                _lines pushBack _normalizedLine;
-
-                _lineChars resize 0; // Drop buffer and skip next char
-                _i = _i + 1;
-            } else {
-                _lineChars pushBack _char;
+        private _normalizedLine = "";
+        switch _char do {
+            case ASCII_CR: {
+                if ([_char, _chars # (_i + 1)] isEqualTo _linebreak) then {
+                    DBG_1("(splitLines) EOL (ASCII_CR, ASCII_NL) detected at position %1", _i);
+                    _normalizedLine = toString ([_lineChars] call _fnc_removeComment);
+                    _lines pushBack _normalizedLine;
+                    _lineChars resize 0;
+                    // Skip next char as it expected to be ASCII_NL from [ASCII_CR, ASCII_NL] end of line pair
+                    _i = _i + 1;
+                } else {
+                    // _lineChars pushBack _char;
+                };
             };
-        } else {
-            switch _char do {
-                case ASCII_NL: {
-                    DBG_1("(splitLines) Found and normalized: %1", toString _lineChars);
-                    _lines pushBack toString _lineChars;
-                    _lineChars resize 0; // Drop buffer
-                };
-                case ASCII_VERTICAL_LINE: {
-                    if (_lineChars isEqualTo []) then {
-                        continue; // Skip | in the beginning of the line
-                    } else {
-                        _lineChars pushBack _char;
-                    };
-                };
-                default {
+            case ASCII_NL: {
+                DBG_1("(splitLines) EOL (ASCII_NL) detected at position %1", _i);
+                // Comments are handled differently in LOAD_FILE and PREPROCESS_FILE modes
+                _normalizedLine = toString(if (_isRawFile) then {
+                    [_lineChars] call _fnc_removeComment
+                } else {
+                    _lineChars
+                });
+                _lines pushBack _normalizedLine;
+                _lineChars resize 0;
+            };
+            case ASCII_VERTICAL_LINE: {
+                if (_lineChars isEqualTo [] && !_isRawFile) then {
+                    // | in the beginning of the line & file is preprocessed - escape it
+                    continue;
+                } else {
                     _lineChars pushBack _char;
                 };
             };
+            default {
+                _lineChars pushBack _char;
+            }
+        };
+
+        if (_normalizedLine isNotEqualTo "") then {
+            DBG_1("(splitLines) Line found and normalized: %1", _normalizedLine);
         };
     };
 
@@ -213,14 +225,14 @@ private _fnc_removeComment = {
                 }; // Ignore hashes inside the quotes or code
                 if (_j == 0) exitWith {
                     _commentStartedIndex = _j;
-                    DBG_1("(removeComment) Found hash at : %1", _j);
+                    DBG_1("(removeComment) Found hash at %1", _j);
                 };
                 if (_chars # (_j - 1) == ASCII_BACKSLASH) then {
                     _escapedHashes pushBack _j - 1;
                     DBG_1("(removeComment) Found escaped hash at : %1", _j - 1);
                 } else {
                     _commentStartedIndex = _j;
-                    DBG_1("(removeComment) Found hash at : %1", _j);
+                    DBG_1("(removeComment) Found hash at %1", _j);
                 };
             };
             case ASCII_GRAVE;
@@ -293,11 +305,11 @@ private _fnc_addArrayItem = {
     private _node = [] call _fnc_getNode;
     private _key = count keys _node;
     _node set [_key, if (isNil "_item") then { nil } else { _item }];
-    DBG_2("(addArrayItem) Adding array node %1. Nodes: %2", _key, _hashNodesRoute);
+    DBG_3("(addArrayItem) Adding array node %1 with item [%2]. Nodes: %3", _key, _item, _hashNodesRoute);
 
-    DBG("----------- Add array item to hash node -------------");
-    DBG_1("%1", values _node);
-    DBG("------------------------------------------------------");
+    DBG("(addArrayItem) ----------- Add array item to hash node -------------");
+    DBG_1("(addArrayItem) %1", values _node);
+    DBG("(addArrayItem) ------------------------------------------------------");
 
     (_key)
 };
@@ -326,19 +338,26 @@ private _fnc_addNode = {
     };
     _node set [_key, createHashMap];
     _hashNodesRoute pushBack _key;
+    DBG_1("(addNode) Nodes now: %1", _hashNodesRoute);
 };
 
 private _fnc_calculateExpectedIndent = {
     // Returns expected indent, according to current active node position
+    DBG_1("(calculateExpectedIndent) Nodes: %1", _hashNodesRoute);
     private _expected = 0;
     {
         if (typename _x == "SCALAR") then {
             private _tline = [_line] call CBA_fnc_trim;
             if (_tline select [0,1] != "-") then {
                 _expected = _expected + INDENT_ARRAY_NESTED;
+                DBG_2("(calculateExpectedIndent) Node %1: Nested into array (+%2)", _forEachIndex, INDENT_ARRAY_NESTED);
+            } else {
+                _expected = _expected + INDENT_ARRAY_NESTED;
+                DBG_2("(calculateExpectedIndent) Node %1: Array node (+%2)", _forEachIndex, INDENT_ARRAY_NESTED);
             };
         } else {
             _expected = _expected + INDENT_DEFAULT;
+            DBG_2("(calculateExpectedIndent) Node %1: Section/nested in section node (+%2)", _forEachIndex, INDENT_DEFAULT);
         };
     } forEach _hashNodesRoute;
 
@@ -1078,12 +1097,14 @@ private _fnc_parseLine = {
 };
 
 // --- Main programm body
+DBG("----------------------------------- PREPARING -----------------------------");
 private _lines = if (_dataMode == MODE_PARSE_LINE) then {
     [_data]
 } else {
     [_data] call _fnc_splitLines;
 };
-DBG_1("Lines: %1", _lines);
+DBG_1("Lines count: %1", count _lines);
+DBG("----------------------------------- PARSING -------------------------------");
 
 if !(_lines findIf { _x != "" } > -1) exitWith {
     REPORT_ERROR_NOLINE(ERR_FILE_NO_CONTENT, 'File has no content (or commented)!');
@@ -1146,12 +1167,10 @@ if (_dataMode == MODE_PARSE_LINE) then {
 DBG("----------------------------------- FINISHED -----------------------------");
 DBG_1("Hash: %1", _hash);
 
-private _timeSpent = diag_tickTime - _startAt;
-private _errorCount = count (_hash get ERRORS_NODE);
-if (_dataMode in [MODE_FILE_LOAD, MODE_FILE_PREPROCESS]) then {
+if (_printStatistics) then {
+    private _timeSpent = diag_tickTime - _startAt;
+    private _errorCount = count (_hash get ERRORS_NODE);
     LOG_3("Parsed file [%1] in %2 seconds. Error count: %3.", _input, _timeSpent, _errorCount);
-} else {
-    LOG_2("Parsed oneliner in %1 seconds. Error count: %2.", _timeSpent, _errorCount)
 };
 
 (_hash)

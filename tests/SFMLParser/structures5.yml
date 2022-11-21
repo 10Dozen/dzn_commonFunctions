@@ -1,0 +1,51 @@
+
+RootSection:
+    NestedArray:
+        - game: Guilty Gear
+          chars:
+              - name: Kuradoberi Jam
+                origin: China
+                details:
+                    gender: F
+                    height: 163
+                    weight: 48
+                participated:
+                    - GG
+                    - GGX
+                    - GGXRd
+                    - GG Strive
+              - name: Ky Kiske
+                origin: France
+                details:
+                    gender: M
+                    height: 178
+                    weight: 58
+                participated:
+                    - GG
+                    - GGX
+                    - GG2
+                    - GGXRd
+                    - GG Strive
+        - game: King of Fighters
+          chars:
+              - name: Athena
+                origin: Japan
+                details:
+                    gender: F
+                    height: 162
+                    weight: 49
+                participated:
+                    - KOF'95
+                    - KOF'97
+              - name: Iori
+                origin: Japan
+                details:
+                    gender: M
+                    height: 182
+                    weight: 79
+                participated:
+                    - KOF'95
+                    - KOF'96
+                    - KOF'97
+
+Foo: Bar

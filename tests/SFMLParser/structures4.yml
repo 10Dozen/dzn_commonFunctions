@@ -1,0 +1,43 @@
+
+Plain:
+    Key1: 5000
+    Key2: 35000
+
+Nested:
+    Section:
+        Key1: 100
+        Key2: 200
+    Key3: 300
+
+Nested2:
+    Key1: 100
+    Section:
+        Key2: 200
+        Key3: 300
+
+Nested3:
+    Key1: 100
+    Key2: 200
+    Section:
+        Key3: 300
+
+
+NestedInArray:
+    - 1
+    - name: John
+      age: 32
+    - 3
+
+NestedInArray2:
+    - 1
+    - 2
+    - name: John
+      age: 32
+
+NestedInArray3:
+    - name: John
+      age: 32
+    - 1
+    - 2
+
+Oneliner: (name: John, age: 32, roles: [Admin, GSO])

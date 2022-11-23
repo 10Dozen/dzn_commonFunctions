@@ -28,6 +28,7 @@ class CfgFunctions
             class setVars {};
             class selectAndRemove {};
             class runLoop {};
+            class report {};
 
             class assignInVehicle {};
             class createVehicle  {};
@@ -107,6 +108,7 @@ class CfgFunctions
             class getItemDisplayName {};
             class getVehicleDisplayName {};
             class addWhitelistedArsenal {};
+            class checkClassExists {};
         };
 
         class support

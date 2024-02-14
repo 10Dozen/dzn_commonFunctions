@@ -1,6 +1,6 @@
 // *************************************
 // DZN COMMON FUNCTIONS
-// v1.4
+// v1.5
 // *************************************
 // Common functions are very common and useful for any missions
 // Area functions provide support of creating locations from triggers, getting points and building inside given areas. It is required for DZN_DYNAI
@@ -28,6 +28,7 @@ class CfgFunctions
             class setVars {};
             class selectAndRemove {};
             class runLoop {};
+            class report {};
 
             class assignInVehicle {};
             class createVehicle  {};
@@ -107,6 +108,7 @@ class CfgFunctions
             class getItemDisplayName {};
             class getVehicleDisplayName {};
             class addWhitelistedArsenal {};
+            class checkClassExists {};
         };
 
         class support

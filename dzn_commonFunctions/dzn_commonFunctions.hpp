@@ -131,6 +131,7 @@ class CfgFunctions
             class CountTextLines {};
             class ShowBasicDialog {};
             class ShowAdvDialog {};
+            class ShowAdvDialog2 {};
             class ShowChooseDialog {};
 
             class CreateControl {};

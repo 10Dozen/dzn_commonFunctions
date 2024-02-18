@@ -19,7 +19,6 @@
 #define TEXT_FONT           "PuristaLight"
 #define TEXT_FONT_SIZE      0.04
 
-
 // Some tackles
 //#define DEBUG true
 #ifdef DEBUG
@@ -70,6 +69,7 @@
 #define A_TAG L(tag)
 #define A_TEXT_RIGHT L(textRight)
 #define A_TEXT_RIGHT_COLOR L(textRightColor)
+#define A_TEXT_RIGHT_COLOR_ACTIVE L(textRightColorActive)
 #define A_CLOSE_BTN L(closeButton)
 
 // Control classes

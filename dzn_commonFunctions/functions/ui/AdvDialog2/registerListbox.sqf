@@ -76,6 +76,11 @@ private _parse = {
 private _render = {
     private _fulfillListbox = {
         params ["_ctrl", "_item"];
+        private [
+            "_elementColor", "_iconColor",
+            "_elementColorActive", "_iconColorActive"
+        ];
+
         private _defaultTextColor = _item getOrDefault [A_COLOR, DEFAULT_COLOR_RGBA];
         {
             LOG_ "(Listbox) %1", _x EOL;
@@ -83,66 +88,77 @@ private _render = {
             private _elementColor = _x getOrDefault [A_COLOR, _defaultTextColor];
 
             _ctrl lbAdd (_x get A_TITLE);
+            _ctrl lbSetPicture [_forEachIndex, _x getOrDefault [A_ICON, ""]];
+
+            // Colors
+            // All inherits from Element Color
+            // - iconColor overwrites for left and right icons
+            _elementColor = _x getOrDefault [A_COLOR, _defaultTextColor];
+            _iconColor = _x getOrDefault [A_ICON_COLOR, _elementColor];
+
             _ctrl lbSetColor [_forEachIndex, _elementColor];
-            _ctrl lbSetPicture [_forEachIndex,
-                _x getOrDefault [A_ICON, ""]
-            ];
-            _ctrl lbSetPictureColor [_forEachIndex,
-                _x getOrDefault [A_ICON_COLOR, _elementColor]
-            ];
-            _ctrl lbSetSelectColor [_forEachIndex,
-                _x getOrDefault [A_COLOR_ACTIVE, _elementColor]
-            ];
-            _ctrl lbSetPictureColorSelected [_forEachIndex,
-                _x getOrDefault [A_ICON_COLOR_ACTIVE,
-                    _x getOrDefault [A_COLOR_ACTIVE, _elementColor]
-               ]
-            ];
+            _ctrl lbSetPictureColor [_forEachIndex, _iconColor];
+
+            // Active colors fallbacks to:
+           // - elementColorActive -> elementColor
+           // - iconColorActive -> colorActive -> iconColor -> elementColor
+           _elementColorActive = _x getOrDefault [A_COLOR_ACTIVE, _elementColor];
+           _iconColorActive = _x getOrDefault [A_ICON_COLOR_ACTIVE, _x getOrDefault [A_COLOR_ACTIVE, _iconColor]];
+
+           _ctrl lbSetSelectColor [_forEachIndex, _elementColorActive];
+           _ctrl lbSetPictureColorSelected [_forEachIndex, _iconColorActive];
         } forEach (_item get A_LIST_ELEMENTS);
     };
 
     private _fulfillDropdown = {
         params ["_ctrl", "_item"];
+        private [
+            "_elementColor", "_iconColor", "_textRightColor", "_iconRightColor",
+            "_elementColorActive", "_iconColorActive", "_textRightColorActive", "_iconRightColorActive"
+        ];
         private _defaultTextColor = _item getOrDefault [A_COLOR, DEFAULT_COLOR_RGBA];
         {
             LOG_ "(Dropdown) %1", _x EOL;
 
-            private _elementColor = _x getOrDefault [A_COLOR, _defaultTextColor];
 
             _ctrl lbAdd (_x get A_TITLE);
             _ctrl lbSetTooltip [
                 _forEachIndex,
                 _x getOrDefault [A_TOOLTIP, _item getOrDefault [A_TOOLTIP, ""]]
             ];
-            _ctrl lbSetColor [
-                _forEachIndex,
-                _elementColor
-            ];
-
             _ctrl lbSetPicture [_forEachIndex, _x getOrDefault [A_ICON, ""]];
-            _ctrl lbSetPictureColor [_forEachIndex,
-                _x getOrDefault [A_ICON_COLOR, _elementColor]
-            ];
             _ctrl lbSetPictureRight [_forEachIndex, _x getOrDefault [A_ICON_RIGHT, ""]];
-            _ctrl lbSetPictureRightColor [_forEachIndex,
-                _x getOrDefault [A_ICON_RIGHT_COLOR, _x getOrDefault [A_ICON_COLOR, _elementColor]]
-            ];
             _ctrl lbSetTextRight [_forEachIndex, _x getOrDefault [A_TEXT_RIGHT, ""]];
-            _ctrl lbSetColorRight [
-                _forEachIndex,
-                _x getOrDefault [A_TEXT_RIGHT_COLOR, _elementColor]
-            ];
-            _ctrl lbSetSelectColor [
-                _forEachIndex,
-                _x getOrDefault [A_COLOR_ACTIVE, _elementColor]
-            ];
-            _ctrl lbSetSelectColorRight [
-                _forEachIndex,
-                _x getOrDefault [
-                    A_COLOR_ACTIVE,
-                    _x getOrDefault [A_TEXT_RIGHT_COLOR, _elementColor]
-                ]
-            ];
+
+            // Colors
+            // All inherits from Element Color
+            // - iconColor overwrites for left and right icons
+            // - iconColorRight overwrites for right icon only
+            // - textRightColor overwrites for right text only
+            _elementColor = _x getOrDefault [A_COLOR, _defaultTextColor];
+            _iconColor = _x getOrDefault [A_ICON_COLOR, _elementColor];
+            _textRightColor = _x getOrDefault [A_TEXT_RIGHT_COLOR, _elementColor];
+            _iconRightColor = _x getOrDefault [A_ICON_RIGHT_COLOR, _iconColor];
+
+            _ctrl lbSetColor [_forEachIndex, _elementColor];
+            _ctrl lbSetColorRight [_forEachIndex, _textRightColor];
+            _ctrl lbSetPictureColor [_forEachIndex, _iconColor];
+            _ctrl lbSetPictureRightColor [_forEachIndex, _iconRightColor];
+
+            // Active colors fallbacks to:
+            // - elementColorActive -> elementColor
+            // - iconColorActive -> colorActive -> iconColor -> elementColor
+            // - iconColorRightActive -> iconColorActive -> colorActive -> iconColor -> elementColor
+            // - textRightColorActive -> colorActive -> textRightColor -> elementColor
+            _elementColorActive = _x getOrDefault [A_COLOR_ACTIVE, _elementColor];
+            _iconColorActive = _x getOrDefault [A_ICON_COLOR_ACTIVE, _x getOrDefault [A_COLOR_ACTIVE, _iconColor]];
+            _iconRightColorActive = _x getOrDefault [A_ICON_RIGHT_COLOR_ACTIVE, _iconColorActive];
+            _textRightColorActive =_x getOrDefault [A_TEXT_RIGHT_COLOR_ACTIVE, _x getOrDefault [A_COLOR_ACTIVE, _textRightColor]];
+
+            _ctrl lbSetSelectColor [_forEachIndex, _elementColorActive];
+            _ctrl lbSetPictureColorSelected [_forEachIndex, _iconColorActive];
+            _ctrl lbSetPictureRightColorSelected [_forEachIndex, _iconRightColorActive];
+            _ctrl lbSetSelectColorRight [_forEachIndex, _textRightColorActive];
         } forEach (_item get A_LIST_ELEMENTS);
     };
 

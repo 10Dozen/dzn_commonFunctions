@@ -21,7 +21,6 @@
 
 
 // Some tackles
-
 //#define DEBUG true
 #ifdef DEBUG
     #define LOG_PREFIX "(AdvDialog2) "
@@ -41,36 +40,37 @@
 #define A(NAME) Q(NAME)
 
 // Attributes
-#define A_TYPE "type"
-#define A_FONT "font"
-#define A_SIZE "size"
-#define A_COLOR "color"
-#define A_COLOR_ACTIVE "colorActive"
-#define A_BG "bg"
-#define A_H "h"
-#define A_W "w"
-#define A_X "x"
-#define A_Y "y"
-#define A_ENABLED "enabled"
-#define A_TITLE "title"
-#define A_SLIDER_RANGE "sliderRange"
-#define A_SELECTED "selected"
-#define A_LIST_ELEMENTS "listElements"
-#define A_LIST_VALUES "listValues"
-#define A_ICON "icon"
-#define A_ICON_COLOR "iconColor"
-#define A_ICON_COLOR_ACTIVE "iconColorActive"
-#define A_ICON_RIGHT "iconRight"
-#define A_ICON_RIGHT_COLOR "iconRightColor"
-#define A_ICON_RIGHT_COLOR_ACTIVE "iconRightColorActive"
-#define A_CALLBACK "callback"
-#define A_CALLBACK_ARGS "callbackArgs"
-#define A_TOOLTIP "tooltip"
-#define A_EVENTS "events"
-#define A_TAG "tag"
-#define A_TEXT_RIGHT "textRight"
-#define A_TEXT_RIGHT_COLOR "textRightColor"
-
+#define L(X) toLowerANSI Q(X)
+#define A_TYPE L(type)
+#define A_FONT L(font)
+#define A_SIZE L(size)
+#define A_COLOR L(color)
+#define A_COLOR_ACTIVE L(colorActive)
+#define A_BG L(bg)
+#define A_H L(h)
+#define A_W L(w)
+#define A_X L(x)
+#define A_Y L(y)
+#define A_ENABLED L(enabled)
+#define A_TITLE L(title)
+#define A_SLIDER_RANGE L(sliderRange)
+#define A_SELECTED L(selected)
+#define A_LIST_ELEMENTS L(listElements)
+#define A_LIST_VALUES L(listValues)
+#define A_ICON L(icon)
+#define A_ICON_COLOR L(iconColor)
+#define A_ICON_COLOR_ACTIVE L(iconColorActive)
+#define A_ICON_RIGHT L(iconRight)
+#define A_ICON_RIGHT_COLOR L(iconRightColor)
+#define A_ICON_RIGHT_COLOR_ACTIVE L(iconRightColorActive)
+#define A_CALLBACK L(callback)
+#define A_CALLBACK_ARGS L(callbackArgs)
+#define A_TOOLTIP L(tooltip)
+#define A_EVENTS L(events)
+#define A_TAG L(tag)
+#define A_TEXT_RIGHT L(textRight)
+#define A_TEXT_RIGHT_COLOR L(textRightColor)
+#define A_CLOSE_BTN L(closeButton)
 
 // Control classes
 #define RSC_GROUP "RscControlsGroupNoScrollbars"
@@ -90,9 +90,13 @@
 // Types registration/Parser/Render
 #define PARSING_APPLY_ATTRIBUTES _cob call [F(MergeAttributes), [_item, _attrs]]
 
-#define SET_POSITION(CTRL, X, Y, W, H) \
-    LOG_ "[render.setPosition] x=%1, y=%2, w=%3, h=%4", X, Y, W, H EOL; \
-    CTRL ctrlSetPosition [X,Y,W,H]; \
+#define SET_POSITION(CTRL, ITEM, X, Y, W, H) \
+    LOG_ "[render.Position] Auto: x=%1, y=%2, w=%3, h=%4", X, Y, W, H EOL; \
+    LOG_ "[render.Position] By props: x=%1, y=%2, w=%3, h=%4", ITEM getOrDefault [A_X, X], ITEM getOrDefault [A_Y, Y], W, H  EOL; \
+    CTRL ctrlSetPosition [ \
+        ITEM getOrDefault [A_X, X], ITEM getOrDefault [A_Y, Y], \
+        W, H \
+    ]; \
     CTRL ctrlCommit 0
 
 #define SET_ATTRIBURES(CTRL) \
@@ -103,6 +107,7 @@
     CTRL ctrlSetTooltip (_item getOrDefault [A_TOOLTIP, ""])
 
 #define SET_EVENTS(CTRL) \
+    CTRL setVariable [Q(DialogCOB), _self]; \
     { \
         _x params ["_eventName", "_eventCallback", "_eventCallbackArgs"]; \
         LOG_ "[render.AddEvent] Adding _eventName=%1, _callback=%2, _args=%3", _eventName, _eventCallback, _eventCallbackArgs EOL; \

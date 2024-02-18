@@ -13,11 +13,13 @@
         nothing
 */
 
-params ["_control"];
-LOG_ "[OnButtonClick] _control=%1, _thisEvent=%2, _userArgs", _control, _thisEvent, _control getVariable A_CALLBACK_ARGS EOL;
+params ["_button"];
+
+private _dialogComponentObject = _button getVariable Q(DialogCOB);
+LOG_ "[OnButtonClick] _control=%1, _thisEvent=%2, _userArgs=%3, _cob=%4", _button, _thisEvent, _button getVariable A_CALLBACK_ARGS, _dialogComponentObject EOL;
 
 [
-    _self,
-    _control getVariable A_CALLBACK_ARGS,
-    _control
-] call (_control getVariable A_CALLBACK);
+    _dialogComponentObject,
+    _button getVariable A_CALLBACK_ARGS,
+    _button
+] call (_button getVariable A_CALLBACK);

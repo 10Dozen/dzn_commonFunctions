@@ -165,7 +165,7 @@ private _render = {
     LOG_ "[render.Dropdown/Listbox] setting lbSetCurSel = %1", _item get A_SELECTED EOL;
 
     REGISTER_AS_INPUT;
-    SET_POSITION(_ctrl, _xOffset, _yOffset, _itemWidth, _itemHeight);
+    SET_POSITION(_ctrl, _item, _xOffset, _yOffset, _itemWidth, _itemHeight);
     SET_ATTRIBURES(_ctrl);
 
     _ctrl

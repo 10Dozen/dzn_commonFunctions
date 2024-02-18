@@ -7,23 +7,22 @@
     User-derined tooltip will be prepended.
 
     Params (see OnSliderChange UI EH):
-        0: _ctrl (Control) - slider control.
+        0: _sliderControl (Control) - slider control.
         1: _newValue (Number) - current value of slider
 
     Returns:
         nothing
 */
 
-params ["_ctrl", "_newValue"];
+params ["_sliderControl", "_newValue"];
 
-
-private _customTooltipText = _ctrl getVariable [Q(sliderCustomTooltip), ""];
+private _customTooltipText = _sliderControl getVariable [Q(sliderCustomTooltip), ""];
 if (_customTooltipText != "") then {
     _customTooltipText = _customTooltipText + "\n";
 };
-private _range = sliderRange _ctrl;
+private _range = sliderRange _sliderControl;
 
-_ctrl ctrlSetTooltip format [
+_sliderControl ctrlSetTooltip format [
     "%1%2 (min: %3, max: %4)",
     _customTooltipText,
     _newValue, _range # 0, _range # 1

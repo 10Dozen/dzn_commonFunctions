@@ -4,7 +4,6 @@
 /*
 TODO:
 - [] test Dropdown extended syntax
-- [] Support X and Y for controls
 */
 
 // COB Definition

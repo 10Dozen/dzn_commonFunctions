@@ -39,7 +39,7 @@ private _render = {
     private _ctrl = _dialog ctrlCreate [RSC_BUTTON_PICTURE, -1, _ctrlGroup];
     _ctrl ctrlSetText (_item get A_ICON);
 
-    SET_POSITION(_ctrl, _xOffset + 0.002, _yOffset + 0.002, _itemWidth - 0.004, _itemHeight - 0.004);
+    SET_POSITION(_ctrl, _item, _xOffset + 0.002, _yOffset + 0.002, _itemWidth - 0.004, _itemHeight - 0.004);
     SET_ATTRIBURES(_ctrl);
     SET_EVENTS(_ctrl);
 

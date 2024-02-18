@@ -13,7 +13,12 @@
 params ["_hash", "_attrs"];
 
 if (typename _attrs == "ARRAY") exitWith {
-    _hash insert _attrs;
+    {
+        _x params ["_key", "_value"];
+        _hash set [toLowerANSI _key, _value];
+    } forEach _attrs;
 };
 
-_hash merge [_attrs, true];
+{
+    _hash set [toLowerANSI _x, _y];
+} forEach _attrs;

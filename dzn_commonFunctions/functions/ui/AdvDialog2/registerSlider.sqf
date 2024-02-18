@@ -42,7 +42,7 @@ private _render = {
     _cob call [F(onSliderChanged), [_ctrl, (_item get A_SELECTED)]];
 
     SET_EVENTS(_ctrl);
-    SET_POSITION(_ctrl, _xOffset, _yOffset, _itemWidth, _itemHeight);
+    SET_POSITION(_ctrl, _item, _xOffset, _yOffset, _itemWidth, _itemHeight);
     REGISTER_AS_INPUT;
 
     _ctrl

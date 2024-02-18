@@ -11,8 +11,8 @@
         nothing
 */
 
-params ["_control", "_button", "", "", "", "", ""];
+params ["_cbLabelControl", "_button", "", "", "", "", ""];
 
-private _cb = _control getVariable Q(relatedCheckbox);
-if (!ctrlEnabled _cb) exitWith {};
-_cb cbSetChecked !(cbChecked _cb);
+private _cbControl = _cbLabelControl getVariable Q(relatedCheckbox);
+if (!ctrlEnabled _cbControl) exitWith {};
+_cbControl cbSetChecked !(cbChecked _cbControl);

@@ -1,15 +1,4 @@
 /*
-TODO:
-    - [ok] Contol tag
-    - [ok] Element width
-    - [ok] Suppor attribures as hashMap syntax
-    - [test] Picture button -- looks like rectangle, not square
-    - [ok] lbTooltip per item for listbox/drodown
-
-*/
-
-
-/*
     [@Item1, @Item2, ..., @ItenN] call dzn_fnc_ShowAdvDialog2;
 
     Displays dialog of given structure of labels and inputs.
@@ -46,6 +35,8 @@ TODO:
         [ 0@Type("BUTTON"), 1@Icon, 2@Callback, 3(optional)@Args, 4(optional)@Attributes, 5(optional)@Events ]
     Line break (used to break current line ):
         ["BR"]
+    Dialog settings (used to set up overall dialog box and background)
+        [0@Type("DIALOG"), 1@Attributes]
 
     , where params:
         // Common
@@ -57,12 +48,15 @@ TODO:
               ["font", (STRING)] - name of the font to use. Defaults to 'PuristaLight'.
               ["size", (NUMBER)] - size of the font. Defaults to 0.04.
               ["color", (RGBA ARRAY)] - RGBA color of text. Defaults to [1,1,1,1].
-              ["bg", (RGBA ARRAY)] - RGBA color of the control background. Defaults to [0,0,0,0].
-              ["h", (NUMBER)] - item hieght (if not set - size will be used).
-              ["w", (NUMBER)] - item width (if not set - item width will be calculated depending on item count in line).
+              ["bg", (RGBA ARRAY)] - RGBA color of the control/dialog background. Defaults to [0,0,0,0].
+              ["x", (NUMBER)] - position of element/dialog in safezone coordinates. Defaults to 0.
+              ["y", (NUMBER)] - position of element/dialog in safezone coordinates. Defaults to 0.
+              ["h", (NUMBER)] - item/dialog hieght in safezone coordinates. Defaults to 1 for dialog, for item - "size" attribute is used.
+              ["w", (NUMBER)] - item/dialog width in safezone coordinates Defaults to 1 for dialog, for item width will be calculated depending on item count in line.
               ["enabled", (BOOL)] - flag to enable/disable control.
               ["tooltip", (STRING)] - tooltip text for control.
               ["tag", (HASHMAP KEY)] - tag name for the control.
+              ["closeButton", (BOOL)] - flag to show close button icon, only for Header. Defaults to true.
 
         Events (ARRAY) - (optional) list of custom events handlers to be added
               in format [eventName, callbackFunction, callbackArgs].
@@ -118,10 +112,10 @@ TODO:
         Args (ANY) - (optional) see Button.
 
         Helper function collections (hashMap) may interact with dialog displayed by ShowAdvDialog2 function.
-            _values = _collection call ["GetValues"] -- returns an array of current values of the dialog's inputs (listed in the same order as inputs in dialog).
-            _valuesMap = _collection call ["GetTaggedValues"] -- return hash map of current values of the dialog's inputs (where key = input tag, and value - current input value).
-            _value = _collection call ["GetControlValue", _control] -- returns value of specific control.
-            _value = _collection call ["GetValueByTag", _tag] -- returns value of control by given tag.
+            _values = _cob call ["GetValues"] -- returns an array of current values of the dialog's inputs (listed in the same order as inputs in dialog).
+            _valuesMap = _cob call ["GetTaggedValues"] -- return hash map of current values of the dialog's inputs (where key = input tag, and value - current input value).
+            _value = _cob call ["GetControlValue", _control] -- returns value of specific control.
+            _value = _cob call ["GetValueByTag", _tag] -- returns value of control by given tag.
             Value format depends on input type:
                 INPUT:    inputText(String)
                 CHECKBOX: isChecked(Bool)
@@ -129,7 +123,7 @@ TODO:
                 DROPDOWN/LISTBOX:
                           [selectedIndex(Number), selectedItemText(String), selectedItemValue(Anything)
 
-            _control = _collection call ["GetByTag", _tag] -- returns control by given tag.
+            _control = _cob call ["GetByTag", _tag] -- returns control by given tag.
 
         Examples:
         // Simple dialog
@@ -160,43 +154,30 @@ TODO:
           ["BR"],
 
           ["BUTTON", "Teleport", {
-            params ["_args", _f"];
-            (_f call ["GetValueByTag", "tpOption"]) params ["_idx", "_tpText", "_tpPos"];
+            params ["_cob", "_args"];
+            (_cob call ["GetValueByTag", "tpOption"]) params ["_idx", "_tpText", "_tpPos"];
 
             hint format ["Teleport to %1 (%2)", _tpText, _tpPos];
             player setPos _tpPos;
           }],
           ["BUTTON", "Show hint", {
-            params ["_args", "_f"];
+            params ["_cob", "_args"];
             hint format [
                 "Hint message: %1",
-                _f call ["GetValueByTag", "hintInput"]
+                _cob call ["GetValueByTag", "hintInput"]
             ];
           }],
           ["BUTTON", "Spawn vehicle", {
-            params ["_args"];
+            params ["", "_args"];
             (selectRandom _args) createVehicle position player;
             hint "Spawned!";
-          }, ["C_Offroad_01_F", "C_Offroad_02_F"]],
-          ["BUTTON", "End mission", { hint "Mission Ends soon (it's not)!"}],
-          ["BR"],
-
-          ["LABEL", "Listbox ->"],
-          ["LISTBOX", ["Item1", "Item2", "Item3"]],
-          ["BR"],
-
-          ["LABEL", "Dropdown ->"],
-          ["DROPDOWN", ["Item1", "Item2", "Item3"]],
-          ["BR"],
-
-          ["LABEL"],
-          ["LABEL"],
-          ["BUTTON", "Close"]
+          }, ["C_Offroad_01_F", "C_Offroad_02_unarmed_F"]],
+          ["BUTTON", "End mission", { hint "Mission Ends soon (it's not)!"}]
         ] call dzn_fnc_ShowAdvDialog2;
 
         // Complex example 2
         [
-          ["HEADER", "Title", nil, [["mouseEnter", { hint (_this # 1); }, "Mouse Enter Event with Args!"]]],
+          ["HEADER", "Title", nil, [["mouseEnter", { params ["_event", "_cob", "_args"]; hint _args; }, "Mouse Enter Event with Args!"]]],
           ["LABEL", "Text"],
           ["INPUT", "Default text", [["tooltip", "This is a tooltip!"]]],
           ["BR"],

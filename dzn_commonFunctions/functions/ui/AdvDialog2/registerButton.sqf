@@ -41,7 +41,7 @@ private _render = {
     LOG_ "[render.Button] Callback=%1, CallbackArg=%2", _item get A_CALLBACK, _item get A_CALLBACK_ARGS EOL;
 
     // Add some room around the button
-    SET_POSITION(_ctrl, _xOffset + BTN_OFFSETS, _yOffset + BTN_OFFSETS, _itemWidth - (2*BTN_OFFSETS), _itemHeight - (2*BTN_OFFSETS));
+    SET_POSITION(_ctrl, _item, _xOffset + BTN_OFFSETS, _yOffset + BTN_OFFSETS, _itemWidth - (2*BTN_OFFSETS), _itemHeight - (2*BTN_OFFSETS));
     SET_ATTRIBURES(_ctrl);
     SET_EVENTS(_ctrl);
 

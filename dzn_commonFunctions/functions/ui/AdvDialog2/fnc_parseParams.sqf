@@ -27,7 +27,10 @@ for "_i" from 0 to _itemsCount do {
 
     if (_type == Q(BR)) then {
         LOG_ "[parseParams] Libebreak - calculating layout and line width for items in line" EOL;
-        if (_itemsInLine isEqualTo []) then { continue; };
+        if (_itemsInLine isEqualTo []) then {
+            LOG_ "[parseParams] There is no items in line, skip..." EOL;
+            continue;
+        };
         _items pushBack _itemsInLine;
 
         // Calculate width

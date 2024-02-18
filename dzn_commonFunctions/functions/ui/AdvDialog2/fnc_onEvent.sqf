@@ -14,6 +14,8 @@
 
 LOG_ "[OnEvent] _this=%1", _this EOL;
 params ["_ctrl"];
+
+private _dialogComponentObject = _ctrl getVariable Q(DialogCOB);
 private _eventCallback = _ctrl getVariable format ["%1_%2", _thisEvent, A_CALLBACK];
 private _eventCallbackArgs = _ctrl getVariable [
     format ["%1_%2", _thisEvent, A_CALLBACK_ARGS],
@@ -22,6 +24,6 @@ private _eventCallbackArgs = _ctrl getVariable [
 
 [
     _this,
-    _self,
+    _dialogComponentObject,
     _eventCallbackArgs
 ] call _eventCallback;

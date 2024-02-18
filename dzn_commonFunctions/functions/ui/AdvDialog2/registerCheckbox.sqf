@@ -39,22 +39,29 @@ private _render = {
     private _cbWidth = _cbHeight * SAFEZONE_ASPECT_RATIO;
     private _titleWidth = _itemWidth - _cbWidth - CB_TEXT_OFFSET;
 
+    private _xPos = _item getOrDefault [A_X, _xOffset];
+    private _yPos = _item getOrDefault [A_Y, _yOffset];
+
     // [ ] Title
-    private _cbOffsetX = _xOffset;
-    private _titleOffsetX = _xOffset + _cbWidth + CB_TEXT_OFFSET;
+    private _cbOffsetX = _xPos;
+    private _titleOffsetX = _xPos + _cbWidth + CB_TEXT_OFFSET;
     // Title [ ]
     if (_itemType == Q(CHECKBOX_RIGHT)) then {
-        _cbOffsetX = _xOffset + _titleWidth + CB_TEXT_OFFSET;
-        _titleOffsetX = _xOffset;
+        _cbOffsetX = _xPos + _titleWidth + CB_TEXT_OFFSET;
+        _titleOffsetX = _xPos;
     };
 
     REGISTER_AS_INPUT;
-    LOG_ "[Render.Checkbox] _cbOffsetX=%1, _yOffset=%2, _cbWidth=%3, _cbHeight=%4", _cbOffsetX, _yOffset + CB_HEIGHT_OFFSET, _cbWidth, _cbHeight EOL;
-    SET_POSITION(_ctrl, _cbOffsetX, _yOffset + CB_HEIGHT_OFFSET, _cbWidth, _cbHeight);
-    SET_POSITION(_ctrlTitle, _titleOffsetX, _yOffset, _titleWidth, _itemHeight);
-
     SET_ATTRIBURES(_ctrl);
     SET_ATTRIBURES(_ctrlTitle);
+    SET_EVENTS(_ctrl);
+    SET_EVENTS(_ctrlTitle);
+
+    LOG_ "[Render.Checkbox] _cbOffsetX=%1, _yOffset=%2, _cbWidth=%3, _cbHeight=%4", _cbOffsetX, _yOffset + CB_HEIGHT_OFFSET, _cbWidth, _cbHeight EOL;
+    _ctrl ctrlSetPosition [_cbOffsetX, _yPos, _cbWidth, _cbHeight];
+    _ctrlTitle ctrlSetPosition [_titleOffsetX, _yPos, _titleWidth, _itemHeight];
+    _ctrl ctrlCommit 0;
+    _ctrlTitle ctrlCommit 0;
 
     _ctrl cbSetChecked (_item get A_SELECTED);
     _ctrl ctrlSetChecked (_item get A_SELECTED);
@@ -63,20 +70,6 @@ private _render = {
     // Handle click on text to change checkbox state
     _ctrlTitle ctrlAddEventHandler ["MouseButtonUp", _cob get F(onChekboxLabelClicked)];
     _ctrlTitle setVariable [Q(relatedCheckbox), _ctrl];
-
-    {
-        _x params ["_eventName", "_eventCallback", "_eventCallbackArgs"];
-
-        _ctrlTitle setVariable [
-            format ["%1_%2", _eventName, A_CALLBACK],
-            _eventCallback
-        ];
-        _ctrlTitle setVariable [
-            format ["%1_%2", _eventName, A_CALLBACK_ARGS],
-            _eventCallbackArgs
-        ];
-        _ctrlTitle ctrlAddEventHandler [_eventName, _cob get F(OnEvent)];
-    } forEach (_item get A_EVENTS);
 
     _ctrl
 };

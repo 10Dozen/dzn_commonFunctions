@@ -8,11 +8,9 @@
     Labels/buttons/checkboxes support StructuredText syntax.
     Allows to add tooltips for label/input.
 
-
     Each control will be placed in the same line as the previous one until ["BR"] item is met.
     Then new line will be filled.
     Controls in the same line will be resized to fill line width in the same proportion.
-
 
     Item types and definition:
     Header (stylized label):
@@ -32,7 +30,7 @@
     Button:
         [ 0@Type("BUTTON"), 1@Title, 2@Callback, 3(optional)@Args, 4(optional)@Attributes, 5(optional)@Events ]
     Icon Button:
-        [ 0@Type("BUTTON"), 1@Icon, 2@Callback, 3(optional)@Args, 4(optional)@Attributes, 5(optional)@Events ]
+        [ 0@Type("ICON_BUTTON"), 1@Icon, 2@Callback, 3(optional)@Args, 4(optional)@Attributes, 5(optional)@Events ]
     Line break (used to break current line ):
         ["BR"]
     Dialog settings (used to set up overall dialog box and background)
@@ -111,6 +109,31 @@
         Callback (CODE) - see Button.
         Args (ANY) - (optional) see Button.
 
+        === Hooks and events ===
+        ["OnParsed", 1@Callback(CODE), 2@Args(ANY)]
+            Code to be executed once params parsed, but no dialog rendered.
+            Callback params:
+            _this # 0 - dzn_AdvDialog2 component object to provide useful methods;
+            _this # 1 - passed args;
+
+        ["OnDraw", 1@Callback(CODE), 2@Args(ANY)]
+            Code to be executed once dialog is rendered and all control's events are set.
+            Callback params:
+            _this # 0 - dzn_AdvDialog2 component object to provide useful methods;
+            _this # 1 - passed args;
+
+        ["OnCustomEvent", 1@EventName(STRING), 2@Callback(CODE), 3@Args(ANY)]
+            Code to be executed on custom CBA event (sent by e.g. CBA_fnc_localEvent).
+            Callback params:
+            _this - arguments:
+                0: _cob - dzn_AdvDialog2 component object to provide useful methods;
+                1: _args - passed args
+            _thisArgs - Arguments added to event by this function.  <ANY>
+            _thisId - Same as the return value of this function.  <NUMBER>
+            _thisType - Name of the event.  (Same as _eventName passed to this function) STRING
+            _thisFnc - Piece of code added to the event by this function <CODE>
+
+        === Helper functions ===
         Helper function collections (hashMap) may interact with dialog displayed by ShowAdvDialog2 function.
             _values = _cob call ["GetValues"] -- returns an array of current values of the dialog's inputs (listed in the same order as inputs in dialog).
             _valuesMap = _cob call ["GetTaggedValues"] -- return hash map of current values of the dialog's inputs (where key = input tag, and value - current input value).

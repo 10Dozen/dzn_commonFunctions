@@ -25,7 +25,20 @@ _self set [Q(Descriptors), nil];
 _self set [Q(Items), []];
 _self set [Q(LineHeights), []];
 
+_self set [Q(Controls), []];
+_self set [Q(ControlsPerLines), []];
+
 _self set [F(OnParsed), {}];
 _self set [F(OnParsedArgs), {}];
 _self set [Q(OnParsed), {}];
 _self set [Q(OnDrawArgs), {}];
+
+_self set [Q(CBAEvents), []];
+
+
+
+diag_log "Deleting events on reset on start";
+{
+    _x params ["_eventName", "", "", "_eventId"];
+    [_eventName, _eventId] call CBA_fnc_removeEventHandler;
+} forEach (_self get Q(CBAEvents));

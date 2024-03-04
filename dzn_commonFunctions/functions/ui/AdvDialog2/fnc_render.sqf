@@ -18,7 +18,7 @@ _self set [Q(Dialog), _dialog];
 
 LOG_ "[render] OnParsed script: %1", _self get F(OnParsed) EOL;
 LOG_ "[render] OnParsed script execution with args: %1", _self get Q(OnParsedArgs) EOL;
-_self call [F(OnParsed), _self get Q(OnParsedArgs)];
+_self call [F(OnParsed), [_self, _self get Q(OnParsedArgs)]];
 
 private _dialogAttrs = _self get Q(DialogAttributes);
 private _dialogX = _dialogAttrs get A_X;
@@ -32,6 +32,7 @@ _ctrlGroup ctrlCommit 0;
 
 private _background = _dialog ctrlCreate [RSC_BG, -1, _ctrlGroup];
 
+private _plainControlsList = [];
 private _controls = [];
 private _inputs = [];
 private _taggedControls = createHashMap;
@@ -77,13 +78,15 @@ private _yOffset = 0;
 
         _xOffset = _xOffset + _itemWidth;
         _lineControls pushBack _ctrl;
+        _plainControlsList pushBack _ctrl;
     } forEach _lineItems;
 
     _controls pushBack _lineControls;
     _yOffset = _yOffset + _lineHeight;
 } forEach (_self get Q(Items));
 
-_dialog setVariable [Q(Controls), _controls];
+_dialog setVariable [Q(Controls), _plainControlsList];
+_dialog setVariable [Q(ControlsPerLines), _controls];
 _dialog setVariable [Q(Inputs), _inputs];
 _dialog setVariable [Q(TaggedControls), _taggedControls];
 
@@ -104,6 +107,6 @@ _ctrlGroup ctrlCommit DIALOG_SHOW_TIME;
 
 
 LOG_ "[render] OnDraw script execution with args: %1", _self get Q(OnDrawArgs) EOL;
-_self call [F(OnDraw), _self get Q(OnDrawArgs)];
+_self call [F(OnDraw), [_self, _self get Q(OnDrawArgs)]];
 
 LOG_ "[render] Rendered!" EOL;

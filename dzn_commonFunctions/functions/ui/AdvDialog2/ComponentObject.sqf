@@ -21,6 +21,7 @@ private _cob = createHashMapObject [[
     [Q(OnParsedArgs), []],
     [F(OnDraw), {}],
     [Q(OnDrawArgs), []],
+    [Q(CBAEvents), []],
 
     [Q(Parsers), createHashMap],
     [Q(Renderers), createHashMap],
@@ -34,6 +35,7 @@ private _cob = createHashMapObject [[
     PREP_COB_FUNCTION(RegisterControlType),
     PREP_COB_FUNCTION(MergeAttributes),
     PREP_COB_FUNCTION(AppendLinebreak),
+    PREP_COB_FUNCTION(Close),
 
     PREP_COB_FUNCTION(reset),
     PREP_COB_FUNCTION(parseParams),
@@ -44,6 +46,7 @@ private _cob = createHashMapObject [[
     PREP_COB_FUNCTION(GetTaggedValues),
     PREP_COB_FUNCTION(GetValues),
     PREP_COB_FUNCTION(GetByTag),
+    PREP_COB_FUNCTION(GetControls),
 
     PREP_COB_FUNCTION(getControlValue),
     PREP_COB_FUNCTION(onSliderChanged),

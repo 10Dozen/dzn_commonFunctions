@@ -83,6 +83,12 @@ for "_i" from 0 to _itemsCount do {
         _self set [Q(OnDrawArgs), _args];
         continue;
     };
+    if (_type == Q(ONCBAEVENT)) then {
+        _itemDescriptor params ["", "_eventName", "_callback", ["_args", []]];
+        LOG_ "[parseParams] Set OnCustomEvent script" EOL;
+        (_self get Q(CBAEvents)) pushBack [_eventName, _callback, _args];
+        continue;
+    };
 
     _item = createHashMapFromArray [
         [A_TYPE, _type],

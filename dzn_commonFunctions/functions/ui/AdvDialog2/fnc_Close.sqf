@@ -11,7 +11,6 @@
 
 {
     _x params ["_eventName", "", "", "_eventId"];
-    diag_log format ["[CLOSE] Deleting event (on reset): %1 - id: %2", _eventName, _eventId];
     [_eventName, _eventId] call CBA_fnc_removeEventHandler;
 } forEach (_self get Q(CBAEvents));
 

@@ -46,6 +46,7 @@ private _cob = createHashMapObject [[
     PREP_COB_FUNCTION(GetTaggedValues),
     PREP_COB_FUNCTION(GetValues),
     PREP_COB_FUNCTION(GetByTag),
+    PREP_COB_FUNCTION(GetControls),
 
     PREP_COB_FUNCTION(getControlValue),
     PREP_COB_FUNCTION(onSliderChanged),

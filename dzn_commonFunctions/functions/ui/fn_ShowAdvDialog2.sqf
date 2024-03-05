@@ -147,6 +147,10 @@
                           [selectedIndex(Number), selectedItemText(String), selectedItemValue(Anything)
 
             _control = _cob call ["GetByTag", _tag] -- returns control by given tag.
+            _controls = _cob call ["GetControls", [_byTag, _byType]] -- returns controls that match given list of types and tags (via AND).
+            Where:
+                _byTag (ARRAY) list of tags to be found by parial match (e.g. 'time' will find controls tagged as 'time', 'timeLbl', 'timeInput')
+                _byType (ARRAY) list of registered types (e.g. "HEADER", "INPUT", "BUTTON")
 
         Examples:
         // Simple dialog

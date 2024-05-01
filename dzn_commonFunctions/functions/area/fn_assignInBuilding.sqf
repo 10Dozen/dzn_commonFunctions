@@ -67,7 +67,6 @@ while { !(_found) } do {
 		};
 		_found = true;
 	};
-	sleep .1;
 	
 	_max = _max + 1;
 	if (_max > 15) then { _found = true; };

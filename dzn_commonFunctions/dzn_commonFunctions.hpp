@@ -34,7 +34,8 @@ class CfgFunctions
             class createVehicle  {};
             class createVehicleCrew {};
             class isCombatCrewAlive {};
-            class getPosOnGivenDir  {};
+            class getPosOnGivenDir {};
+            class getSurfacePos {};
 
             class getComposition {};
             class setComposition {};

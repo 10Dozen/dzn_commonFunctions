@@ -5,7 +5,7 @@
  *
  * INPUT:
  * 0: TRIGGER or List of TRIGGERS or [] - area to search (1 or several triggers). If [] - all map units will be checked
- * 1: STRING or CODE - custom conditions where _x is reference to unit. Optional, defaults to "true".
+ * 1: STRING or CODE - custom conditions where _x is reference to unit. Optional, defaults to "".
  * 2: STRING - comparative operator and value (e.g. "> 4", "== 15"). Optional, defaults to "" - returns list of players.
  * OUTPUT: OUTPUT: BOOLEAN or ARRAY
  *
@@ -23,7 +23,7 @@ params ["_areas", ["_cond", "true"], ["_operatorAndValue", ""]];
 private _customConditionStr = [_cond, ["CODE"]] call dzn_fnc_stringify;
 private _areaConditionStr = "true";
 
-if (typename _areas != "ARRAY") then { _areas = [_areas]; };
+if !(_areas isEqualType []) then { _areas = [_areas]; };
 
 if (_areas isNotEqualTo []) then {
     private _areaConds = [];
@@ -40,10 +40,10 @@ private _condString = format [
 ];
 
 (call compile format [
-	[
-		"{ %1 } count (call BIS_fnc_listPlayers) %2",  /* count */
-		"(call BIS_fnc_listPlayers) select %1"         /* list  */
-	] select (_operatorAndValue == ""),
-	_condString,
-	_operatorAndValue
+    [
+        "{ %1 } count (call BIS_fnc_listPlayers) %2",  /* count */
+        "(call BIS_fnc_listPlayers) select { %1 }"     /* list  */
+    ] select (_operatorAndValue == ""),
+    _condString,
+    _operatorAndValue
 ])

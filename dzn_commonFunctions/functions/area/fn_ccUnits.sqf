@@ -29,7 +29,7 @@ if !(_areas isEqualType []) then { _areas = [_areas]; };
 if (_areas isNotEqualTo []) then {
     private _areaConds = [];
     {
-        _areaConds pushBack format ["_x inArea (_area select %1)", _forEachIndex];
+        _areaConds pushBack format ["_x inArea (_areas select %1)", _forEachIndex];
     } forEach _areas;
     _areaConditionStr = _areaConds joinString " || ";
 };

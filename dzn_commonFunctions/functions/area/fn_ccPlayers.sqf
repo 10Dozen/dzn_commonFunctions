@@ -23,6 +23,7 @@ params ["_areas", ["_cond", "true"], ["_operatorAndValue", ""]];
 private _customConditionStr = [_cond, ["CODE"]] call dzn_fnc_stringify;
 private _areaConditionStr = "true";
 
+if (_customConditionStr == "") then { _customConditionStr = "true"; };
 if !(_areas isEqualType []) then { _areas = [_areas]; };
 
 if (_areas isNotEqualTo []) then {

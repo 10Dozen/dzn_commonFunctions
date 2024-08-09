@@ -5,7 +5,7 @@
  *
  * INPUT:
  * 0: TRIGGER or List of TRIGGERS or [] - Area to search (1 or several triggers). If [] - all map units will be checked
- * 1: STRING - side of units ("west","east","resistance")
+ * 1: STRING or SIDE - side of units ("west","east","resistance")
  * 2: STRING or CODE - custom conditions where _x is reference to unit ("" or nil if not used). Optional, defaults to "".
  * 3: STRING - comparative operator and value (e.g. "> 4", "== 15"). Optional, defaults to "" - returns list of units.
  * OUTPUT: BOOLEAN or ARRAY
@@ -18,12 +18,13 @@
  *      _list = [[Trg1,Trg2,Trg3], "east", {alive _x}] call dzn_fnc_ccUnits
  */
 
-params["_area", "_side", ["_cond", "true"], ["_operatorAndValue", ""]];
+params["_areas", "_side", ["_cond", "true"], ["_operatorAndValue", ""]];
 
 private _sideConditionStr = format ["side _x == %1", _side];
 private _customConditionStr = [_cond, ["CODE"]] call dzn_fnc_stringify;
 private _areaConditionStr = "true";
 
+if (_customConditionStr == "") then { _customConditionStr = "true"; };
 if !(_areas isEqualType []) then { _areas = [_areas]; };
 
 if (_areas isNotEqualTo []) then {

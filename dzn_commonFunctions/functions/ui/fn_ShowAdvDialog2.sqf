@@ -232,8 +232,8 @@ if (isNil Q(dzn_AdvDialog2)) then {
     dzn_AdvDialog2 = [] call COMPILE_SCRIPT(ComponentObject);
 };
 
-if (_this isNotEqualTo []) exitWith {
-    dzn_AdvDialog2 call [F(ShowDialog), _this];
-};
+if (_this isEqualTo []) exitWith { forceUnicode -1; };
+
+dzn_AdvDialog2 call [F(ShowDialog), _this];
 
 forceUnicode -1;

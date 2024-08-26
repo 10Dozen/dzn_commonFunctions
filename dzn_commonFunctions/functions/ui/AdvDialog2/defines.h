@@ -11,7 +11,7 @@
 
 // Defaults
 #define BG_COLOR_RGBA        [0,0,0,0.6]
-#define HEADER_BG_COLOR_RGBA [0.77, 0.51, 0.08, 0.8]
+#define HEADER_BG_COLOR_RGBA (["GUI", "BCG_RGB"] call BIS_fnc_displayColorGet)
 #define ITEM_BG_COLOR_RGBA   [0,0,0,0.7]
 #define NO_BG_COLOR_RGBA     [0,0,0,0]
 

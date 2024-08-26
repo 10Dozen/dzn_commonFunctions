@@ -19,6 +19,7 @@
         [ 0@Type("LABEL"), 1@Title, 2(optional)@Attributes, 3(optional)@Events ]
     Text input:
         [ 0@Type("INPUT"), 1@DefaultText, 2(optional)@Attributes, 3(optional)@Events ]
+        [ 0@Type("INPUT_AREA"), 1@DefaultText, 2(optional)@Attributes, 3(optional)@Events ] 
     Checkbox (left or right-aligned)
         [ 0@Type("CHECKBOX"), 1@Title, 2(optional)@DefaultState, 3(optional)@Attributes, 4(optional)@Events ]
         [ 0@Type("CHECKBOX_RIGHT"), 1@Title, 2(optional)@DefaultState, 3(optional)@Attributes, 4(optional)@Events ]
@@ -65,7 +66,7 @@
                 _this # 1 -- callback arguments;
                 _this # 2 - helper function collections (hashMap), see below.
 
-        // Input
+        // Input, Input_area
         DefaultText (STRING) - (optional) input's pre-filled text. Defaults to "".
 
         // Checkbox, Checkbox_right

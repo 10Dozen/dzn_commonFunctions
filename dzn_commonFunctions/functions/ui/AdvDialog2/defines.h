@@ -16,7 +16,7 @@
 #define NO_BG_COLOR_RGBA     [0,0,0,0]
 
 #define TEXT_COLOR_RGBA     [1, 1, 1, 1]
-#define TEXT_FONT           "PuristaLight"
+#define TEXT_FONT           "PuristaMedium"
 #define TEXT_FONT_SIZE      0.04
 
 // Some tackles

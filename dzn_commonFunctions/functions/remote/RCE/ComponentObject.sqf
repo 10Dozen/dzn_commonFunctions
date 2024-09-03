@@ -7,7 +7,7 @@
     until component initialization and registration.
 */
 
-dzn_RCE_CallbackFunction = [
+private _CallbackFunction = [
     ["#type", "rce_callback_function"],
     ["#create", {
         _this params ["_function", ["_args", []]];
@@ -15,15 +15,19 @@ dzn_RCE_CallbackFunction = [
         _self set ["_args", _args];
     }],
     ["executeCallback", {
-        if (remoteExecutedOwner == 0) exitWith {};
-        private _args = _self get "args";
-        if (!isNil "_this") then { _args = _args + [_this] };
-        DEBUG_ "(RCE_CallbackFunction) Invoking remoteExec with _args: %1", _args EOL;
-        _args remoteExec [_self get "function", remoteExecutedOwner];
+        _this params ["_result", "_owner"];
+        if (_owner == 0) exitWith {};
+
+        private _args = [];
+        _args append (_self get "args");
+        if (!isNil "_result") then { _args pushBack _result; };
+
+        LOG_ "(RCE_CallbackFunction) Invoking remoteExec with _args: %1", _args EOL;
+        _args remoteExec [_self get "function", _owner];
     }]
 ];
 
-dzn_RCE_RemoteExecCallbackCOB = [
+private _CallbackCOB = [
     ["#type", "rce_callback_cob"],
     ["#create", {
         _this params ["_cobName", "_method", ["_args", []]];
@@ -32,16 +36,19 @@ dzn_RCE_RemoteExecCallbackCOB = [
         _self set ["_args", _args];
     }],
     ["executeCallback", {
-        if (remoteExecutedOwner == 0) exitWith {
-            DEBUG_ "(RCE_CallbackCOB) Owner is 0, preventing execution..." EOL;
-        };
-        private _args = _self get "args";
-        if (!isNil "_this") then { _args = _args + [_this] };
-        DEBUG_ "(RCE_CallbackCOB) Invoking remoteExec for COB=%1 / Method=%2 with _args: %3", _self get "cob", _self get "method", _args EOL;
+        _this params ["_result", "_owner"];
+        if (_owner == 0) exitWith {};
+        
+        private _args = [];
+        _args append (_self get "args");
+        if (!isNil "_result") then { _args pushBack _result; };
+
+        LOG_ "(RCE_CallbackCOB) Invoking remoteExec for COB=%1 / Method=%2 with _args: %3", _self get "cob", _self get "method", _args EOL;
         [
             _self get "cob",
-            [_self get "method", _args]
-        ] remoteExec [FUNC(CallComponentByRemote), remoteExecutedOwner];
+            _self get "method",
+            _args
+        ] remoteExec ["dzn_fnc_receiveRCE", _owner];
     }]
 ];
 
@@ -49,19 +56,17 @@ dzn_RCE_RemoteExecCallbackCOB = [
 // COB Definition
 private _cob = createHashMapObject [[
     ["#str", { "RCE_ComponentObject" }],
-    [Q(queue), createHashMap],
-    [Q(registeredComponent), createHashMap],
+    [Q(storedCalls), createHashMap],
+    [Q(registeredComponents), createHashMap],
 
     PREP_COB_FUNCTION(registerComponent),
     PREP_COB_FUNCTION(send),
     PREP_COB_FUNCTION(receive),
-    PREP_COB_FUNCTION(addToQueue),
-    PREP_COB_FUNCTION(handleQueue),
-    
-    ["#create", {}]
+    PREP_COB_FUNCTION(store),
+    PREP_COB_FUNCTION(handleStored),
+
+    [Q(cobCallback), _CallbackCOB],
+    [Q(functionCallback), _CallbackFunction]
 ]];
-
-
-
 
 _cob

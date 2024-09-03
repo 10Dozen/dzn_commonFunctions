@@ -22,7 +22,7 @@
  *    "fnc_assignActions",
  *    [_arg1, _arg2],
  *    0
- * ] call dzb_fnc_remoteComponentExec;
+ * ] call dzn_fnc_remoteComponentExec;
  *
  * [
  *    "tSF_Core",
@@ -30,11 +30,22 @@
  *    ["tSF_Respawn", "locationObjects"],
  *    2,
  *    false,
+ *    // -- Callback will send remote exec component request back to the initiator
  *    createHashMapObject [dzn_RCE_RemoteExecCallbackCOB, [
  *       "tSF_Core", "fnc_applyComponentVariable", ["tSF_Respawn", "locationObjects"]
  *    ]]
- * ] call dzb_fnc_remoteComponentExec;
+ * ] call dzn_fnc_RCE;
  */
 
- 
+#include "RCE\defines.h"
+#define RCE_COB COB
 
+LOG_ "(RCE) Params: %1", _this EOL;
+
+if (isNil Q(RCE_COB)) then {
+    LOG_ "(RCE) Init RCE component" EOL;
+    RCE_COB = [] call COMPILE_SCRIPT(ComponentObject);
+};
+
+LOG_ "(RCE) Invoke RCE component - method 'Send'" EOL;
+RCE_COB call [F(send), _this];

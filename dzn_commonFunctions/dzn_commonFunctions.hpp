@@ -144,5 +144,12 @@ class CfgFunctions
             class AddDraw3d {};
             class RemoveDraw3d {};
         };
+
+        class remote
+        {
+            file = "dzn_commonFunctions\functions\remote";
+
+            class remoteComponentExec {};
+        }
     };
 };

@@ -2,7 +2,7 @@
 #define COB dzn_RCE
 
 // Some tackles
-#define DEBUG true
+//#define DEBUG true
 #ifdef DEBUG
     #define LOG_PREFIX "(RCE) "
     #define LOG_ diag_log parseText format [LOG_PREFIX +

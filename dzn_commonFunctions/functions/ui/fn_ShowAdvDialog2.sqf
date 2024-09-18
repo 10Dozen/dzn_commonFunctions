@@ -92,8 +92,8 @@
                    ["iconRight", (STRING)] - path to right picture .paa file (dropdown only).
                    ["iconRightColor", (RGBA ARRAY)] - color of right picture (dropdown only).
                    ["iconColorActive", (RGBA ARRAY)] - color of left picture (dropdown only).
-                   ["textRight", (NUMBER)] - right text of item (dropdown only).
-                   ["textColorRight", (NUMBER)] - right text of item (dropdown only).
+                   ["textRight", (STRING)] - right text of item (dropdown only).
+                   ["textRightColor", (RGBA ARRAY)] - right text of item (dropdown only).
 
         DefaultSelected (NUMBER) - (optional) option index selected by default. Defaults to 0.
 
@@ -235,6 +235,14 @@ if (isNil Q(dzn_AdvDialog2)) then {
 
 if (_this isEqualTo []) exitWith { forceUnicode -1; };
 
-dzn_AdvDialog2 call [F(ShowDialog), _this];
+if (!isNil { dzn_AdvDialog2 get Q(Dialog) }) exitWith {
+    forceUnicode -1;
 
+    dzn_AdvDialog2 call [F(Close)];
+    [{        
+        dzn_AdvDialog2 call [F(ShowDialog), _this];
+    }, _this] call CBA_fnc_execNextFrame;
+};
+
+dzn_AdvDialog2 call [F(ShowDialog), _this];
 forceUnicode -1;

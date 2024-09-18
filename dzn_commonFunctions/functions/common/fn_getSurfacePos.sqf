@@ -9,7 +9,7 @@
         0: Pos2d/Pos3d/Object - Position or object
         1: Boolean - optional. Flag to get position on most top surface at given pos. Defaults to true.
         2: Number  - optional, height to measure from. Defaults to 3000.
-    OUTPUT: ARRAY Pos3d
+    OUTPUT: ARRAY Pos3d (ASL)
 */
 
 params ["_origin", ["_onMostTop", true], ["_heightFrom", 3000]];

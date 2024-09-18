@@ -1,6 +1,6 @@
 // *************************************
 // DZN COMMON FUNCTIONS
-// v1.6.3
+// v1.7
 // *************************************
 // Common functions are very common and useful for any missions
 // Area functions provide support of creating locations from triggers, getting points and building inside given areas. It is required for DZN_DYNAI
@@ -144,5 +144,15 @@ class CfgFunctions
             class AddDraw3d {};
             class RemoveDraw3d {};
         };
+
+        class remote
+        {
+            file = "dzn_commonFunctions\functions\remote";
+
+            class registerRCE {};
+            class RCE {};
+            class receiveRCE {};
+            class createRCECallback {};
+        }
     };
 };

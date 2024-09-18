@@ -12,7 +12,7 @@
 // Defaults
 #define BG_COLOR_RGBA        [0,0,0,0.6]
 #define HEADER_BG_COLOR_RGBA (["GUI", "BCG_RGB"] call BIS_fnc_displayColorGet)
-#define ITEM_BG_COLOR_RGBA   [0,0,0,0.7]
+#define ITEM_BG_COLOR_RGBA   [0,0,0,0.9]
 #define NO_BG_COLOR_RGBA     [0,0,0,0]
 
 #define TEXT_COLOR_RGBA     [1, 1, 1, 1]
@@ -71,6 +71,9 @@
 #define A_TEXT_RIGHT_COLOR L(textRightColor)
 #define A_TEXT_RIGHT_COLOR_ACTIVE L(textRightColorActive)
 #define A_CLOSE_BTN L(closeButton)
+
+#define A_DIALOG_SHOW_TIME L(dialogShowTime)
+#define A_DIALOG L(dialog)
 
 // Control classes
 #define RSC_GROUP "RscControlsGroupNoScrollbars"

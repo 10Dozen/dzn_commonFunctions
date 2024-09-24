@@ -26,9 +26,9 @@ private _render = {
     params ["_cob", "_item", "_xOffset", "_yOffset", "_itemWidth", "_itemHeight", "_dialog", "_ctrlGroup"];
     private _ctrl = _dialog ctrlCreate [RSC_LABEL, -1, _ctrlGroup];
     _ctrl ctrlSetStructuredText parseText (_item get A_TITLE);
+    SET_POSITION(_ctrl, _item, _xOffset, _yOffset, _itemWidth, _itemHeight);
     SET_ATTRIBURES(_ctrl);
     SET_EVENTS(_ctrl);
-    SET_POSITION(_ctrl, _item, _xOffset, _yOffset, _itemWidth, _itemHeight);
 
     _ctrl
 };

@@ -12,10 +12,6 @@
 
 LOG_ "[render] Rendering started" EOL;
 
-createDialog DIALOG_NAME;
-private _dialog = findDisplay DIALOG_ID;
-_self set [Q(Dialog), _dialog];
-
 LOG_ "[render] OnParsed script: %1", _self get F(OnParsed) EOL;
 LOG_ "[render] OnParsed script execution with args: %1", _self get Q(OnParsedArgs) EOL;
 _self call [F(OnParsed), [_self, _self get Q(OnParsedArgs)]];
@@ -25,6 +21,13 @@ private _dialogX = _dialogAttrs get A_X;
 private _dialogY = _dialogAttrs get A_Y;
 private _dialogW = _dialogAttrs get A_W;
 private _dialogH = _dialogAttrs get A_H;
+
+private _dialog = _dialogAttrs get A_DIALOG;
+if (isNil "_dialog") then {
+    createDialog DIALOG_NAME;
+    _dialog = findDisplay DIALOG_ID;
+};
+_self set [Q(Dialog), _dialog];
 
 private _ctrlGroup = _dialog ctrlCreate [RSC_GROUP, -1];
 _ctrlGroup ctrlSetPosition [_dialogX + _dialogW/2, 0, 0, 0];
@@ -96,15 +99,14 @@ _background ctrlSetBackgroundColor (_dialogAttrs getOrDefault [A_BG, BG_COLOR_RG
 // otherwise - fill bg starting from 1st line.
 private _topItemIsHeader = ((_self get Q(Items)) # 0 # 0) get A_TYPE == Q(HEADER);
 _background ctrlSetPosition ([
-    [0, 0, _dialogW,_yOffset],
+    [0, 0, _dialogW, _yOffset],
     [0, (_linesHeights # 0), _dialogW,  _yOffset - (_linesHeights # 0)]
 ] select _topItemIsHeader);
 
 _background ctrlCommit 0;
 
-_ctrlGroup ctrlSetPosition [_dialogX, _dialogY, _dialogW, _dialogH];
-_ctrlGroup ctrlCommit DIALOG_SHOW_TIME;
-
+_ctrlGroup ctrlSetPosition [_dialogX, _dialogY, _dialogW, _dialogH min _yOffset];
+_ctrlGroup ctrlCommit (_dialogAttrs getOrDefault [A_DIALOG_SHOW_TIME, DIALOG_SHOW_TIME]);
 
 LOG_ "[render] OnDraw script execution with args: %1", _self get Q(OnDrawArgs) EOL;
 _self call [F(OnDraw), [_self, _self get Q(OnDrawArgs)]];

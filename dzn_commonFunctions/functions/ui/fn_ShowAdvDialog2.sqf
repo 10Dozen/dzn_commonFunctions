@@ -55,7 +55,9 @@
               ["enabled", (BOOL)] - flag to enable/disable control.
               ["tooltip", (STRING)] - tooltip text for control.
               ["tag", (HASHMAP KEY)] - tag name for the control.
-              ["closeButton", (BOOL)] - flag to show close button icon, only for Header. Defaults to true.
+              ["closeButton", (BOOL)] - flag to show close button icon, only for Header. Defaults to true,
+              ["dialog", (DISPLAY)] - target dialog. If not set - will create several dialog, if some display passed - controls will be added to it.
+              ["dialogShowTime", (NUMBER)] - duration of the draw animation. Defaults to 0.15.
 
         Events (ARRAY) - (optional) list of custom events handlers to be added
               in format [eventName, callbackFunction, callbackArgs].
@@ -63,8 +65,8 @@
               (without 'on' prefix).
               Parameters of the callback function:
                 _this # 0 -- event's arguments (see BIKI);
-                _this # 1 -- callback arguments;
-                _this # 2 - helper function collections (hashMap), see below.
+                _this # 1 - helper function collections (hashMap), see below;
+                _this # 2 -- callback arguments;
 
         // Input, Input_area
         DefaultText (STRING) - (optional) input's pre-filled text. Defaults to "".

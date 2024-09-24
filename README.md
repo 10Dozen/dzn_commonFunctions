@@ -1,5 +1,5 @@
 # dzn_commonFunctions
-##### Version: 1.7
+##### Version: 1.8
 A library of common and useful functions
 
 Check [Wiki](https://github.com/10Dozen/dzn_commonFunctions/wiki/Common-Functions) for details.

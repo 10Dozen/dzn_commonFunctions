@@ -131,10 +131,10 @@ private _result = switch (toLowerANSI _mode) do {
         dzn_ControlHandler call [F(reset), [_display]]
     };
     case "getcontrols": {
-        dzn_ControlHandler call [F(GetByTag), [_display, _tag]]
+        dzn_ControlHandler call [F(GetByTag), [_display, _tagname]]
     };
     case "getvalues": {
-        dzn_ControlHandler call [F(GetValueByTag), [_display, _tag]]
+        dzn_ControlHandler call [F(GetValueByTag), [_display, _tagname]]
     };
     default { nil };
 };

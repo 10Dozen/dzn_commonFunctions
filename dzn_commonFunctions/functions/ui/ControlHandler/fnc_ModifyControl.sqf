@@ -29,13 +29,22 @@ LOG_ "[ModifyControl] _controls=%1", _controls, _display EOL;
     private _attrs = _x getVariable [P_ATTRS, createHashMap];
     // -- Parse and merge
     [_self, _attrs, [_newAttrs, _newEvents], _x] call (_self get Q(Parsers) get (_x getVariable P_TYPE));
-    _self call [F(MergeAttributes), [_attrs, _newAttrsMap]];
+    //_self call [F(MergeAttributes), [_attrs, _newAttrsMap]];
 
+    
+    LOG_ "[ModifyControl] On parsed=%1", _attrs EOL;
+    private _newPos = _attrs get A_POS;
+    private _newAttrsKeys = _newAttrs apply { _x # 0 };
+    if (A_X in _newAttrsKeys || A_Y in _newAttrsKeys || A_W in _newAttrsKeys || A_H in _newAttrsKeys) then {
+        _newPos = [
+            _attrs get A_X,
+            _attrs get A_Y,
+            _attrs get A_W,
+            _attrs get A_H
+        ];
+        _attrs set [A_POS, _newPos];
+    };
     // -- Parse POS params and map to X,Y,W,H
-    private _newPos = _attrs getOrDefault [
-        A_POS, 
-        [_attrs get A_X,_attrs get A_Y, _attrs get A_W, _attrs get A_H]
-    ];
     _newPos params ["_xPos", "_yPos", "_w", "_h"];
     _attrs set [A_X, _xPos];
     _attrs set [A_Y, _yPos];

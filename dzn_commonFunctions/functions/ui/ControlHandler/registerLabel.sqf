@@ -13,7 +13,7 @@ private _parse = {
     if (!isNull _ctrl) then {
         _itemDescriptor = [
             "",
-            _item get A_TITLE,
+            _itemAttrs get A_TITLE,
             _itemDescriptor # 0,
             _itemDescriptor # 1
         ];

@@ -30,7 +30,7 @@ _self set [Q(ControlsPerLines), []];
 
 _self set [F(OnParsed), {}];
 _self set [F(OnParsedArgs), {}];
-_self set [Q(OnParsed), {}];
+_self set [Q(OnDraw), {}];
 _self set [Q(OnDrawArgs), {}];
 
 _self set [Q(CBAEvents), []];

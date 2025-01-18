@@ -22,6 +22,11 @@ private _value = switch (_this getVariable Q(type)) do {
     case Q(LISTBOX);
     case Q(DROPDOWN): {
         private _selectedIndex = lbCurSel _this;
+        // -- Prevent selecting value when cur sel is out of range
+        if (_selectedIndex == -1 || _selectedIndex >= count (_this getVariable Q(listValues))) exitWith {
+            [-1, nil, nil]
+        };
+
         [
             _selectedIndex,
             _this lbText _selectedIndex,

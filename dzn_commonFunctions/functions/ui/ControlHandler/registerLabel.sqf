@@ -17,7 +17,7 @@ private _parse = {
             _itemDescriptor # 0,
             _itemDescriptor # 1
         ];
-        
+
         LOG_ "[parse.Label] On modify: %1", _itemDescriptor EOL;
     };
 
@@ -54,8 +54,18 @@ private _render = {
 
     SET_COMMON_ATTRIBURES(_ctrl,_itemAttrs);
     SET_EVENT_HANDLERS(_ctrl,_itemAttrs,_cob);
-
     _ctrl ctrlCommit 0;
+
+    if (_itemAttrs getOrDefault [A_ADJUST_HEIGHT, false]) then {
+        _ctrl ctrlSetPosition [
+            _itemAttrs get A_X,
+            _itemAttrs get A_Y,
+            _itemAttrs get A_W,
+            ctrlTextHeight _ctrl
+        ];
+        _ctrl ctrlCommit 0;
+    };
+
     _ctrl
 };
 

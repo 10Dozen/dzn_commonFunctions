@@ -28,6 +28,7 @@ private _value = switch (_this getVariable Q(type)) do {
             (_this getVariable Q(listValues)) # _selectedIndex
         ]
     };
+    default { nil };
 };
 
 LOG_ "[GetControlValue] Value=%1", _value EOL;

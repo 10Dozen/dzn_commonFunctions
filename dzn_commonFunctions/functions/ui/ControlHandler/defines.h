@@ -78,11 +78,7 @@
 #define A_CLOSE_BTN L(closeButton)
 #define A_ICON_SQUARED L(iconSquared)
 #define A_LIST_ITEMS L(listItems)
-
-#define A_X_CALC L(x_calculated)
-#define A_Y_CALC L(y_calculated)
-#define A_W_CALC L(w_calculated)
-#define A_H_CALC L(h_calculated)
+#define A_ADJUST_HEIGHT L(adjustHeight)
 
 #define P_CALLBACK Q(callback)
 #define P_CALLBACK_ARGS Q(callbackArgs)

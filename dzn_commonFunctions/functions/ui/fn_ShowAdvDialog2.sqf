@@ -19,7 +19,7 @@
         [ 0@Type("LABEL"), 1@Title, 2(optional)@Attributes, 3(optional)@Events ]
     Text input:
         [ 0@Type("INPUT"), 1@DefaultText, 2(optional)@Attributes, 3(optional)@Events ]
-        [ 0@Type("INPUT_AREA"), 1@DefaultText, 2(optional)@Attributes, 3(optional)@Events ] 
+        [ 0@Type("INPUT_AREA"), 1@DefaultText, 2(optional)@Attributes, 3(optional)@Events ]
     Checkbox (left or right-aligned)
         [ 0@Type("CHECKBOX"), 1@Title, 2(optional)@DefaultState, 3(optional)@Attributes, 4(optional)@Events ]
         [ 0@Type("CHECKBOX_RIGHT"), 1@Title, 2(optional)@DefaultState, 3(optional)@Attributes, 4(optional)@Events ]
@@ -65,7 +65,7 @@
               (without 'on' prefix).
               Parameters of the callback function:
                 _this # 0 -- event's arguments (see BIKI);
-                _this # 1 - helper function collections (hashMap), see below;
+                _this # 1 - helper function collections (dzn_AdvDialog2 object hashMap), see below;
                 _this # 2 -- callback arguments;
 
         // Input, Input_area
@@ -241,7 +241,7 @@ if (!isNil { dzn_AdvDialog2 get Q(Dialog) }) exitWith {
     forceUnicode -1;
 
     dzn_AdvDialog2 call [F(Close)];
-    [{        
+    [{
         dzn_AdvDialog2 call [F(ShowDialog), _this];
     }, _this] call CBA_fnc_execNextFrame;
 };

@@ -30,7 +30,7 @@ LOG_ "[parseParams] Invoking parse function for %1", _type EOL;
 _item set [A_X, _xPos, true];
 _item set [A_Y, _yPos, true];
 _item set [A_W, _w, true];
-_item set [A_H, ((_item get A_SIZE) + LINE_HEIGHT_OFFSET) max _h];
+_item set [A_H, (_item getOrDefault [A_H, _h]) max ((_item get A_SIZE) + LINE_HEIGHT_OFFSET)];
 
 
 LOG_ "[parseParams] Parsed item %1", _item EOL;

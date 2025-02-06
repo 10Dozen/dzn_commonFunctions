@@ -70,6 +70,7 @@ private _render = {
     // Handle click on text to change checkbox state
     _ctrlTitle ctrlAddEventHandler ["MouseButtonUp", _cob get F(onChekboxLabelClicked)];
     _ctrlTitle setVariable [Q(relatedCheckbox), _ctrl];
+    _ctrl setVariable [Q(GroupedCtrls), [_ctrl, _ctrlTitle]];
 
     _ctrl
 };

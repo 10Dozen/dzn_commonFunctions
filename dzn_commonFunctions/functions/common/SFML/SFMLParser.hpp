@@ -34,32 +34,8 @@
 #define VARIABLE_PREFIX ASCII_LT
 #define VARIABLE_POSTFIX ASCII_GT
 #define EXPRESSION_PERFIX_ASCII ASCII_GRAVE
-#define SIDES_MAP [\
-    ["BLUFOR", west],\
-    ["WEST", west],\
-    ["OPFOR", east],\
-    ["EAST", east],\
-    ["INDEP", resistance],\
-    ["INDEPENDENT", resistance],\
-    ["RESISTANCE", resistance],\
-    ["GUER", resistance],\
-    ["CIVILIAN", civilian],\
-    ["CIV", civilian] \
-]
 
 #define NIL_TYPE "nil"
-#define NULL_TYPES [ \
-    "objNull",\
-    "grpNull",\
-    "controlNull",\
-    "displayNull",\
-    "locationNull",\
-    "taskNull",\
-    "scriptNull",\
-    "configNull",\
-    "diaryRecordNull",\
-    "teamMemberNull"\
-]
 
 #define REF_PREFIX ASCII_ASTERISK
 #define REF_PREFIX_PROCESSED "#REF:"

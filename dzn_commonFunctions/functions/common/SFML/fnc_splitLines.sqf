@@ -8,7 +8,7 @@
 	0: _data (STRING) - text to split.
 
 	Returns:
-	_lines (ARRAY of STRING) - splitted lines.
+	nothing (splitten lines saved to _self "StrLines" and "CharsLines")
 */
 
 params ["_data"];
@@ -19,7 +19,10 @@ private _linebreak = [[ASCII_NL], [ASCII_CR, ASCII_NL]] select (ASCII_CR in _cha
 private _linebreakSize = count _linebreak;
 _chars append _linebreak;
 private _lineChars = [];
-private _lines = [];
+
+private _strLines = [];
+private _charLines = [];
+
 DBG_1("(splitLines) Linebreaks size: %1", _linebreakSize);
 
 for "_i" from 0 to (count _chars - _linebreakSize) do {
@@ -30,8 +33,11 @@ for "_i" from 0 to (count _chars - _linebreakSize) do {
             if ([_char, _chars # (_i + 1)] isNotEqualTo _linebreak) then { continue; };
 
             DBG_1("(splitLines) EOL (ASCII_CR, ASCII_NL) detected at position %1", _i);
-            _normalizedLine = toString (_self call [F(removeComment), [_lineChars]]);
-            _lines pushBack _normalizedLine;
+            _normalizedLine = _self call [F(removeComment), [_lineChars]];
+
+            _charLines pushBack _normalizedLine
+            _strLines pushBack toString _normalizedLine;
+
             _lineChars resize 0;
 			
             // Skip next char as it expected to be ASCII_NL from [ASCII_CR, ASCII_NL] end of line pair
@@ -40,12 +46,14 @@ for "_i" from 0 to (count _chars - _linebreakSize) do {
         case ASCII_NL: {
             DBG_1("(splitLines) EOL (ASCII_NL) detected at position %1", _i);
             // Comments are handled differently in LOAD_FILE and PREPROCESS_FILE modes
-            _normalizedLine = toString(if (_isRawFile) then {
-                _self call [F(removeComment), [_lineChars]]
-            } else {
-                _lineChars
-            });
-            _lines pushBack _normalizedLine;
+            _normalizedLine = _lineChars;
+            if (_isRawFile) then {
+                _normalizedLine = _self call [F(removeComment), [_lineChars]]
+            };
+
+            _charLines pushBack _normalizedLine
+            _strLines pushBack toString _normalizedLine;
+
             _lineChars resize 0;
         };
         case ASCII_VERTICAL_LINE: {
@@ -64,4 +72,5 @@ for "_i" from 0 to (count _chars - _linebreakSize) do {
     };
 };
 
-_lines  
+_self set [Q(StrLines), _strLines];
+_self set [Q(CharsLines), _charLines];

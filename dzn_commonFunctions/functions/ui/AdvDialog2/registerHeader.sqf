@@ -41,7 +41,9 @@ private _render = {
 
         private _ctrlCloseBtn = _dialog ctrlCreate [RSC_BUTTON_PICTURE, -1, _ctrlGroup];
         _ctrlCloseBtn ctrlSetText PICTURE_CLOSE;
-        _ctrlCloseBtn ctrlAddEventHandler ["ButtonClick", { closeDialog 2 }];
+        _ctrlCloseBtn ctrlAddEventHandler ["ButtonClick", { 
+            COB call [F(Close), []];
+        }];
 
         _ctrlCloseBtn setVariable [format ["%1_%2", "ButtonClick", A_CALLBACK], _eventCallback];
         _ctrlCloseBtn setVariable [format ["%1_%2", "ButtonClick", A_CALLBACK_ARGS], _eventCallbackArgs];
@@ -50,6 +52,8 @@ private _render = {
         private _closeBtnX = (_item getOrDefault [A_X, 0]) + _itemWidth - _iconWidth;
         private _closeBtnY = _item getOrDefault [A_Y, _yOffset];
         LOG_ "[render.Position] Close icon. By props: x=%1, y=%2, w=%3, h=%4", _closeBtnX, _closeBtnY, _iconWidth, _iconHeigth  EOL;
+
+        _ctrl setVariable [Q(GroupedCtrls), [_ctrl, _ctrlCloseBtn]];
 
         _ctrlCloseBtn ctrlSetPosition [_closeBtnX, _closeBtnY, _iconWidth, _iconHeigth];
         _ctrlCloseBtn ctrlCommit 0

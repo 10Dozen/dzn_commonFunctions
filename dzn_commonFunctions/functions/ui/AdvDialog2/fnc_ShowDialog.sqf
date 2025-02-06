@@ -11,6 +11,8 @@
         nothing - shows dialog
 */
 
+forceUnicode 0;
+
 // Resets COB state
 _self call [F(reset)];
 
@@ -42,3 +44,5 @@ private _cbaEvents = _self get Q(CBAEvents);
     },
     _cbaEvents
 ] call CBA_fnc_waitUntilAndExecute;
+
+forceUnicode -1;

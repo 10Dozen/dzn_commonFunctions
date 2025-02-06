@@ -35,8 +35,9 @@ _ctrlGroup ctrlCommit 0;
 
 private _background = _dialog ctrlCreate [RSC_BG, -1, _ctrlGroup];
 
+private _allCtrls = [];
 private _plainControlsList = [];
-private _controls = [];
+private _perLineControls = [];
 private _inputs = [];
 private _taggedControls = createHashMap;
 
@@ -82,14 +83,16 @@ private _yOffset = 0;
         _xOffset = _xOffset + _itemWidth;
         _lineControls pushBack _ctrl;
         _plainControlsList pushBack _ctrl;
+        _allCtrls append (_ctrl getVariable [Q(GroupedCtrls), [_ctrl]]);
     } forEach _lineItems;
 
-    _controls pushBack _lineControls;
+    _perLineControls pushBack _lineControls;
     _yOffset = _yOffset + _lineHeight;
 } forEach (_self get Q(Items));
 
+_dialog setVariable [Q(AllDialogControls), _allCtrls];
 _dialog setVariable [Q(Controls), _plainControlsList];
-_dialog setVariable [Q(ControlsPerLines), _controls];
+_dialog setVariable [Q(ControlsPerLines), _perLineControls];
 _dialog setVariable [Q(Inputs), _inputs];
 _dialog setVariable [Q(TaggedControls), _taggedControls];
 

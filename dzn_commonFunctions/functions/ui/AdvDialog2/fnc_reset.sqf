@@ -36,7 +36,6 @@ _self set [Q(OnDrawArgs), {}];
 _self set [Q(CBAEvents), []];
 
 
-
 diag_log "Deleting events on reset on start";
 {
     _x params ["_eventName", "", "", "_eventId"];

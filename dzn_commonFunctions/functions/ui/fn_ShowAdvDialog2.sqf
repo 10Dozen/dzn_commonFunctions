@@ -229,22 +229,18 @@
 #include "AdvDialog2\defines.h"
 
 disableSerialization;
-forceUnicode 0;
 
 if (isNil Q(dzn_AdvDialog2)) then {
     dzn_AdvDialog2 = [] call COMPILE_SCRIPT(ComponentObject);
 };
 
-if (_this isEqualTo []) exitWith { forceUnicode -1; };
+if (_this isEqualTo []) exitWith {};
 
-if (!isNil { dzn_AdvDialog2 get Q(Dialog) }) exitWith {
-    forceUnicode -1;
-
+if ((dzn_AdvDialog2 get Q(Dialog)) isEqualTo (findDisplay DIALOG_ID)) exitWith {
     dzn_AdvDialog2 call [F(Close)];
     [{
-        dzn_AdvDialog2 call [F(ShowDialog), _this];
+        dzn_AdvDialog2 call [F(ShowDialog), _this]; 
     }, _this] call CBA_fnc_execNextFrame;
 };
 
 dzn_AdvDialog2 call [F(ShowDialog), _this];
-forceUnicode -1;

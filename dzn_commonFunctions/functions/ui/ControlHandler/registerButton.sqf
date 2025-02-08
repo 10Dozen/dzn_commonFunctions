@@ -6,7 +6,8 @@ params ["_cob"];
 private _typeNames = Q(BUTTON);
 
 private _parse = {
-    LOG_ "[parse.Button] Parsing. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Button.Parse"
+    DBG_1("Parsing. Params: %1", _this);
     params ["_cob", "_itemAttrs", "_itemDescriptor", ["_ctrl", controlNull]];
     // [ 0@Type("BUTTON"), 1@Title, 2@Code, 3@Args, 4(optional)@Attrs, 5(optional)@Events ]
 
@@ -19,8 +20,8 @@ private _parse = {
             _itemDescriptor # 0,
             _itemDescriptor # 1
         ];
-        
-        LOG_ "[parse.Button] On modify: %1", _itemDescriptor EOL;
+
+        DBG_1("On modify: %1", _itemDescriptor);
     };
 
     _itemDescriptor params [
@@ -41,12 +42,13 @@ private _parse = {
 };
 
 private _create = {
-    LOG_ "[create.Button] Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Button.Create"
+    DBG_1("Params: %1", _this);
     params ["_cob", "_itemsAttrs", "_dialog", ["_ctrlGroup", controlNull]];
-    
+
     private _ctrl = _dialog ctrlCreate [
-        RSC_BUTTON, 
-        -1, 
+        RSC_BUTTON,
+        -1,
         _ctrlGroup
     ];
     _ctrl ctrlAddEventHandler ["ButtonClick", _cob get F(onButtonClick)];
@@ -56,12 +58,13 @@ private _create = {
 
 #define BTN_OFFSETS 0.002
 private _render = {
-    LOG_ "[render.Button] Update rendering. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Button.Render"
+    DBG_1("Update rendering. Params: %1", _this);
     params ["_cob", "_ctrl", "_itemAttrs"];
 
     // Add some room around the button
     _ctrl ctrlSetPosition [
-        (_itemAttrs get A_X) + BTN_OFFSETS, 
+        (_itemAttrs get A_X) + BTN_OFFSETS,
         (_itemAttrs get A_Y) + BTN_OFFSETS,
         (_itemAttrs get A_W) - (2*BTN_OFFSETS),
         (_itemAttrs get A_H) - (2*BTN_OFFSETS)
@@ -71,15 +74,15 @@ private _render = {
     // _ctrl ctrlSetActiveColor (_itemAttrs getOrDefault [A_COLOR_ACTIVE, COLOR_ACTIVE_DEFAULT]);
     SET_COMMON_ATTRIBURES(_ctrl,_itemAttrs);
 
-    LOG_ "[render.Button] Callback=%1, CallbackArg=%2", _itemAttrs get A_CALLBACK, _itemAttrs get A_CALLBACK_ARGS EOL;
+    DBG_2("Callback=%1, CallbackArg=%2", _itemAttrs get A_CALLBACK, _itemAttrs get A_CALLBACK_ARGS);
     _ctrl setVariable [P_CALLBACK, _itemAttrs get A_CALLBACK];
     _ctrl setVariable [P_CALLBACK_ARGS, _itemAttrs get A_CALLBACK_ARGS];
 
-    LOG_ "[render.Button] Going to set EH callbacks and args: %1", _itemAttrs get A_EVENTS EOL;
+    DBG_1("Going to set EH callbacks and args: %1", _itemAttrs get A_EVENTS);
     SET_EVENT_HANDLERS(_ctrl,_itemAttrs,_cob);
 
     _ctrl ctrlCommit 0;
-    _ctrl 
+    _ctrl
 };
 
 _cob call [F(RegisterControlType), [_typeNames, _parse, _create, _render]];

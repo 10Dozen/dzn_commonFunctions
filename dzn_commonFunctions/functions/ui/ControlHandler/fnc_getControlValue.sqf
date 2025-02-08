@@ -10,8 +10,8 @@
         _value (Anything) - value of the control, depeneding on it's type.
 */
 
-LOG_ "[GetControlValue] _this=%1", _this EOL;
-LOG_ "[GetControlValue] Control type=%1", _this getVariable Q(type) EOL;
+DBG_1("Params: %1", _this);
+DBG_1("Control type=%1", _this getVariable Q(type));
 
 private _value = switch (_this getVariable Q(type)) do {
     case Q(INPUT);
@@ -31,6 +31,6 @@ private _value = switch (_this getVariable Q(type)) do {
     default { nil };
 };
 
-LOG_ "[GetControlValue] Value=%1", _value EOL;
+DBG_1("Value=%1", _value);
 
 _value

@@ -1,10 +1,7 @@
 
-#define COB dzn_AdvDialog2
+#define COB dzn_ControlHandler
 
-#define DIALOG_NAME         "dzn_Dynamic_Dialog_Advanced_v2"
-#define DIALOG_ID           134801
 #define START_CTRL_ID       914500
-#define DIALOG_SHOW_TIME    0.15
 
 #define LINE_HEIGHT_OFFSET  0.005
 #define SAFEZONE_ASPECT_RATIO (safeZoneH / safeZoneW)
@@ -23,15 +20,32 @@
 #define TEXT_FONT_SIZE      0.04
 
 // Some tackles
-#define DEBUG true
+#define DBG_PREFIX Q(ControlHandler)
+#define DBG_FUNC_PREFIX __FILE_SHORT__
+#define _DBG_PREFIX format ['(%1) [%2] ', DBG_PREFIX, DBG_FUNC_PREFIX]
+#define _DBG_FMT diag_log parseText format
+
+#define DEBUG
 #ifdef DEBUG
-    #define LOG_PREFIX "(ControlHandler) "
-    #define LOG_ diag_log parseText format [LOG_PREFIX +
-    #define EOL ]
+    #define DBG(MSG) _DBG_FMT [_DBG_PREFIX + MSG]
+    #define DBG_8(MSG,A1,A2,A3,A4,A5,A6,A7,A8) _DBG_FMT [_DBG_PREFIX + MSG,A1,A2,A3,A4,A5,A6,A7,A8]
+    #define DBG_7(MSG,A1,A2,A3,A4,A5,A6,A7) _DBG_FMT [_DBG_PREFIX + MSG,A1,A2,A3,A4,A5,A6,A7]
+    #define DBG_6(MSG,A1,A2,A3,A4,A5,A6) _DBG_FMT [_DBG_PREFIX + MSG,A1,A2,A3,A4,A5,A6]
+    #define DBG_5(MSG,A1,A2,A3,A4,A5) _DBG_FMT [_DBG_PREFIX + MSG,A1,A2,A3,A4,A5]
+    #define DBG_4(MSG,A1,A2,A3,A4) _DBG_FMT [_DBG_PREFIX + MSG,A1,A2,A3,A4]
+    #define DBG_3(MSG,A1,A2,A3) _DBG_FMT [_DBG_PREFIX + MSG,A1,A2,A3]
+    #define DBG_2(MSG,A1,A2) _DBG_FMT [_DBG_PREFIX + MSG,A1,A2]
+    #define DBG_1(MSG,A1) _DBG_FMT [_DBG_PREFIX + MSG,A1]
 #else
-    #define LOG_PREFIX
-    #define LOG_
-    #define EOL
+    #define DBG(MSG)
+    #define DBG_8(MSG,A1,A2,A3,A4,A5,A6,A7,A8)
+    #define DBG_7(MSG,A1,A2,A3,A4,A5,A6,A7)
+    #define DBG_6(MSG,A1,A2,A3,A4,A5,A6)
+    #define DBG_5(MSG,A1,A2,A3,A4,A5)
+    #define DBG_4(MSG,A1,A2,A3,A4)
+    #define DBG_3(MSG,A1,A2,A3)
+    #define DBG_2(MSG,A1,A2)
+    #define DBG_1(MSG,A1)
 #endif
 
 #define Q(X) #X
@@ -109,16 +123,6 @@
 
 
 // Types registration/Parser/Render
-#define PARSING_APPLY_ATTRIBUTES _cob call [F(MergeAttributes), [_item, _attrs]]
-
-#define SET_POSITION(CTRL,ATTRS) \
-    LOG_ "[render.Position] By props: x=%1, y=%2, w=%3, h=%4", ATTRS get A_X_CALC, ATTRS get A_Y_CALC, ATTRS get A_W_CALC, ATTRS get A_H_CALC  EOL; \
-    CTRL ctrlSetPosition [ \
-        ATTRS get A_X_CALC, ATTRS get A_Y_CALC, \
-        ATTRS get A_W_CALC, ATTRS get A_H_CALC \
-    ]; \
-    CTRL ctrlCommit 0
-
 #define SET_COMMON_ATTRIBURES(CTRL,ATTRS) \
     CTRL ctrlSetTextColor (ATTRS get A_COLOR); \
     CTRL ctrlSetFont (ATTRS get A_FONT); \
@@ -132,7 +136,7 @@
 #define SET_EVENT_HANDLERS(CTRL,ATTRS,HANDLER) \
     { \
         _x params ["_eventName", "_eventCallback", "_eventCallbackArgs"]; \
-        LOG_ "[render.setEventHandlers] Settings EH to %1 for event [%2]", CTRL, _eventName EOL; \
+        DBG_2("Settings EH to %1 for event [%2]", CTRL, _eventName); \
         CTRL ctrlRemoveEventHandler [_eventName, CTRL getVariable [format ["%1_%2", _eventName, P_EH_ID], -1]]; \
         CTRL setVariable [ \
             format ["%1_%2", _eventName, P_EH_ID], \

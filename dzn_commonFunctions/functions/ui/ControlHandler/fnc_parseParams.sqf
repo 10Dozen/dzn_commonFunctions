@@ -6,11 +6,10 @@
     Returns:
         nothing (updates COB.Items hashMap)
 */
-LOG_ "[parseParams] Parsing started" EOL;
 
 private _itemDescriptor = _this;
 private _type = toUpperANSI (_itemDescriptor # 0);
-LOG_ "[parseParams] Parsing item: %1", _itemDescriptor EOL;
+DBG_1("Parsing item: %1", _itemDescriptor);
 
 private _item = createHashMapFromArray [
     [A_TYPE, _type],
@@ -22,7 +21,7 @@ private _item = createHashMapFromArray [
     [A_SHOW, true]
 ];
 
-LOG_ "[parseParams] Invoking parse function for %1", _type EOL;
+DBG_1("Invoking parse function for %1", _type);
 [_self, _item, _itemDescriptor] call (_self get Q(Parsers) get _type);
 
 // -- Update attributes after mergin
@@ -33,6 +32,6 @@ _item set [A_W, _w, true];
 _item set [A_H, (_item getOrDefault [A_H, _h]) max ((_item get A_SIZE) + LINE_HEIGHT_OFFSET)];
 
 
-LOG_ "[parseParams] Parsed item %1", _item EOL;
+DBG_1("Parsed item %1", _item);
 
 _item

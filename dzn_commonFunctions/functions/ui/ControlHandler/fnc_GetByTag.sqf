@@ -12,29 +12,29 @@
 */
 
 
-LOG_ "[GetByTag]: _this=%1", _this EOL;
+DBG_1("Params: %1", _this);
 params ["_display", "_tag", ["_exactMatch", true]];
 
 private _controls = _self get Q(Controls) get str(_display);
-if (isNil "_tag" || isNil "_controls") exitWith { 
-    LOG_ "[GetByTag] Not defined Tag or Controls" EOL;
-    [] 
+if (isNil "_tag" || isNil "_controls") exitWith {
+    DBG("Not defined Tag or Controls");
+    []
 };
 if (_tag == "") exitWith {
-    LOG_ "[GetByTag] Return all controls: %1", _controls EOL;
+    DBG_1("Return all controls: %1", _controls);
     +_controls
 };
 
 // -- If tag in format "MyTag*" - means non-exact search
 if (_tag select [-1 + count _tag, 1] == "*") then {
     _exactMatch = false;
-    _tag = _tag select [0, -1 + count _tag];    
-    LOG_ "[GetByTag] Asteriks pattern found, change to not-exact match, _tag=%1", _tag EOL;
+    _tag = _tag select [0, -1 + count _tag];
+    DBG_1("Asteriks pattern found, change to not-exact match, _tag=%1", _tag);
 };
 
 private _filtered = [];
 if (_exactMatch) exitWith {
-    LOG_ "[GetByTag] Exact match for tag=%1", _tag EOL;
+    DBG_1("Exact match for tag=%1", _tag);
     private _ctrl = _self get Q(TaggedControls) get str(_display) get _tag;
     if (!isNil "_ctrl") then {
         _filtered = [_ctrl]
@@ -43,11 +43,11 @@ if (_exactMatch) exitWith {
     _filtered
 };
 
-LOG_ "[GetByTag] Not-exact match for tag=%1", _tag EOL;
+DBG_1("Not-exact match for tag=%1", _tag);
 {
     if (_x select [0, count _tag] != _tag) then { continue; };
     _filtered pushBack _y;
 } forEach (_self get Q(TaggedControls) get str(_display));
 
-LOG_ "[GetByTag] Result=%1", _filtered EOL;
+DBG_1("Result=%1", _filtered);
 _filtered

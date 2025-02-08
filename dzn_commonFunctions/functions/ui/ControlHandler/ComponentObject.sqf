@@ -12,6 +12,12 @@ private _cob = createHashMapObject [[
     [Q(Controls), createHashMap],
     [Q(TaggedControls), createHashMap],
     [Q(ControlIndex), 0],
+    [Q(MissionEndEH), addMissionEventHandler [
+        "Ended", {
+            DBG("On Mission Ended EH");
+            COB call [F(reset), []];
+        }
+    ]],
 
     // Main functions
     PREP_COB_FUNCTION(AddControl),

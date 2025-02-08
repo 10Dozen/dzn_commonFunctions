@@ -236,10 +236,10 @@ if (isNil Q(dzn_AdvDialog2)) then {
 
 if (_this isEqualTo []) exitWith {};
 
-if ((dzn_AdvDialog2 get Q(Dialog)) isEqualTo (findDisplay DIALOG_ID)) exitWith {
+if (!isNull (dzn_AdvDialog2 get Q(Dialog))) exitWith {
     dzn_AdvDialog2 call [F(Close)];
     [{
-        dzn_AdvDialog2 call [F(ShowDialog), _this]; 
+        dzn_AdvDialog2 call [F(ShowDialog), _this];
     }, _this] call CBA_fnc_execNextFrame;
 };
 

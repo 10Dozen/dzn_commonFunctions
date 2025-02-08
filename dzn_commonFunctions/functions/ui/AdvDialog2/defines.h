@@ -20,8 +20,6 @@
 #define TEXT_FONT_SIZE      0.04
 
 // Some tackles
-//#define DEBUG true
-
 #define DBG_PREFIX Q(AdvDialog2)
 #define DBG_FUNC_PREFIX __FILE_SHORT__
 #define _DBG_PREFIX format ['(%1) [%2] ', DBG_PREFIX, DBG_FUNC_PREFIX]

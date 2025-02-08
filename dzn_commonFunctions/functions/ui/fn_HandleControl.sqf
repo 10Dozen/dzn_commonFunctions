@@ -157,7 +157,10 @@ private _result = switch (toLowerANSI _mode) do {
     case "getvalues": {
         dzn_ControlHandler call [F(GetValueByTag), [_display, _tagname]]
     };
-    default { nil };
+    case "preinit": {
+        dzn_ControlHandler call [F(reset), []]
+    };
+    default {};
 };
 
 forceUnicode -1;

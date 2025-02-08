@@ -10,7 +10,8 @@ private _typeNames = [ Q(LISTBOX), Q(DROPDOWN) ];
 #define STRINGIFY(VAL) (if (typename VAL == "STRING") then { VAL } else { str(VAL) })
 
 private _parse = {
-    LOG_ "[parse.Listbox/Dropdown] Parsing. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Listbox.Parse"
+    DBG_1("Params: %1", _this);
     params ["_cob", "_itemAttrs", "_itemDescriptor", ["_ctrl", controlNull], "_idx"];
     // [ 0@Type("DROPDOWN"), 1@ListItems, 2(optional)@DefaultSelectd, 3(optional)@Attrs, 4(optional)@Evenets ]
     if (!isNull _ctrl) then {
@@ -22,7 +23,7 @@ private _parse = {
             _newAttrs,
             _newEvents
         ];
-        LOG_ "[parse.Listbox/Dropdown] On modify: %1", _itemDescriptor EOL;
+        DBG_1("On modify: %1", _itemDescriptor);
     };
 
     _itemDescriptor params [
@@ -42,7 +43,7 @@ private _parse = {
     // Process input values to be [STRING, ANY] pairs
     // --- list items may be just string or array of Name-Value-Attrs
     private _newListItems = _itemAttrs get A_LIST_ITEMS;
-    LOG_ "[parse.Listbox/Dropdown] _newListItems: %1", _newListItems EOL;
+    DBG_1("_newListItems: %1", _newListItems);
 
     private _isExtendedSyntax = if (_newListItems isNotEqualTo []) then { typename (_newListItems # 0) == "ARRAY" } else { false };
     private _defaultTooltip = _itemAttrs getOrDefault [A_TOOLTIP, ""];
@@ -90,7 +91,8 @@ private _parse = {
 };
 
 private _create = {
-    LOG_ "[create.Listbox/Dropdown] Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Listbox.Create"
+    DBG_1("Params: %1", _this);
     params ["_cob", "_itemsAttrs", "_dialog", ["_ctrlGroup", controlNull]];
     private _ctrl = _dialog ctrlCreate [
         [RSC_DROPDOWN, RSC_LISTBOX] select ((_itemAttrs get A_TYPE) == Q(LISTBOX)),
@@ -103,18 +105,19 @@ private _create = {
 
 
 private _render = {
+    #define DBG_FUNC_PREFIX "Listbox.Render"
     private _fulfillListbox = {
         params ["_ctrl", "_item"];
         private [
             "_elementColor", "_iconColor",
             "_elementColorActive", "_iconColorActive"
         ];
-        
-        LOG_ "[render.Listbox] Fulfilling" EOL;  
+
+        DBG("Fulfilling");
 
         private _defaultTextColor = _item getOrDefault [A_COLOR, DEFAULT_COLOR_RGBA];
         {
-            LOG_ "(Listbox) %1", _x EOL;
+            DBG_1("Listbox item: %1", _x);
             private _elementColor = _x getOrDefault [A_COLOR, _defaultTextColor];
             _ctrl lbAdd (_x get A_TITLE);
             _ctrl lbSetPicture [_forEachIndex, _x getOrDefault [A_ICON, ""]];
@@ -144,10 +147,10 @@ private _render = {
             "_elementColorActive", "_iconColorActive", "_textRightColorActive", "_iconRightColorActive"
         ];
 
-        LOG_ "[render.Dropdown] Fulfilling" EOL;  
+        DBG("Fulfilling");
         private _defaultTextColor = _item getOrDefault [A_COLOR, DEFAULT_COLOR_RGBA];
         {
-            LOG_ "(Dropdown) %1", _x EOL;
+            DBG_1("Dropdown item: %1", _x);
             _ctrl lbAdd (_x get A_TITLE);
             _ctrl lbSetTooltip [
                 _forEachIndex,
@@ -187,21 +190,21 @@ private _render = {
         } forEach (_item get A_LIST_ELEMENTS);
     };
 
-    LOG_ "[render.Listbox/Dropdown] Rendering. Params: %1", _this EOL;    
+    DBG_1("Params: %1", _this);
     params ["_cob", "_ctrl", "_itemAttrs"];
 
-    LOG_ "[render.Listbox/Dropdown] Deleting %1 list items", count (_ctrl getVariable P_LIST_VALUES) EOL;  
+    DBG_1("Deleting %1 list items", count (_ctrl getVariable P_LIST_VALUES));
     for "_i" from count (_ctrl getVariable P_LIST_VALUES) to 0 step -1 do { _ctrl lbDelete _i; };
 
-    LOG_ "[render.Listbox/Dropdown] Going to populate list" EOL;
+    DBG("Going to populate list");
     [_ctrl, _itemAttrs] call ([_fulfillDropdown, _fulfillListbox] select ((_itemAttrs get A_TYPE) == Q(LISTBOX)));
     _ctrl setVariable [P_LIST_VALUES, _itemAttrs get A_LIST_VALUES];
 
-    LOG_ "[render.Listbox/Dropdown] Setting overall attributes" EOL;
+    DBG("Setting overall attributes");
     SET_COMMON_ATTRIBURES(_ctrl,_itemAttrs);
     SET_EVENT_HANDLERS(_ctrl,_itemAttrs,_cob);
     REGISTER_AS_INPUT;
-    
+
     _ctrl lbSetCurSel (_itemAttrs get A_VALUE);
     _ctrl ctrlSetPosition [
         _itemAttrs get A_X, _itemAttrs get A_Y,

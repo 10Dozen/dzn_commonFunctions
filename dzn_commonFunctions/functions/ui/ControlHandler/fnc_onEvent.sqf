@@ -12,7 +12,8 @@
         nothing
 */
 
-LOG_ "[OnEvent] _thisEvent=%1, _this=%2", _thisEvent, _this EOL;
+DBG_2("_thisEvent=%1, _this=%2", _thisEvent, _this);
+
 params ["_ctrl"];
 
 private _dialogComponentObject = _ctrl getVariable P_HANDLER;

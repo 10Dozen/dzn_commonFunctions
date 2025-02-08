@@ -6,24 +6,25 @@ params ["_cob"];
 private _typeNames = Q(SLIDER);
 
 private _parse = {
-    LOG_ "[parse.Slider] Parsing. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Slider.Parse"
+    DBG_1("Params: %1", _this);
 
     params ["_cob", "_itemAttrs", "_itemDescriptor", ["_ctrl", controlNull], "_idx"];
     // [ 0@Type("SLIDER"), 1@[@Min,@Max,@Decimal], 2(optional)@DefaultPosition, 3@(optional)Attrs, 4(optional)@Events ]
-    
+
     if (!isNull _ctrl) then {
         // -- On modify (ctrl is not null) - item descriptor is array of ATTRIBUTES and EVENTS only
         _itemDescriptor = [
-            "", 
+            "",
             _itemAttrs get A_SLIDER_RANGE,
             sliderPosition _ctrl,
             _itemDescriptor # 0,
             _itemDescriptor # 1
         ];
-        
-        LOG_ "[parse.Slider] On modify: %1", _itemDescriptor EOL;
+
+        DBG_1("On modify: %1", _itemDescriptor);
     };
-    
+
     _itemDescriptor params [
         "",
         "_sliderParams",
@@ -40,7 +41,8 @@ private _parse = {
 };
 
 private _create = {
-    LOG_ "[create.Slider] Rendering. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Slider.Create"
+    DBG_1("Rendering. Params: %1", _this);
     params ["_cob", "_itemsAttrs", "_dialog", ["_ctrlGroup", controlNull]];
     private _ctrl = _dialog ctrlCreate [RSC_SLIDER, -1, _ctrlGroup];
     _ctrl ctrlAddEventHandler ["SliderPosChanged", _cob get F(onSliderChanged)];
@@ -49,7 +51,8 @@ private _create = {
 };
 
 private _render = {
-    LOG_ "[render.Slider] Rendering. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Slider.Render"
+    DBG_1("Params: %1", _this);
     params ["_cob", "_ctrl", "_itemAttrs"];
 
     _ctrl ctrlSetPosition [

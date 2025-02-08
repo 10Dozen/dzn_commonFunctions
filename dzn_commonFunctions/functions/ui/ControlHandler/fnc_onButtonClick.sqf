@@ -16,14 +16,8 @@
 params ["_button"];
 
 private _dialogComponentObject = _button getVariable P_HANDLER;
-LOG_ "[OnButtonClick] _control=%1, _thisEvent=%2, _userArgs=%3, _cob=%4", 
-     _button, _thisEvent, _button getVariable A_CALLBACK_ARGS, _dialogComponentObject 
-EOL;
-LOG_ "[OnButtonClick] _CALLBACK=%1", 
-     _button getVariable A_CALLBACK_ARGS
-EOL;
-
-XC9 = _button getVariable A_CALLBACK_ARGS;
+DBG_4("_control=%1, _thisEvent=%2, _userArgs=%3, _cob=%4", _button, _thisEvent, _button getVariable A_CALLBACK_ARGS, _dialogComponentObject);
+DBG_1("_CALLBACK=%1", _button getVariable A_CALLBACK_ARGS);
 
 [
     _dialogComponentObject,

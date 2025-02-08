@@ -136,7 +136,9 @@ class CfgFunctions
             class ShowAdvDialog2 {};
             class ShowChooseDialog {};
 
-            class HandleControl {};
+            class HandleControl {
+                preInit=1;
+            };
             class GetDisplay {};
 
             class ShowMessage {};

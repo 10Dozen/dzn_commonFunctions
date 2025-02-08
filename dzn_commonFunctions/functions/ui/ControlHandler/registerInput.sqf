@@ -6,10 +6,11 @@ params ["_cob"];
 private _typeNames = [ Q(INPUT), Q(INPUT_AREA) ];
 
 private _parse = {
-    LOG_ "[parse.Input] Parsing. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Input.Parse"
+    DBG_1("Params: %1", _this);
     params ["_cob", "_itemAttrs", "_itemDescriptor", ["_ctrl", controlNull], "_idx"];
     // [ 0@Type("INPUT"), 1@DefaultValue(str), 2@(optional)Various ]
-    
+
     if (!isNull _ctrl) then {
         _itemDescriptor = [
             "",
@@ -17,8 +18,8 @@ private _parse = {
             _itemDescriptor # 0,
             _itemDescriptor # 1
         ];
-        
-        LOG_ "[parse.Input] On modify: %1", _itemDescriptor EOL;
+
+        DBG_1("On modify: %1", _itemDescriptor);
     };
 
     _itemDescriptor params [
@@ -34,7 +35,8 @@ private _parse = {
 };
 
 private _create = {
-    LOG_ "[create.Input] Rendering. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Input.Create"
+    DBG_1("Params: %1", _this);
     params ["_cob", "_itemsAttrs", "_dialog", ["_ctrlGroup", controlNull]];
     private _ctrl = _dialog ctrlCreate [
         [RSC_INPUT_AREA, RSC_INPUT] select ((_itemAttrs get A_TYPE) == Q(INPUT)),
@@ -46,7 +48,8 @@ private _create = {
 };
 
 private _render = {
-    LOG_ "[render.Input] Rendering. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Input.Render"
+    DBG_1("Params: %1", _this);
 
     params ["_cob", "_ctrl", "_itemAttrs"];
     _ctrl ctrlSetPosition [

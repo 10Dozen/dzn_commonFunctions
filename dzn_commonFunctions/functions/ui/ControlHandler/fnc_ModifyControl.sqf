@@ -14,15 +14,15 @@
 
 params ["_display", ["_tag", ""], ["_newAttrs", []], ["_newEvents", []]];
 
-LOG_ "[ModifyControl] Params: %1", _this EOL;
+DBG_1("Params: %1", _this);
 
 private _controls = _self call [F(GetByTag), [_display, _tag]];
 if (_controls isEqualTo []) exitWith {
-    LOG_ "[ModifyControl] Failed to find controls with tag '%1' in display %2", _tag, _display EOL;
+    DBG_2("Failed to find controls with tag '%1' in display %2", _tag, _display);
     false
 };
 
-LOG_ "[ModifyControl] _controls=%1", _controls, _display EOL;
+DBG_1("_controls=%1", _controls, _display);
 
 {
     // -- Override current attributes
@@ -30,7 +30,7 @@ LOG_ "[ModifyControl] _controls=%1", _controls, _display EOL;
     // -- Parse and merge
     [_self, _attrs, [_newAttrs, _newEvents], _x] call (_self get Q(Parsers) get (_x getVariable P_TYPE));
 
-    LOG_ "[ModifyControl] On parsed=%1", _attrs EOL;
+    DBG_1("On parsed=%1", _attrs);
 
     // -- Parse POS params and map to X,Y,W,H, replace missing with newAttrs
     (_attrs getOrDefault [A_POS, []]) params [
@@ -43,12 +43,13 @@ LOG_ "[ModifyControl] _controls=%1", _controls, _display EOL;
     _attrs set [A_Y, _yPos];
     _attrs set [A_W, _w];
     _attrs set [A_H, ((_attrs get A_SIZE) + LINE_HEIGHT_OFFSET) max _h];
-    LOG_ "[ModifyControl] Modified attributes=%1", _attrs EOL;
+    DBG_1("Modified attributes=%1", _attrs);
 
     // -- Call re-render
     _self call [F(render), [_display, _attrs, _x]];
-    LOG_ "[ModifyControl] Rendered" EOL;
+    DBG("Rendered");
 } forEach _controls;
 
-LOG_ "[ModifyControl] Control(s) tagged '%1' was modified successfully in display %2", _tag, _display EOL;
+DBG_2("Control(s) tagged '%1' was modified successfully in display %2", _tag, _display);
+
 true

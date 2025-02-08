@@ -6,11 +6,12 @@ params ["_cob"];
 private _typeNames = [ Q(CHECKBOX), Q(CHECKBOX_RIGHT) ];
 
 private _parse = {
-    LOG_ "[parse.Checkbox] Parsing. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Checkbox.Parse"
+    DBG_1("Params: %1", _this);
 
     params ["_cob", "_itemAttrs", "_itemDescriptor", ["_ctrl", controlNull], "_idx"];
     // [ 0@Type, 1@Title, 2(optional)@DefaultState, 3(optional)@Attrs, 4(optional)@Events ]
-    
+
     if (!isNull _ctrl) then {
         _itemDescriptor = [
             "",
@@ -19,7 +20,7 @@ private _parse = {
             _itemDescriptor # 0,
             _itemDescriptor # 1
         ];
-        LOG_ "[parse.Checkbox] On modify: %1", _itemDescriptor EOL;
+        DBG_1("On modify: %1", _itemDescriptor);
     };
 
     _itemDescriptor params [
@@ -37,9 +38,10 @@ private _parse = {
 };
 
 private _create = {
-    LOG_ "[create.Checkbox] Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Checkbox.Create"
+    DBG_1("Params: %1", _this);
     params ["_cob", "_itemsAttrs", "_dialog", ["_ctrlGroup", controlNull]];
-    
+
     private _ctrl = _dialog ctrlCreate [RSC_CHECKBOX, -1, _ctrlGroup];
     private _ctrlTitle = _dialog ctrlCreate [RSC_LABEL, -1, _ctrlGroup];
 
@@ -48,14 +50,15 @@ private _create = {
 
     // Handle click on text to change checkbox state
     _ctrlTitle ctrlAddEventHandler ["MouseButtonUp", _cob get F(onChekboxLabelClicked)];
-   
+
     _ctrl
 };
 
 #define CB_TEXT_OFFSET 0.004
 #define CB_HEIGHT_OFFSET LINE_HEIGHT_OFFSET / 2
 private _render = {
-    LOG_ "[render.Checkbox] Rendering. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Checkbox.Render"
+    DBG_1("Rendering. Params: %1", _this);
     params ["_cob", "_ctrl", "_itemAttrs"];
 
     private _ctrlTitle = _ctrl getVariable P_SUBCONTROL;
@@ -84,14 +87,7 @@ private _render = {
     SET_EVENT_HANDLERS(_ctrl,_itemAttrs,_cob);
     SET_EVENT_HANDLERS(_ctrlTitle,_itemAttrs,_cob);
 
-    LOG_ 
-        "[render.Checkbox] _cbOffsetX=%1, _cbOffsetY=%2, _cbWidth=%3, _cbHeight=%4, _titleOffsetX=%5", 
-        _cbOffsetX, 
-        _cbOffsetY, 
-        _cbWidth, 
-        _cbHeight,
-        _titleOffsetX
-    EOL;
+    DBG_5("_cbOffsetX=%1, _cbOffsetY=%2, _cbWidth=%3, _cbHeight=%4, _titleOffsetX=%5", _cbOffsetX, _cbOffsetY, _cbWidth, _cbHeight,_titleOffsetX);
 
     _ctrl ctrlSetPosition [_cbOffsetX, _cbOffsetY, _cbWidth, _cbHeight];
     _ctrlTitle ctrlSetPosition [_titleOffsetX, _yPos, _titleWidth, _titleHeight];
@@ -106,7 +102,8 @@ private _render = {
 };
 
 private _remove = {
-    LOG_ "[render.Checkbox] Rendering. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Checkbox.Remove"
+    DBG_1("Params: %1", _this);
     params ["_cob", "_ctrl"];
 
     ctrlDelete (_ctrl getVariable P_SUBCONTROL);

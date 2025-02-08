@@ -6,7 +6,8 @@ params ["_cob"];
 private _typeNames = Q(HEADER);
 
 private _parse = {
-    LOG_ "[parse.Header] Parsing. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Header.Parse"
+    DBG_1("Params: %1", _this);
 
     params ["_cob", "_itemAttrs", "_itemDescriptor", ["_ctrl", controlNull], "_idx"];
     // [ 0@Type("HEADER"), 1@Title, 2(optional)@Various, 3(optional)@Events ]
@@ -17,7 +18,7 @@ private _parse = {
             _itemDescriptor # 0,
             _itemDescriptor # 1
         ];
-        LOG_ "[parse.Header] On modify: %1", _itemDescriptor EOL;
+        DBG_1("On modify: %1", _itemDescriptor);
     };
     _itemDescriptor params [
         "",
@@ -33,17 +34,19 @@ private _parse = {
 };
 
 private _create = {
-    LOG_ "[render.Header] Creating. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Header.Create"
+    DBG_1("Params: %1", _this);
     params ["_cob", "_itemsAttrs", "_dialog", ["_ctrlGroup", controlNull]];
 
     private _ctrl = _dialog ctrlCreate [RSC_HEADER, -1, _ctrlGroup];
-    // TBD: Close button support?  
+    // TBD: Close button support?
 
     _ctrl
 };
 
 private _render = {
-    LOG_ "[render.Header] Rendering. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Header.Render"
+    DBG_1("Params: %1", _this);
     params ["_cob", "_ctrl", "_itemAttrs"];
 
     _ctrl ctrlSetStructuredText parseText (_itemAttrs get A_TITLE);

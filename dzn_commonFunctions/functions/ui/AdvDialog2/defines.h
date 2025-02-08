@@ -21,14 +21,33 @@
 
 // Some tackles
 //#define DEBUG true
+
+#define DBG_PREFIX Q(AdvDialog2)
+#define DBG_FUNC_PREFIX __FILE_SHORT__
+#define _DBG_PREFIX format ['(%1) [%2] ', DBG_PREFIX, DBG_FUNC_PREFIX]
+#define _DBG_FMT diag_log parseText format
+
+//#define DEBUG
 #ifdef DEBUG
-    #define LOG_PREFIX "(AdvDialog2) "
-    #define LOG_ diag_log parseText format [LOG_PREFIX +
-    #define EOL ]
+    #define DBG(MSG) _DBG_FMT [_DBG_PREFIX + MSG]
+    #define DBG_8(MSG,A1,A2,A3,A4,A5,A6,A7,A8) _DBG_FMT [_DBG_PREFIX + MSG,A1,A2,A3,A4,A5,A6,A7,A8]
+    #define DBG_7(MSG,A1,A2,A3,A4,A5,A6,A7) _DBG_FMT [_DBG_PREFIX + MSG,A1,A2,A3,A4,A5,A6,A7]
+    #define DBG_6(MSG,A1,A2,A3,A4,A5,A6) _DBG_FMT [_DBG_PREFIX + MSG,A1,A2,A3,A4,A5,A6]
+    #define DBG_5(MSG,A1,A2,A3,A4,A5) _DBG_FMT [_DBG_PREFIX + MSG,A1,A2,A3,A4,A5]
+    #define DBG_4(MSG,A1,A2,A3,A4) _DBG_FMT [_DBG_PREFIX + MSG,A1,A2,A3,A4]
+    #define DBG_3(MSG,A1,A2,A3) _DBG_FMT [_DBG_PREFIX + MSG,A1,A2,A3]
+    #define DBG_2(MSG,A1,A2) _DBG_FMT [_DBG_PREFIX + MSG,A1,A2]
+    #define DBG_1(MSG,A1) _DBG_FMT [_DBG_PREFIX + MSG,A1]
 #else
-    #define LOG_PREFIX
-    #define LOG_
-    #define EOL
+    #define DBG(MSG)
+    #define DBG_8(MSG,A1,A2,A3,A4,A5,A6,A7,A8)
+    #define DBG_7(MSG,A1,A2,A3,A4,A5,A6,A7)
+    #define DBG_6(MSG,A1,A2,A3,A4,A5,A6)
+    #define DBG_5(MSG,A1,A2,A3,A4,A5)
+    #define DBG_4(MSG,A1,A2,A3,A4)
+    #define DBG_3(MSG,A1,A2,A3)
+    #define DBG_2(MSG,A1,A2)
+    #define DBG_1(MSG,A1)
 #endif
 
 #define Q(X) #X
@@ -93,9 +112,10 @@
 // Types registration/Parser/Render
 #define PARSING_APPLY_ATTRIBUTES _cob call [F(MergeAttributes), [_item, _attrs]]
 
+#define GET_OR(ITEM,KEY,DEF) ITEM getOrDefault [KEY,DEF]
 #define SET_POSITION(CTRL, ITEM, X, Y, W, H) \
-    LOG_ "[render.Position] Auto: x=%1, y=%2, w=%3, h=%4", X, Y, W, H EOL; \
-    LOG_ "[render.Position] By props: x=%1, y=%2, w=%3, h=%4", ITEM getOrDefault [A_X, X], ITEM getOrDefault [A_Y, Y], W, H  EOL; \
+    DBG_4("Position - Auto: x=%1, y=%2, w=%3, h=%4", X, Y, W, H); \
+    DBG_4("Position - prop: x=%1, y=%2, w=%3, h=%4", GET_OR(ITEM,A_X,X), GET_OR(ITEM,A_Y,Y), W, H); \
     CTRL ctrlSetPosition [ \
         ITEM getOrDefault [A_X, X], ITEM getOrDefault [A_Y, Y], \
         W, H \
@@ -113,7 +133,7 @@
     CTRL setVariable [Q(DialogCOB), _self]; \
     { \
         _x params ["_eventName", "_eventCallback", "_eventCallbackArgs"]; \
-        LOG_ "[render.AddEvent] Adding _eventName=%1, _callback=%2, _args=%3", _eventName, _eventCallback, _eventCallbackArgs EOL; \
+        DBG_3("Add event: _eventName=%1, _callback=%2, _args=%3", _eventName, _eventCallback, _eventCallbackArgs); \
         CTRL setVariable [format ["%1_%2", _eventName, A_CALLBACK], _eventCallback]; \
         CTRL setVariable [format ["%1_%2", _eventName, A_CALLBACK_ARGS], _eventCallbackArgs]; \
         CTRL ctrlAddEventHandler [_eventName, _cob get F(onEvent)]; \

@@ -1,12 +1,14 @@
 #include "defines.h"
-
+DBG_1("Params: %1", _this);
 params ["_cob"];
 
 // Label
 private _typeNames = Q(LABEL);
 
 private _parse = {
-    LOG_ "[parse.Label] Parsing. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Label.Parse"
+    DBG_1("Params: %1", _this);
+
     params ["_cob", "_item", "_itemDescriptor", "_idx"];
     // [ 0@Type(LABEL), 1@Title, 2(opt)@Attrs, 3(opt)@Events ]
     _itemDescriptor params [
@@ -21,11 +23,13 @@ private _parse = {
 };
 
 private _render = {
-    LOG_ "[render.Label] Rendering. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Label.Render"
+    DBG_1("Params: %1", _this);
 
     params ["_cob", "_item", "_xOffset", "_yOffset", "_itemWidth", "_itemHeight", "_dialog", "_ctrlGroup"];
     private _ctrl = _dialog ctrlCreate [RSC_LABEL, -1, _ctrlGroup];
     _ctrl ctrlSetStructuredText parseText (_item get A_TITLE);
+
     SET_POSITION(_ctrl, _item, _xOffset, _yOffset, _itemWidth, _itemHeight);
     SET_ATTRIBURES(_ctrl);
     SET_EVENTS(_ctrl);

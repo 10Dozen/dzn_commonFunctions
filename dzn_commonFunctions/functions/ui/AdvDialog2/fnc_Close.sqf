@@ -9,6 +9,8 @@
         nothing
 */
 
+DBG("Invoked!");
+
 private _dialog = _self get Q(Dialog);
 {
     ctrlDelete _x;
@@ -19,7 +21,9 @@ private _dialog = _self get Q(Dialog);
     [_eventName, _eventId] call CBA_fnc_removeEventHandler;
 } forEach (_self get Q(CBAEvents));
 
+if (_dialog isNotEqualTo (findDisplay DIALOG_ID)) exitWith {
+    DBG("Non-standalone dialog. Skip closeDialog.");
+};
 
-if (_dialog isNotEqualTo (findDisplay DIALOG_ID)) exitWith {};
+closeDialog 2;
 
-closeDialog 2; 

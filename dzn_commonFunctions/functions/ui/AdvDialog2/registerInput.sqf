@@ -1,12 +1,14 @@
 #include "defines.h"
-
+DBG_1("Params: %1", _this);
 params ["_cob"];
 
 // Header
 private _typeNames = [ Q(INPUT), Q(INPUT_AREA) ];
 
 private _parse = {
-    LOG_ "[parse.Input] Parsing. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Input.Parse"
+    DBG_1("Params: %1", _this);
+
     params ["_cob", "_item", "_itemDescriptor", "_idx"];
     // [ 0@Type("INPUT"), 1@DefaultValue(str), 2@(optional)Various ]
    _itemDescriptor params [
@@ -22,7 +24,8 @@ private _parse = {
 };
 
 private _render = {
-    LOG_ "[render.Input] Rendering. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Input.Render"
+    DBG_1("Params: %1", _this);
 
     params ["_cob", "_item", "_xOffset", "_yOffset", "_itemWidth", "_itemHeight", "_dialog", "_ctrlGroup"];
     _ctrl = _dialog ctrlCreate [

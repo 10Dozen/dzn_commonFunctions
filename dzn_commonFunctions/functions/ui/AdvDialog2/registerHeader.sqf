@@ -1,12 +1,14 @@
 #include "defines.h"
 
+DBG_1("Params: %1", _this);
 params ["_cob"];
 
 // Header
 private _typeNames = Q(HEADER);
 
 private _parse = {
-    LOG_ "[parse.Header] Parsing. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Header.Parse"
+    DBG_1("Params: %1", _this);
 
     params ["_cob", "_item", "_itemDescriptor", "_idx"];
     // [ 0@Type("HEADER"), 1@Title, 2(optional)@Various, 3(optional)@Events ]
@@ -25,7 +27,8 @@ private _parse = {
 };
 
 private _render = {
-    LOG_ "[render.Header] Rendering. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Header.Render"
+    DBG_1("Params: %1", _this);
     params ["_cob", "_item", "_xOffset", "_yOffset", "_itemWidth", "_itemHeight", "_dialog", "_ctrlGroup"];
 
     private _ctrl = _dialog ctrlCreate [RSC_HEADER, -1, _ctrlGroup];
@@ -41,17 +44,20 @@ private _render = {
 
         private _ctrlCloseBtn = _dialog ctrlCreate [RSC_BUTTON_PICTURE, -1, _ctrlGroup];
         _ctrlCloseBtn ctrlSetText PICTURE_CLOSE;
-        _ctrlCloseBtn ctrlAddEventHandler ["ButtonClick", { 
+        _ctrlCloseBtn ctrlAddEventHandler ["ButtonClick", {
             COB call [F(Close), []];
         }];
 
+        /*
         _ctrlCloseBtn setVariable [format ["%1_%2", "ButtonClick", A_CALLBACK], _eventCallback];
         _ctrlCloseBtn setVariable [format ["%1_%2", "ButtonClick", A_CALLBACK_ARGS], _eventCallbackArgs];
         _ctrlCloseBtn ctrlAddEventHandler ["ButtonClick", _cob get F(onEvent)];
+        */
 
         private _closeBtnX = (_item getOrDefault [A_X, 0]) + _itemWidth - _iconWidth;
         private _closeBtnY = _item getOrDefault [A_Y, _yOffset];
-        LOG_ "[render.Position] Close icon. By props: x=%1, y=%2, w=%3, h=%4", _closeBtnX, _closeBtnY, _iconWidth, _iconHeigth  EOL;
+
+        DBG_4("Close icon. By props: x=%1, y=%2, w=%3, h=%4", _closeBtnX, _closeBtnY, _iconWidth, _iconHeigth);
 
         _ctrl setVariable [Q(GroupedCtrls), [_ctrl, _ctrlCloseBtn]];
 

@@ -10,6 +10,7 @@
         nothing
 */
 
+DBG_1("Params: %1", _this);
 _self set [Q(Dialog), nil];
 _self set [
     Q(DialogAttributes),
@@ -35,8 +36,6 @@ _self set [Q(OnDrawArgs), {}];
 
 _self set [Q(CBAEvents), []];
 
-
-diag_log "Deleting events on reset on start";
 {
     _x params ["_eventName", "", "", "_eventId"];
     [_eventName, _eventId] call CBA_fnc_removeEventHandler;

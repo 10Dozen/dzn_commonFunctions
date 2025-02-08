@@ -9,11 +9,12 @@
         nothing
 */
 
+DBG_1("Params: %1", _this);
+DBG("Rendering started");
 
-LOG_ "[render] Rendering started" EOL;
+DBG_1("OnParsed script: %1", _self get F(OnParsed));
+DBG_1("OnParsed script execution with args: %1", _self get Q(OnParsedArgs));
 
-LOG_ "[render] OnParsed script: %1", _self get F(OnParsed) EOL;
-LOG_ "[render] OnParsed script execution with args: %1", _self get Q(OnParsedArgs) EOL;
 _self call [F(OnParsed), [_self, _self get Q(OnParsedArgs)]];
 
 private _dialogAttrs = _self get Q(DialogAttributes);
@@ -35,7 +36,7 @@ _ctrlGroup ctrlCommit 0;
 
 private _background = _dialog ctrlCreate [RSC_BG, -1, _ctrlGroup];
 
-private _allCtrls = [];
+private _allCtrls = [_ctrlGroup, _background];
 private _plainControlsList = [];
 private _perLineControls = [];
 private _inputs = [];
@@ -51,26 +52,27 @@ private _yOffset = 0;
     private _lineHeight = _linesHeights # _lineNo;
     private _xOffset = 0;
 
-    LOG_ "[render] Line number = %1, with %2 items", _lineNo, count _lineItems EOL;
-    LOG_ "[render] Line height: %1", _lineHeight EOL;
+    DBG_2("Line number = %1, with %2 items", _lineNo, count _lineItems);
+    DBG_1("Line height: %1", _lineHeight);
 
     {
-        LOG_ "[render] Adding new control to line %1, descriptor: %2", _lineNo + 1, _x EOL;
+        DBG_2("Adding new control to line %1, descriptor: %2", _lineNo + 1, _x);
 
         private _item = _x;
         private _itemType = _item get A_TYPE;
         private _itemWidth = _dialogW * (_item get A_W);
         private _itemHeight = _item get A_H;
 
-        LOG_ "[render] Auto-layout for item: x=%1, y=%2, width=%3, height=%4", _xOffset, _yOffset, _itemWidth, _itemHeight EOL;
-        LOG_ "[render] Invoking Render function for control type %1", _itemType EOL;
+        DBG_4("Auto-layout for item: x=%1, y=%2, width=%3, height=%4", _xOffset, _yOffset, _itemWidth, _itemHeight);
+        DBG_1("Invoking Render function for control type %1", _itemType);
+
         private _ctrl = [
             _self, _item,
             _xOffset, _yOffset, _itemWidth, _itemHeight,
             _dialog, _ctrlGroup
         ] call (_self get Q(Renderers) get _itemType);
 
-        LOG_ "[render] Finalizing item: _enabled=%1", _item get A_ENABLED EOL;
+        DBG_1("Finalizing item: _enabled=%1", _item get A_ENABLED);
         _ctrl ctrlEnable (_item get A_ENABLED);
         _ctrl setVariable [Q(type), _itemType];
         _ctrl setVariable [Q(tag), _item get A_TAG];
@@ -111,7 +113,7 @@ _background ctrlCommit 0;
 _ctrlGroup ctrlSetPosition [_dialogX, _dialogY, _dialogW, _dialogH min _yOffset];
 _ctrlGroup ctrlCommit (_dialogAttrs getOrDefault [A_DIALOG_SHOW_TIME, DIALOG_SHOW_TIME]);
 
-LOG_ "[render] OnDraw script execution with args: %1", _self get Q(OnDrawArgs) EOL;
+DBG_1("OnDraw script execution with args: %1", _self get Q(OnDrawArgs));
 _self call [F(OnDraw), [_self, _self get Q(OnDrawArgs)]];
 
-LOG_ "[render] Rendered!" EOL;
+DBG("Rendered!");

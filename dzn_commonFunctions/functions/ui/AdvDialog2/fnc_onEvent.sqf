@@ -11,8 +11,7 @@
     Returns:
         nothing
 */
-
-LOG_ "[OnEvent] _this=%1", _this EOL;
+DBG_1("Params: %1", _this);
 params ["_ctrl"];
 
 private _dialogComponentObject = _ctrl getVariable Q(DialogCOB);

@@ -1,5 +1,5 @@
 #include "defines.h"
-
+DBG_1("Params: %1", _this);
 params ["_cob"];
 
 // Header
@@ -10,7 +10,9 @@ private _typeNames = [ Q(LISTBOX), Q(DROPDOWN) ];
 #define STRINGIFY(VAL) (if (typename VAL == "STRING") then { VAL } else { str(VAL) })
 
 private _parse = {
-    LOG_ "[parse.Listbox/Dropdown] Parsing. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Listbox.Parse"
+    DBG_1("Params: %1", _this);
+
     params ["_cob", "_item", "_itemDescriptor", "_idx"];
     // [ 0@Type("DROPDOWN"), 1@ListItems, 2(optional)@DefaultSelectd, 3(optional)@Attrs, 4(optional)@Evenets ]
     _itemDescriptor params [
@@ -74,6 +76,9 @@ private _parse = {
 };
 
 private _render = {
+    #define DBG_FUNC_PREFIX "Listbox.Render"
+    DBG_1("Params: %1", _this);
+
     private _fulfillListbox = {
         params ["_ctrl", "_item"];
         private [
@@ -83,7 +88,7 @@ private _render = {
 
         private _defaultTextColor = _item getOrDefault [A_COLOR, DEFAULT_COLOR_RGBA];
         {
-            LOG_ "(Listbox) %1", _x EOL;
+            DBG_1("Listbox element: %1", _x);
 
             private _elementColor = _x getOrDefault [A_COLOR, _defaultTextColor];
 
@@ -118,8 +123,7 @@ private _render = {
         ];
         private _defaultTextColor = _item getOrDefault [A_COLOR, DEFAULT_COLOR_RGBA];
         {
-            LOG_ "(Dropdown) %1", _x EOL;
-
+            DBG_1("Dropdown element: %1", _x);
 
             _ctrl lbAdd (_x get A_TITLE);
             _ctrl lbSetTooltip [
@@ -162,8 +166,6 @@ private _render = {
         } forEach (_item get A_LIST_ELEMENTS);
     };
 
-    LOG_ "[render.Listbox/Dropdown] Rendering. Params: %1", _this EOL;
-
     params ["_cob", "_item", "_xOffset", "_yOffset", "_itemWidth", "_itemHeight", "_dialog", "_ctrlGroup"];
     private _itemType = _item get A_TYPE;
     private _ctrl = _dialog ctrlCreate [
@@ -178,7 +180,7 @@ private _render = {
     _ctrl lbSetCurSel (_item get A_SELECTED);
     _ctrl setVariable [Q(listValues), _item get A_LIST_VALUES];
 
-    LOG_ "[render.Dropdown/Listbox] setting lbSetCurSel = %1", _item get A_SELECTED EOL;
+    DBG_1("setting lbSetCurSel = %1", _item get A_SELECTED);
 
     REGISTER_AS_INPUT;
     SET_POSITION(_ctrl, _item, _xOffset, _yOffset, _itemWidth, _itemHeight);

@@ -13,7 +13,7 @@
     Returns:
         nothing
 */
-
+DBG_1("Params: %1", _this);
 params ["_sliderControl", "_newValue"];
 
 private _customTooltipText = _sliderControl getVariable [Q(sliderCustomTooltip), ""];

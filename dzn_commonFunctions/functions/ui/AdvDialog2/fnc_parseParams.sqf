@@ -6,8 +6,7 @@
     Returns:
         nothing (updates COB.Items hashMap)
 */
-
-LOG_ "[parseParams] Parsing started" EOL;
+DBG_1("Params: %1", _this);
 
 _self call [F(AppendLinebreak), -2]; // Add closing item
 
@@ -23,12 +22,13 @@ private _itemsInLine = [];
 for "_i" from 0 to _itemsCount do {
     _itemDescriptor = _descriptors # _i;
     _type = toUpperANSI (_itemDescriptor # 0);
-    LOG_ "[parseParams] Parsing item: %1", _itemDescriptor EOL;
+
+    DBG_1("Parsing item: %1", _itemDescriptor);
 
     if (_type == Q(BR)) then {
-        LOG_ "[parseParams] Libebreak - calculating layout and line width for items in line" EOL;
+        DBG("Libebreak - calculating layout and line width for items in line");
         if (_itemsInLine isEqualTo []) then {
-            LOG_ "[parseParams] There is no items in line, skip..." EOL;
+            DBG("There is no items in line, skip...");
             continue;
         };
         _items pushBack _itemsInLine;
@@ -46,7 +46,7 @@ for "_i" from 0 to _itemsCount do {
         } forEach _itemsInLine;
         private _defaultWidthItemsCount = count _defaultWidthItems;
 
-        LOG_ "[parseParams] _totalDesiredWidth=%1,Default items=%2", _totalDesiredWidth, count _defaultWidthItems EOL;
+        DBG_2("_totalDesiredWidth=%1,Default items=%2", _totalDesiredWidth, count _defaultWidthItems);
 
         if (_defaultWidthItemsCount > 0) then {
             private _defaultWidth = (1 - _totalDesiredWidth) / count _defaultWidthItems;
@@ -56,7 +56,7 @@ for "_i" from 0 to _itemsCount do {
         // Calculate height of the line by selecting max height among the items
         _linesHeights pushBack (selectMax (_itemsInLine apply { _x get A_H }));
 
-        { LOG_ "[parseParams] Items in line %1 (item %2): %3", _lineNo, _forEachIndex, _x EOL; } forEach _itemsInLine;
+        { DBG_3("Items in line %1 (item %2): %3", _lineNo, _forEachIndex, _x); } forEach _itemsInLine;
 
         // Reset collection variables
         _itemsInLine = [];
@@ -65,27 +65,27 @@ for "_i" from 0 to _itemsCount do {
     };
     if (_type == Q(DIALOG)) then {
         _itemDescriptor params ["", "_attrs"];
-        LOG_ "[parseParams] Updating Dialog attributes: %1", _attrs EOL;
+        DBG_1("Updating Dialog attributes: %1", _attrs);
         _self call [F(MergeAttributes), [(_self get Q(DialogAttributes)), _attrs]];
         continue;
     };
     if (_type == Q(ONPARSED)) then {
         _itemDescriptor params ["", "_callback", "_args"];
-        LOG_ "[parseParams] Set OnParsed script" EOL;
+        DBG("Set OnParsed script");
         _self set [F(OnParsed), _callback];
         _self set [Q(OnParsedArgs), _args];
         continue;
     };
     if (_type == Q(ONDRAW)) then {
         _itemDescriptor params ["", "_callback", "_args"];
-        LOG_ "[parseParams] Set OnDraw script" EOL;
+        DBG("Set OnDraw script");
         _self set [F(OnDraw), _callback];
         _self set [Q(OnDrawArgs), _args];
         continue;
     };
     if (_type == Q(ONCBAEVENT)) then {
         _itemDescriptor params ["", "_eventName", "_callback", ["_args", []]];
-        LOG_ "[parseParams] Set OnCustomEvent script" EOL;
+        DBG("Set OnCustomEvent script");
         (_self get Q(CBAEvents)) pushBack [_eventName, _callback, _args];
         continue;
     };
@@ -100,7 +100,7 @@ for "_i" from 0 to _itemsCount do {
         [A_ENABLED, true]
     ];
 
-    LOG_ "[parseParams] Invoking parse function for %1", _type EOL;
+    DBG_1("Invoking parse function for %1", _type);
     [_self, _item, _itemDescriptor, _i] call (_self get Q(Parsers) get _type);
 
     _item set [
@@ -110,7 +110,7 @@ for "_i" from 0 to _itemsCount do {
     _itemsInLine pushBack _item;
 
     _itemCount = count _descriptors;
-    LOG_ "[parseParams] Parsed item %1", _item EOL;
+    DBG_1("Parsed item %1", _item);
 };
 
-LOG_ "[parseParams] Params parsing finished." EOL;
+DBG("Params parsing finished");

@@ -11,7 +11,7 @@
         _controls (Array) - list of controls found or empty list.
 */
 
-LOG_ "[GetControls] Invoked: %1", _this EOL;
+DBG_1("Params: %1", _this);
 params [
     ["_filterByTag", []],
     ["_filterByType", []]

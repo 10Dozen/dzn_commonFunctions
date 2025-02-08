@@ -9,7 +9,7 @@
     Returns:
         nothing
 */
-
+DBG_1("Params: %1", _this);
 params ["_hash", "_attrs"];
 
 if (typename _attrs == "ARRAY") exitWith {

@@ -1,12 +1,13 @@
 #include "defines.h"
-
+DBG_1("Params: %1", _this);
 params ["_cob"];
 
 // Header
 private _typeNames = Q(ICON_BUTTON);
 
 private _parse = {
-    LOG_ "[parse.IconButton] Parsing. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "IconButton.Parse"
+    DBG_1("Params: %1", _this);
 
     params ["_cob", "_item", "_itemDescriptor", "_idx"];
     // [ 0@Type("ICON_BUTTON"), 1@Icon, 2@Code, 3(optional)@Args, 4(optional)@Attributes, 5(optional)@Events]
@@ -33,7 +34,8 @@ private _parse = {
 };
 
 private _render = {
-    LOG_ "[render.IconButton] Rendering. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "IconButton.Render"
+    DBG_1("Params: %1", _this);
 
     params ["_cob", "_item", "_xOffset", "_yOffset", "_itemWidth", "_itemHeight", "_dialog", "_ctrlGroup"];
     private _ctrl = _dialog ctrlCreate [RSC_BUTTON_PICTURE, -1, _ctrlGroup];

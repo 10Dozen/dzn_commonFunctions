@@ -9,8 +9,7 @@
         Anything (value fo the tagged input, or NIL if not found)
 
 */
-
-LOG_ "[GetValueByTag] _this=%1", _this EOL;
+DBG_1("Params: %1", _this);
 
 _self call [
     F(getControlValue),

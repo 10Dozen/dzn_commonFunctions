@@ -9,16 +9,15 @@
         _control (Control) - found control; or nil if not found or dialog not exists.
 */
 
-
-LOG_ "[GetByTag]: _this=%1", _this EOL;
+DBG_1("Params: %1", _this);
 
 private _dialog = _self get Q(Dialog);
 
 if (isNil "_dialog" || isNull _dialog) exitWith {
-    LOG_ "[GetByTag] No dialog found" EOL;
+    DBG("No dialog found");
 };
 
-LOG_ "[GetByTag] Tagged control: %1", (_dialog getVariable Q(TaggedControls)) EOL;
-LOG_ "[GetByTag] Found Control=%1", (_dialog getVariable Q(TaggedControls)) get _this EOL;
+DBG_1("Tagged control: %1", (_dialog getVariable Q(TaggedControls)));
+DBG_1("Found Control=%1", (_dialog getVariable Q(TaggedControls)) get _this);
 
 (_dialog getVariable Q(TaggedControls)) get _this

@@ -15,12 +15,11 @@
                       [selectedIndex(Number), selectedItemText(String), selectedItemValue(Anything)
 
 */
-
-LOG_ "[GetValues] Invoked" EOL;
+DBG_1("Params: %1", _this);
 private _dialog = _self get Q(Dialog);
 
 if (isNil "_dialog" || isNull _dialog) exitWith {
-    LOG_ "[GetValues] No dialog found" EOL;
+    DBG("No dialog found");
 };
 
 (_dialog getVariable Q(Inputs)) apply {

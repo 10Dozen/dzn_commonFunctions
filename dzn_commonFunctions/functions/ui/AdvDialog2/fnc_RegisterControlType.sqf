@@ -27,7 +27,7 @@
     Return:
         nothing
 */
-
+DBG_1("Params: %1", _this);
 params ["_typeNames", "_parseFunction", "_renderFunction"];
 if (typename _typeNames == "STRING") then {
     _typeNames = [_typeNames];

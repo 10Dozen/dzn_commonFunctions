@@ -9,6 +9,6 @@
         nothing (modifies COB.Params list)
 */
 
-LOG_ "[AppendLinebreak] Invoked with params: %1", _this EOL;
+DBG_1("Invoked with params: %1", _this);
 
 (_self get Q(Descriptors)) insert [ _this + 1, [[Q(BR)]] ];

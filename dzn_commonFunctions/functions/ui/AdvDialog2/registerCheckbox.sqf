@@ -1,12 +1,14 @@
 #include "defines.h"
 
+DBG_1("Params: %1", _this);
 params ["_cob"];
 
 // Header
 private _typeNames = [ Q(CHECKBOX), Q(CHECKBOX_RIGHT) ];
 
 private _parse = {
-    LOG_ "[parse.Checkbox] Parsing. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Checkbox.Parse"
+    DBG_1("Params: %1", _this);
 
     params ["_cob", "_item", "_itemDescriptor", "_idx"];
     // [ 0@Type, 1@Title, 2(optional)@DefaultState, 3(optional)@Attrs, 4(optional)@Events ]
@@ -28,7 +30,8 @@ private _parse = {
 #define CB_TEXT_OFFSET 0.004
 #define CB_HEIGHT_OFFSET LINE_HEIGHT_OFFSET / 2
 private _render = {
-    LOG_ "[render.Checkbox] Rendering. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Checkbox.Render"
+    DBG_1("Params: %1", _this);
 
     params ["_cob", "_item", "_xOffset", "_yOffset", "_itemWidth", "_itemHeight", "_dialog", "_ctrlGroup"];
 
@@ -57,7 +60,8 @@ private _render = {
     SET_EVENTS(_ctrl);
     SET_EVENTS(_ctrlTitle);
 
-    LOG_ "[Render.Checkbox] _cbOffsetX=%1, _yOffset=%2, _cbWidth=%3, _cbHeight=%4", _cbOffsetX, _yOffset + CB_HEIGHT_OFFSET, _cbWidth, _cbHeight EOL;
+    DBG_4("_cbOffsetX=%1, _yOffset=%2, _cbWidth=%3, _cbHeight=%4", _cbOffsetX, _yOffset + CB_HEIGHT_OFFSET, _cbWidth, _cbHeight);
+
     _ctrl ctrlSetPosition [_cbOffsetX, _yPos, _cbWidth, _cbHeight];
     _ctrlTitle ctrlSetPosition [_titleOffsetX, _yPos, _titleWidth, _itemHeight];
     _ctrl ctrlCommit 0;

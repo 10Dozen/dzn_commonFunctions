@@ -1,12 +1,13 @@
 #include "defines.h"
-
+DBG_1("Params: %1", _this);
 params ["_cob"];
 
 // Header
 private _typeNames = Q(SLIDER);
 
 private _parse = {
-    LOG_ "[parse.Slider] Parsing. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Slider.Parse"
+    DBG_1("Params: %1", _this);
 
     params ["_cob", "_item", "_itemDescriptor", "_idx"];
     // [ 0@Type("SLIDER"), 1@[@Min,@Max,@Decimal], 2(optional)@DefaultPosition, 3@(optional)Attrs, 4(optional)@Events ]
@@ -26,7 +27,8 @@ private _parse = {
 };
 
 private _render = {
-    LOG_ "[render.Slider] Rendering. Params: %1", _this EOL;
+    #define DBG_FUNC_PREFIX "Slider.Render"
+    DBG_1("Params: %1", _this);
 
     params ["_cob", "_item", "_xOffset", "_yOffset", "_itemWidth", "_itemHeight", "_dialog", "_ctrlGroup"];
     _ctrl = _dialog ctrlCreate [RSC_SLIDER, -1, _ctrlGroup];

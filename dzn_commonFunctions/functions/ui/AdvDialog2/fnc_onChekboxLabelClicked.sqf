@@ -10,7 +10,7 @@
     Returns:
         nothing
 */
-
+DBG_1("Params: %1", _this);
 params ["_cbLabelControl", "_button", "", "", "", "", ""];
 
 private _cbControl = _cbLabelControl getVariable Q(relatedCheckbox);

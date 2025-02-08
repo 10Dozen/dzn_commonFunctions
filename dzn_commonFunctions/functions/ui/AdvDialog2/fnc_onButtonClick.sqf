@@ -12,11 +12,12 @@
     Returns:
         nothing
 */
-
+DBG_1("Params: %1", _this);
 params ["_button"];
 
 private _dialogComponentObject = _button getVariable Q(DialogCOB);
-LOG_ "[OnButtonClick] _control=%1, _thisEvent=%2, _userArgs=%3, _cob=%4", _button, _thisEvent, _button getVariable A_CALLBACK_ARGS, _dialogComponentObject EOL;
+
+DBG_4("_control=%1, _thisEvent=%2, _userArgs=%3, _cob=%4", _button, _thisEvent, _button getVariable A_CALLBACK_ARGS, _dialogComponentObject);
 
 [
     _dialogComponentObject,

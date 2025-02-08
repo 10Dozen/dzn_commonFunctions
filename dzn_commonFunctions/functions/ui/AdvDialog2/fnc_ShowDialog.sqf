@@ -10,6 +10,7 @@
     Returns:
         nothing - shows dialog
 */
+DBG_1("Params: %1", _this);
 
 forceUnicode 0;
 

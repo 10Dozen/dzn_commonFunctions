@@ -12,6 +12,7 @@
 
 DBG_1("Params: %1", _this);
 _self set [Q(Dialog), nil];
+_self set [Q(DialogID), ""];
 _self set [
     Q(DialogAttributes),
     createHashMapFromArray [

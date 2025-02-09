@@ -22,8 +22,9 @@ private _dialog = _self get Q(Dialog);
 } forEach (_self get Q(CBAEvents));
 
 if (_dialog isNotEqualTo (findDisplay DIALOG_ID)) exitWith {
-    DBG("Non-standalone dialog. Skip closeDialog.");
+    _self set [Q(Dialog), displayNull];
+    _self set [Q(DialogID), ""];
+    DBG("Non-standalone dialog. Skip closeDialog, but clear dialog.");
 };
 
 closeDialog 2;
-

@@ -10,6 +10,7 @@ TODO:
 private _cob = createHashMapObject [[
     ["#str", { "AdvDialog2_ComponentObject" }],
     [Q(Dialog), nil],
+    [Q(DialogID), ""],
     [Q(DialogAttributes), createHashMapFromArray [
         [A_W, 1],
         [A_H, 1],

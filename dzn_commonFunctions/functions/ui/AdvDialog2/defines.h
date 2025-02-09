@@ -91,7 +91,9 @@
 #define A_ADJUST_HEIGHT L(adjustHeight)
 
 #define A_DIALOG_SHOW_TIME L(dialogShowTime)
+#define A_DIALOG_ID L(dialogId)
 #define A_DIALOG L(dialog)
+
 
 // Control classes
 #define RSC_GROUP "RscControlsGroupNoScrollbars"

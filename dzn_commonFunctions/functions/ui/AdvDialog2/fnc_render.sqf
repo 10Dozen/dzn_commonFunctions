@@ -29,6 +29,7 @@ if (isNil "_dialog") then {
     _dialog = findDisplay DIALOG_ID;
 };
 _self set [Q(Dialog), _dialog];
+_self set [Q(DialogID), _dialogAttrs getOrDefault [A_DIALOG_ID, ""]];
 
 private _ctrlGroup = _dialog ctrlCreate [RSC_GROUP, -1];
 _ctrlGroup ctrlSetPosition [_dialogX + _dialogW/2, 0, 0, 0];

@@ -32,17 +32,22 @@ DBG_1("_controls=%1", _controls, _display);
 
     DBG_1("On parsed=%1", _attrs);
 
-    // -- Parse POS params and map to X,Y,W,H, replace missing with newAttrs
-    (_attrs getOrDefault [A_POS, []]) params [
-        ["_xPos", _attrs get A_X],
-        ["_yPos", _attrs get A_Y],
-        ["_w", _attrs get A_W],
-        ["_h", _attrs get A_H]
-    ];
-    _attrs set [A_X, _xPos];
-    _attrs set [A_Y, _yPos];
-    _attrs set [A_W, _w];
-    _attrs set [A_H, ((_attrs get A_SIZE) + LINE_HEIGHT_OFFSET) max _h];
+    // -- If A_POS was redefined by modify - parse it to X,Y,W,H
+    if (_newAttrs findIf { _x # 0 == A_POS } > -1) then {
+        (_attrs get A_POS) params [
+            ["_xPos", _attrs get A_X],
+            ["_yPos", _attrs get A_Y],
+            ["_w", _attrs get A_W],
+            ["_h", _attrs get A_H]
+        ];
+
+        _attrs set [A_X, _xPos];
+        _attrs set [A_Y, _yPos];
+        _attrs set [A_W, _w];
+        _attrs set [A_H, ((_attrs get A_SIZE) + LINE_HEIGHT_OFFSET) max _h];
+    } else {
+        _attrs set [A_H, ((_attrs get A_SIZE) + LINE_HEIGHT_OFFSET) max (_attrs get A_H)];
+    };
     DBG_1("Modified attributes=%1", _attrs);
 
     // -- Call re-render

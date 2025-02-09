@@ -34,6 +34,18 @@ private _render = {
     SET_ATTRIBURES(_ctrl);
     SET_EVENTS(_ctrl);
 
+    if (_item getOrDefault [A_ADJUST_HEIGHT, false]) then {
+        DBG_1("Adjusting height to: %1", ctrlTextHeight _ctrl);
+        _ctrl ctrlSetPosition [
+            _item getOrDefault [A_X, _xOffset],
+            _item getOrDefault [A_Y, _yOffset],
+            _itemWidth,
+            ctrlTextHeight _ctrl
+        ];
+        _ctrl setVariable [Q(AdjustedHeight), ctrlTextHeight _ctrl];
+        _ctrl ctrlCommit 0;
+    };
+
     _ctrl
 };
 

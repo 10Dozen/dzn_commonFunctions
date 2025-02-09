@@ -88,6 +88,7 @@
 #define A_TEXT_RIGHT_COLOR L(textRightColor)
 #define A_TEXT_RIGHT_COLOR_ACTIVE L(textRightColorActive)
 #define A_CLOSE_BTN L(closeButton)
+#define A_ADJUST_HEIGHT L(adjustHeight)
 
 #define A_DIALOG_SHOW_TIME L(dialogShowTime)
 #define A_DIALOG L(dialog)

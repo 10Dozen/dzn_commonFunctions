@@ -83,6 +83,8 @@ private _yOffset = 0;
         };
 
         _xOffset = _xOffset + _itemWidth;
+        _lineHeight = _lineHeight max (_ctrl getVariable [Q(AdjustedHeight), _lineHeight]);
+
         _lineControls pushBack _ctrl;
         _plainControlsList pushBack _ctrl;
         _allCtrls append (_ctrl getVariable [Q(GroupedCtrls), [_ctrl]]);

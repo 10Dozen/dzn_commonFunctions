@@ -1,35 +1,38 @@
 #include "defines.h"
 
 /*
-	Parses line data into key and value by ":" char.
+    Parses line data into key and value by ":" char.
 
-	Params:
-	0: _line (STRING) - text to parse.
+    Params:
+    0: _lineChars (ARRAY of chars) - chars to parse.
 
-	Returns:
-	0: _key (STRING) - key name
-	1: _value (ANY) - parsed value
+    Returns:
+    0: _key (STRING) - key name
+    1: _value (ARRAY of chars) -  value
 
-	One of the results may be returned:
+    One of the results may be returned:
     [] -- line doesn't contain ":" char
     [_key, ""] -- line contain only key (start of the nested section)
     [_key, _value] -- line is key-value pair
 */
 
-params ["_line"];
+params ["_lineChars"];
 
-private _chars = toArray _line;
-private _idx = _chars findIf { _x == ASCII_COLON };
+private _idx = _lineChars find ASCII_COLON;
 if (_idx == -1) exitWith {
     DBG("(parseKeyValuePair) -----------# No key definition found, this is not an key-value pair");
     []
 };
 
-private _result = [
-	trim toString (_chars select [0, _idx]),
-	trim toString (_chars select [idx+1, count _chars])
-];
-DBG_2("(parseKeyValuePair) -----------# #PARSED# Key: %1, Value: %2", _result select 0, _result select 1);
+private _key = _lineChars select [0, _idx];
+private _value = _lineChars select [idx+1, count _lineChars];
+
+TRIM(_key,42);
+TRIM(_value,42);
+
+DBG_2("(parseKeyValuePair) -----------# #PARSED# Key: %1, Value: %2", toString _key, toString _value);
+
+[toString _key, _value]
 
 /*
 if !(":" in _line) exitWith {

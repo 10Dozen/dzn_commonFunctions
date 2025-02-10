@@ -8,6 +8,13 @@
 #define PREP_COB_FUNCTION(NAME) [Q(NAME), compileScript [format ["dzn_commonFunctions\functions\common\SFML\fnc_%1.sqf", Q(NAME)]]]
 #define F(NAME) Q(NAME)
 
+#define TRIM(CHARS_VAR,TRIM_CHAR) \
+    private _trim_leftIdx = CHARS_VAR findIf { _x != TRIM_CHAR };
+    reverse CHARS_VAR;
+    private _trim_rightIdx = CHARS_VAR findIf { _x != TRIM_CHAR };
+    CHARS_VAR = CHARS_VAR select [_trim_rightIdx, count CHARS_VAR - _trim_leftIdx - 1];
+    reverse CHARS_VAR
+
 //#define DEBUG DEBUG
 #define LOG_PREFIX '[dzn_fnc_parseSFML] PARSER: '
 #define LOG_1(MSG) diag_log text format [LOG_PREFIX + MSG,ARG1]
@@ -45,12 +52,13 @@
 #define ONELINER_ARRAY 1000
 #define ONELINER_HASHMAP 1001
 
+
 #define EOF "#EOF"
 
 #define CURRENT_NODE_KEY (if (count _hashNodesRoute > 0) then {_hashNodesRoute select (count _hashNodesRoute - 1)} else {""})
 #define STRIP(X) (X select [1, count X - 2])
 #define IS_REF_VALUE(X) (X select [0, REF_PREFIX_PROCESSED_LENGTH] == REF_PREFIX_PROCESSED)
-#define IS_MULTILINE_START(X) ((toArray X select 0) in [MULTILINE_NEWLINES_PREFIX, MULTILINE_FOLDED_PREFIX, MULTILINE_CODE_PREFIX])
+#define IS_MULTILINE_START(X) ((X select 0) in [MULTILINE_NEWLINES_PREFIX, MULTILINE_FOLDED_PREFIX, MULTILINE_CODE_PREFIX])
 #define IS_IN_ARRAY_NODE (typename CURRENT_NODE_KEY == "SCALAR")
 
 // Error reporting

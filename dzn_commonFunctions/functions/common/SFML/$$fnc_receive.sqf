@@ -18,7 +18,7 @@ _chars
     private _trim_leftIdx = CHARS_VAR findIf { _x != TRIM_CHAR };
     reverse CHARS_VAR;
     private _trim_rightIdx = CHARS_VAR findIf { _x != TRIM_CHAR };
-    CHARS_VAR = CHARS_VAR select [_trim_rightIdx, _trim_leftIdx];
+    CHARS_VAR = CHARS_VAR select [_trim_rightIdx, count CHARS_VAR - _trim_leftIdx - 1];
     reverse CHARS_VAR
 
 #define LEFT_TRIM(CHARS_VAR,TRIM_CHAR) \

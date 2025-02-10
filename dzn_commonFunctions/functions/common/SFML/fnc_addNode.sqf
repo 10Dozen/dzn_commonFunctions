@@ -16,10 +16,11 @@ DBG_1("(addNode) Adding node: %1", _key);
 private _node = _self call [F(getNode), []];
 
 DBG_1("(addNode) Node exists?: %1", !isNil {_node get _key});
-if (!isNil {_node get _key}) then {
-    REPORT_ERROR(ERR_NODE_DUPLICATE, _forEachIndex, "Duplicate node found!");
+if (_key in _node) then {
+    REPORT_ERROR(ERR_NODE_DUPLICATE, _self get Q(LineNo), "Duplicate node found!");
 };
 
 _node set [_key, createHashMap];
-_hashNodesRoute pushBack _key;
-DBG_1("(addNode) Nodes now: %1", _hashNodesRoute);
+(_self get Q(CurrentNodesRoute)) pushBack _key;
+
+DBG_1("(addNode) Nodes now: %1", (_self get Q(CurrentNodesRoute)));

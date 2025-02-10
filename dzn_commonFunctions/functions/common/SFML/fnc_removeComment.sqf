@@ -16,6 +16,7 @@ params ["_chars"];
 if !(ASCII_HASH in _chars) exitWith { _chars };
 
 private _size = count _chars;
+private _hasNonWhitespaceChars = false;
 private _commentStartedIndex = -1;
 private _escapedHashes = [];
 private _inQuotes = false;
@@ -77,6 +78,9 @@ for "_j" from 0 to _size-1 do {
                 _inCode = false;
             };
         };
+        default {
+            _hasNonWhitespaceChars = _hasNonWhitespaceChars || (_char != ASCII_SPACE);
+        };
     };
 
 	// Stop seraching and clear comments if unescaped hash was found
@@ -85,12 +89,10 @@ for "_j" from 0 to _size-1 do {
 	};
 };
 
-// Clear comments
-/*
-if (_commentStartedIndex > -1) then {
-    _chars deleteRange [_commentStartedIndex, _size];
+// -- If line is whitespaces only - return empty
+if (!_hasNonWhitespaceChars) exitWith {
+    []
 };
-*/
 
 // Unwrap escaped hashes: \# -> #
 reverse _escapedHashes;

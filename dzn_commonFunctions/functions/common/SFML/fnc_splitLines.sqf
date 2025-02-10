@@ -72,5 +72,4 @@ for "_i" from 0 to (count _chars - _linebreakSize) do {
     };
 };
 
-_self set [Q(StrLines), _strLines];
-_self set [Q(CharsLines), _charLines];
+[_strLines, _charLines]

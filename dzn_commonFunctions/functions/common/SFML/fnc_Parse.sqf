@@ -20,6 +20,8 @@ params [
 	["_convertKeys", false]
 ];
 
+_self call [F(reset), []];
+
 DBG_1("Params: %1", _this);
 DBG_1("Mode: %1", _dataMode);
 
@@ -58,21 +60,27 @@ if (count _data == 0) exitWith {
 
 _self set [Q(Struct), _resultStruct];
 _self set [Q(DataMode), _dataMode];
+_self set [Q(Args), _args];
 
 forceUnicode 1;
 
 
 // --- Main programm body
 DBG("----------------------------------- PREPARING -----------------------------");
-if (_dataMode != MODE_PARSE_LINE) then {
+if (_dataMode == MODE_PARSE_LINE) then {
     _self set [Q(StrLines), [_data]];
 	_self set [Q(CharsLines), [toArray _data]];
 } else {
-    _self call [F(splitLines), [_data]]
+    private _lines = _self call [F(splitLines), [_data]];
+    _self set [Q(StrLines), _lines # 0];
+	_self set [Q(CharsLines), _lines # 1];
 };
+private _lines = _self get Q(StrLines);
+private _linesCh = _self get Q(CharsLines);
+
 DBG_1("Lines count: %1", count (_self get Q(StrLines)));
 
-private _nonEmptyLinesExists = (_self get Q(CharsLines)) findIf { trim _x != "" } > -1;
+private _nonEmptyLinesExists = _linesCh findIf { _x isNotEqualTo [] } > -1;
 DBG_1("Non empty lines found: %1", _nonEmptyLinesExists);
 
 if (!_nonEmptyLinesExists) exitWith {
@@ -90,32 +98,30 @@ if (!_nonEmptyLinesExists) exitWith {
 
 DBG("----------------------------------- PARSING -------------------------------");
 
-_lines pushBack EOF;
+_lines pushBack EOF; // TBD
 private _linesCount = count _lines - 1;
-private _resultStructNodesRoute = [];
-private _arrayNodes = [];
-private _hasReferences = false;
-private _mode = MODE_ROOT;
+// private _resultStructNodesRoute = [];
+// private _arrayNodes = [];
+// private _mode = MODE_ROOT;
 
 {
     private _line = _x;
-    private _chars = toArray _line;
+    private _chars = _linesCh # _forEachIndex;
+
     private _startsWith = _chars # 0;
-    private _actualIndent = 0;
-    for "_i" from 0 to (count _chars)-1 do {
-        if (_chars # _i != ASCII_SPACE) exitWith { _actualIndent = _i; };
-    };
+    private _actualIndent = 0 max (_chars findIf { _x != ASCII_SPACE });
+    
     DBG_3("Line %1: %2 [Indents: %3]", _forEachIndex+1, _line, _actualIndent);
 
-    if (trim _line isEqualTo "") then {
-        if (_mode == MODE_MULTILINE_TEXT) then {
+    if (_chars isEqualTo []) then {
+        if ((_self get Q(LineMode)) == MODE_MULTILINE_TEXT) then {
             if (_forEachIndex == _linesCount) exitWith {}; // Last line in file - not a piece of multiline
 
-            private _multilineIndentCount = _resultStruct get MULTILINE_INDENT_NODE;
+            private _multilineIndentCount = _self get Q(MultilineIndent);
             DBG("Empty line in multiline mode. Possible newline!");
             if (_actualIndent < _multilineIndentCount) then {
                 for "_i" from 1 to _multilineIndentCount do { _chars pushBack ASCII_SPACE };
-                _line = toString _chars;
+                // _line = toString _chars;
                 _actualIndent = _multilineIndentCount;
                 DBG_1("Empty line adjusted: [%1]", _line);
             };
@@ -124,10 +130,12 @@ private _mode = MODE_ROOT;
             continue;
         };
     };
+    
+    _self set [Q(LineNo), _forEachIndex];
+    _self call [F(parseLine), [_chars, _actualIndent]];
+} forEach _linesCh;
 
-    _self call ["parseLine", []];
-} forEach _lines;
-
+// -- TBD
 if (_dataMode == MODE_PARSE_LINE) then {
     // Move data from DATA_NODE to main hash, and remove data node
     private _node = _resultStruct get DATA_NODE;

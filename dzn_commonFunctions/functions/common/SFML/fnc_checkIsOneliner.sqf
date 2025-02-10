@@ -4,7 +4,7 @@
 	Checks value to be a onliner structure (array, hashmap, expression or code)
 
 	Params:
-	0: _value (STRING) - potential oneliner
+	0: _value (ARRAY of chars) - potential oneliner
 
 	Returns:
 	_isOneliner - (BOOL)  true if value is oneliner, false otherwise.
@@ -14,13 +14,12 @@
 params ["_value"];
 DBG_1("(checkIsOneliner) Params: %1", _this);
 
-if (_value isEqualTo "") exitWith { "STRING" };
+if (_value isEqualTo []) exitWith { false };
 
-private _asChars = toArray _value;
-private _first = _asChars select 0;
-private _last = _asChars select (count _asChars - 1);
+private _first = _value select 0;
+private _last = _value select (count _value - 1);
 private _sameChars = _first == _last;
-DBG_3("(checkIsOneliner) Value: %1. First: %2. Last: %3", _value, toString [_first], toString [_last]);
+DBG_3("(checkIsOneliner) Value: %1. First: %2. Last: %3", toString _value, toString [_first], toString [_last]);
 
 // Quoted STRING case - unwrap quotes and return: "My string"
 (_sameChars && _first in STRING_QUOTES_ASCII)

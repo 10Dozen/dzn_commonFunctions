@@ -16,7 +16,7 @@
     - null --> one of null types names (objNull, grpNull, locationNull)
 
     Params:
-    0: _value (STRING) - value to parse.
+    0: _value (ARRAY of chars) - value to parse.
 
     Returns:
     _result (ANY) - parsed value.
@@ -26,41 +26,53 @@
 params ["_value"];
 DBG_1("(parseValueType) Params: %1", _this);
 
-if (_value isEqualTo "") exitWith {
+if (_value isEqualTo []) exitWith {
     DBG("(parseValueType) Value parsed to STRING (empty).");
     ""
 };
 
-private _asChars = toArray _value;
-private _first = _asChars # 0;
-private _last = _asChars select (count _asChars - 1);
+private _first = _value # 0;
+private _last = _value select (count _asChars - 1);
 private _sameChars = _first == _last;
 
-DBG_3("(parseValueType) Value: %1. First: %2. Last: %3", _value, toString [_first], toString [_last]);
+DBG_3("(parseValueType) Value: %1. First: %2. Last: %3", toString _value, toString [_first], toString [_last]);
 
 // Quoted STRING case - unwrap quotes and return: "My string"
 if (_sameChars && _first in STRING_QUOTES_ASCII) exitWith {
     DBG("(parseValueType) Value parsed to STRING (explicit).");
-    _value = _self call ["removeEscaping", [STRIP(_asChars)]];
-    (_value)
+    _value = _self call [F(removeEscaping), [STRIP(_value)]];
+    (toString _value)
 };
 
-// Boolean case: true
-if (toLower _value in ['true', 'false']) exitWith {
+// Boolean case: true/false
+if (_value isEqualTo BOOL_TRUE || _value isEqualTo BOOL_FALSE) exitWith {
     DBG("(parseValueType) Value parsed to BOOLEAN.");
-    (call compile _value)
+    (_value isEqualTo BOOL_TRUE)
 };
 
+// Note: Expressions must be declared by `expressions` syntax
 // Scalar case: 23.32 or equations
-if (toLower _value regexMatch SCALAR_TYPE_REGEX) exitWith {
+// if ((toLower toString _value) regexMatch SCALAR_TYPE_REGEX) exitWith {
+//    DBG("(parseValueType) Value parsed to SCALAR.");
+//    (call compile _value)
+// };
+
+// Scalar case: 23.32, -23.23
+if ((_value - [48,49,50,51,52,53,54,55,56,57,46,45]) isEqualTo []) exitWith {
     DBG("(parseValueType) Value parsed to SCALAR.");
-    (call compile _value)
+    parseNumber toString _value
+}
+
+// Expression case: `date select 2`, `23.3 * 60 - 2`
+if (_sameChars && _first == EXPRESSION_PERFIX_ASCII) exitWith {
+    DBG("(parseValueType) Value parsed to EXPRESSION.");
+    ((_self get Q(Args)) call compile toString STRIP(_value))
 };
 
 // Code case: { hint "Kek" }
 if (_first == CODE_PREFIX && _last == CODE_POSTIFX) exitWith {
     DBG("(parseValueType) Value parsed to CODE.");
-    (compile STRIP(_value))
+    (compile toString STRIP(_value))
 };
 
 // Array case: [item1, item2]
@@ -78,19 +90,13 @@ if (_first == HASHMAP_PREFIX && _last == HASHMAP_POSTFIX) exitWith {
 // Explicit Variable case: <spearhead>
 if (_first == VARIABLE_PREFIX && _last == VARIABLE_POSTFIX) exitWith {
     DBG("(parseValueType) Value parsed to VARIABLE (explicit).");
-    private _var = missionNamespace getVariable [STRIP(_value), nil];
+    private _var = missionNamespace getVariable [toString STRIP(_value), nil];
     if (isNil "_var") then {
-        REPORT_ERROR_1(ERR_DATA_NIL_VARIABLE_REF, _forEachIndex, "Value is referencing to non-existing variable", STRIP(_value));
+        REPORT_ERROR_1(ERR_DATA_NIL_VARIABLE_REF, _forEachIndex, "Value is referencing to non-existing variable", toString STRIP(_value));
         nil
     } else {
         _var
     };
-};
-
-// Expression case: `date select 2`
-if (_sameChars && _first == EXPRESSION_PERFIX_ASCII) exitWith {
-    DBG("(parseValueType) Value parsed to EXPRESSION.");
-    (_args call compile STRIP(_value))
 };
 
 // Reference values - skip processing, as it should be resolved to actual value later
@@ -100,17 +106,17 @@ if (_first == REF_PREFIX) exitWith {
     (format ["%1%2", REF_PREFIX_PROCESSED, _value select [1, count _value]])
 };
 
-// Side case: west
+// Special data: nil
+if (_value isEqualTo NIL_TYPE) exitWith {
+    DBG("(parseValueType) Value parsed to NIL.");
+    nil
+};
+
+// -- Next checks are string based, so convert// Side case: west
 private _side = _self get Q(Sides) get _value;
 if (!isNil "_side") exitWith {
     DBG("(parseValueType) Value parsed to SIDE.");
     _side
-};
-
-// Special data: nil
-if (_value == NIL_TYPE) exitWith {
-    DBG("(parseValueType) Value parsed to NIL.");
-    nil
 };
 
 // Special data - null: objNull/grpNull
@@ -124,4 +130,4 @@ if (!isNil "_nullType") exitWith {
 DBG("(parseValueType) Value parsed to STRING.");
 
 _value = _self call [F(removeEscaping), [_asChars]];
-(_value)
+(toString _value)

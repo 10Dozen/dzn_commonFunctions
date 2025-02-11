@@ -74,6 +74,32 @@
  *   For "RESET" mode:
  *       BOOL - always True
  *
+ * CBA EVENTS:
+ * Subscribe by:
+ *     _ehId = ["dzn_ControlHandler_onControlAdded", { ...event handler code... }] call CBA_fnc_addEventHandler
+ *
+ * dzn_ControlHandler_onControlAdded - emits on new control rendered.
+ *     0: _cob (dzn_ControlHandler hashMapObject) - dzn_ControlHandler component object.
+ *     1: _display (DISPLAY) - target display.
+ *     2: _control (CONTROL) - created control.
+ *
+ * dzn_ControlHandler_onControlModified - emits on existed controls modified.
+ *     0: _cob (dzn_ControlHandler hashMapObject) - dzn_ControlHandler component object.
+ *     1: _display (DISPLAY) - target display.
+ *     2: _controls (ARRAY of CONTROL) - list of modiefied controls.
+ *     3: _tagname (STRING) - tagname used to select controls.
+ * 
+ * dzn_ControlHandler_onControlRemoved - emits right before deletion of the selected controls.
+ *     0: _cob (dzn_ControlHandler hashMapObject) - dzn_ControlHandler component object.
+ *     1: _display (DISPLAY) - target display.
+ *     2: _controls (ARRAY of CONTROL) - list of controls.
+ *     3: _tagname (STRING) - tagname used to select controls.
+ *
+  * dzn_ControlHandler_onDisplayReset - emits on display reset.
+ *     0: _cob (dzn_ControlHandler hashMapObject) - dzn_ControlHandler component object.
+ *     1: _display (DISPLAY) - target display.
+ *
+ *
  * EXAMPLES:
  * // Add new button control to Map display
  * _ctrl = [
@@ -130,37 +156,38 @@ if (isNil Q(dzn_ControlHandler)) then {
     dzn_ControlHandler = [] call COMPILE_SCRIPT(ComponentObject);
 };
 
-private _result = switch (toLowerANSI _mode) do {
+private _result = false;
+switch (toLowerANSI _mode) do {
     case "add": {
         _this params ["", "", "", ["_itemDescriptor", []]];
         if (_itemDescriptor isEqualTo []) exitWith { forceUnicode -1; nil };
-        dzn_ControlHandler call [F(AddControl), [_display, _tagname, _itemDescriptor]]
+        _result = dzn_ControlHandler call [F(AddControl), [_display, _tagname, _itemDescriptor]]
     };
     case "remove": {
-        dzn_ControlHandler call [F(RemoveControl), [_display, _tagname]]
+        _result = dzn_ControlHandler call [F(RemoveControl), [_display, _tagname]]
     };
     case "modify": {
         _this params ["", "", "", ["_newAttrs", []], ["_newEvents", []]];
         if (_newAttrs isEqualTo [] && _newEvents isEqualTo [] ) exitWith { forceUnicode -1; nil };
-        dzn_ControlHandler call [F(ModifyControl), [_display, _tagname, _newAttrs, _newEvents]]
+        _result = dzn_ControlHandler call [F(ModifyControl), [_display, _tagname, _newAttrs, _newEvents]];
     };
     case "reset": {
-        dzn_ControlHandler call [F(reset), [_display]]
+        _result = dzn_ControlHandler call [F(reset), [_display]];
+        ["dzn_ControlHandler_onDisplayReset", [dzn_ControlHandler, _display]] call CBA_fnc_localEvent;
     };
     case "exists": {
         private _ctrl = dzn_ControlHandler get Q(TaggedControls) get str(_display) get _tagname;
-        (!isNil "_ctrl")
+        _result = (!isNil "_ctrl");
     };
     case "getcontrols": {
-        dzn_ControlHandler call [F(GetByTag), [_display, _tagname]]
+        _result = dzn_ControlHandler call [F(GetByTag), [_display, _tagname]]
     };
     case "getvalues": {
-        dzn_ControlHandler call [F(GetValueByTag), [_display, _tagname]]
+        _result = dzn_ControlHandler call [F(GetValueByTag), [_display, _tagname]]
     };
     case "preinit": {
-        dzn_ControlHandler call [F(reset), []]
+        _result = dzn_ControlHandler call [F(reset), []]
     };
-    default {};
 };
 
 forceUnicode -1;

@@ -9,7 +9,11 @@
         nothing
 */
 
+params [["_interrupted", false]]
 DBG("Invoked!");
+
+_self set [Q(Closed), true];
+["dzn_AdvDialog2_onClosed", [_self get Q(Dialog), _self get Q(DialogID), _self, _interrupted]] call CBA_fnc_localEvent;
 
 private _dialog = _self get Q(Dialog);
 {

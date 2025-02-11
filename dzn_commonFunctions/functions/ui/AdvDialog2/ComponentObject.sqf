@@ -24,6 +24,8 @@ private _cob = createHashMapObject [[
     [Q(OnDrawArgs), []],
     [Q(CBAEvents), []],
 
+    [Q(Closed), true],
+
     [Q(Parsers), createHashMap],
     [Q(Renderers), createHashMap],
 

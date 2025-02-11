@@ -55,6 +55,8 @@ DBG_1("_controls=%1", _controls, _display);
     DBG("Rendered");
 } forEach _controls;
 
+["dzn_ControlHandler_onControlModified", [_self, _display, _controls, _tag]] call CBA_fnc_localEvent;
+
 DBG_2("Control(s) tagged '%1' was modified successfully in display %2", _tag, _display);
 
 true

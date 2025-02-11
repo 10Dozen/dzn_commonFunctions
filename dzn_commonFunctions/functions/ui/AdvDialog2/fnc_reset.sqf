@@ -35,6 +35,8 @@ _self set [F(OnParsedArgs), {}];
 _self set [Q(OnDraw), {}];
 _self set [Q(OnDrawArgs), {}];
 
+_self set [Q(Closed), false];
+
 _self set [Q(CBAEvents), []];
 
 {

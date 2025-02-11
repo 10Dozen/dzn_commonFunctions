@@ -34,16 +34,11 @@ private _cbaEvents = _self get Q(CBAEvents);
     _x pushBack _id;
 } forEach _cbaEvents;
 
-// Handle deletion of CBA handlers in case user presses Esc
+// Handle deletion of CBA handlers in case user presses Esc (Close attribute is false, but no dialog)
 [
-    { !dialog },
-    {
-        {
-            _x params ["_eventName", "", "", "_eventId"];
-            [_eventName, _eventId] call CBA_fnc_removeEventHandler;
-        } forEach _this;
-    },
-    _cbaEvents
+    { !dialog && !(_this get Q(Closed)) },
+    { _this call [F(Close), [true]]; },
+    _self
 ] call CBA_fnc_waitUntilAndExecute;
 
 forceUnicode -1;

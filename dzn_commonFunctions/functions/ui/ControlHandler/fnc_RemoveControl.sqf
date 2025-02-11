@@ -24,6 +24,8 @@ DBG_2("Control found by tag (%2): %1", _ctrls, count _ctrls);
 
 if (_ctrls isEqualTo []) exitWith { false };
 
+["dzn_ControlHandler_onControlRemoved", [_self, _display, _ctrls, _tag]] call CBA_fnc_localEvent;
+
 private _controls = _self get Q(Controls) get str(_display);
 private _taggedControls = _self get Q(TaggedControls) get str(_display);
 private ["_ctrl"];
@@ -34,6 +36,7 @@ private ["_ctrl"];
 
     [_self, _ctrl] call (_self get Q(Removers) get (_ctrl getVariable P_TYPE));
 } forEach _ctrls;
+
 
 DBG_2("Controls tagged '%1' was deleted successfully from display %2", _tag, _display);
 true

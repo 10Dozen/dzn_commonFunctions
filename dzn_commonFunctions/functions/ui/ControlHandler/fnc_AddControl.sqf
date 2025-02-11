@@ -42,6 +42,8 @@ _ctrlAttrs set [A_TAG, _tag, true];
 // -- Render parsed
 private _ctrl = _self call [F(render), [_display, _ctrlAttrs]];
 
+["dzn_ControlHandler_onControlAdded", [_self, _display, _ctrl]] call CBA_fnc_localEvent;
+
 DBG_1("[AddControl] Created control = %1", _ctrl);
 
 _ctrl

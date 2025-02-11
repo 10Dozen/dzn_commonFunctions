@@ -112,7 +112,7 @@
         Callback (CODE) - see Button.
         Args (ANY) - (optional) see Button.
 
-        === Hooks and events ===
+        === Hooks ===
         ["OnParsed", 1@Callback(CODE), 2@Args(ANY)]
             Code to be executed once params parsed, but no dialog rendered.
             Callback params:
@@ -135,6 +135,26 @@
             _thisId - Same as the return value of this function.  <NUMBER>
             _thisType - Name of the event.  (Same as _eventName passed to this function) STRING
             _thisFnc - Piece of code added to the event by this function <CODE>
+
+        == CBA Events ==
+        Subscribe by:
+            _ehId = ["dzn_AdvDialog2_onOpened", { ...event handler code... }] call CBA_fnc_addEventHandler
+
+        dzn_AdvDialog2_onOpened:
+            Emits on dialog rendering completion.
+            0: _display (Display) - display or dialog that contains rendered controls.
+            1: _dialogID (STRING) - invoked dialog ID (value set via dialog's attribute "DialogID"). "" if not set.
+            2: _cob (dzn_AdvDialog2 hashMapObject) - dzn_AdvDialog2 object.
+
+        dzn_AdvDialog2_onClosed:
+            Emits on closing dialog. 
+            by invocation of dzn_AdvDialog2.Close method.
+            0: _display (Display) - display or dialog that contains rendered controls.
+            1: _dialogID (STRING) - invoked dialog ID (value set via dialog's attribute "DialogID"). "" if not set.
+            2: _cob (dzn_AdvDialog2 hashMapObject) - dzn_AdvDialog2 object.
+            3: _interrupted (BOOL) - `true` if dialog closed by display destruction. In this case dialog is already destoyed 
+                                     and no values may be extracted. `false` if dialog is requestsd by script and controls 
+                                     are still available for retieving data via dzn_AdvDialog2 functions.
 
         === Helper functions ===
         Helper function collections (hashMap) may interact with dialog displayed by ShowAdvDialog2 function.

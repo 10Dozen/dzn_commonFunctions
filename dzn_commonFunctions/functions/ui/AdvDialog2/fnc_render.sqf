@@ -119,4 +119,6 @@ _ctrlGroup ctrlCommit (_dialogAttrs getOrDefault [A_DIALOG_SHOW_TIME, DIALOG_SHO
 DBG_1("OnDraw script execution with args: %1", _self get Q(OnDrawArgs));
 _self call [F(OnDraw), [_self, _self get Q(OnDrawArgs)]];
 
+["dzn_AdvDialog2_onOpened", [_self get Q(Dialog), _self get Q(DialogID), _self]] call CBA_fnc_localEvent;
+
 DBG("Rendered!");

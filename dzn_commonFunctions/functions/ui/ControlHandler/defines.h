@@ -25,7 +25,7 @@
 #define _DBG_PREFIX format ['(%1) [%2] ', DBG_PREFIX, DBG_FUNC_PREFIX]
 #define _DBG_FMT diag_log parseText format
 
-//#define DEBUG
+#define DEBUG
 #ifdef DEBUG
     #define DBG(MSG) _DBG_FMT [_DBG_PREFIX + MSG]
     #define DBG_8(MSG,A1,A2,A3,A4,A5,A6,A7,A8) _DBG_FMT [_DBG_PREFIX + MSG,A1,A2,A3,A4,A5,A6,A7,A8]

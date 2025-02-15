@@ -10,7 +10,8 @@
         nothing
 */
 
-DBG_1("Params: %1", _this);
+DBG("Invoked");
+
 _self set [Q(Dialog), nil];
 _self set [Q(DialogID), ""];
 _self set [
@@ -43,3 +44,6 @@ _self set [Q(CBAEvents), []];
     _x params ["_eventName", "", "", "_eventId"];
     [_eventName, _eventId] call CBA_fnc_removeEventHandler;
 } forEach (_self get Q(CBAEvents));
+
+[_self get Q(PFH)] call CBA_fnc_removePerFrameHandler;
+_self set [Q(PFH), nil];

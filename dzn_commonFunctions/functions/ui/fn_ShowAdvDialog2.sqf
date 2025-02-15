@@ -140,6 +140,12 @@
         Subscribe by:
             _ehId = ["dzn_AdvDialog2_onOpened", { ...event handler code... }] call CBA_fnc_addEventHandler
 
+        dzn_AdvDialog2_onBeforeOpened:
+            Emits right before dialog rendering starts.
+            0: _display (Display) - display or dialog that contains rendered controls.
+            1: _dialogID (STRING) - invoked dialog ID (value set via dialog's attribute "DialogID"). "" if not set.
+            2: _cob (dzn_AdvDialog2 hashMapObject) - dzn_AdvDialog2 object.
+
         dzn_AdvDialog2_onOpened:
             Emits on dialog rendering completion.
             0: _display (Display) - display or dialog that contains rendered controls.
@@ -147,13 +153,13 @@
             2: _cob (dzn_AdvDialog2 hashMapObject) - dzn_AdvDialog2 object.
 
         dzn_AdvDialog2_onClosed:
-            Emits on closing dialog. 
+            Emits on closing dialog.
             by invocation of dzn_AdvDialog2.Close method.
             0: _display (Display) - display or dialog that contains rendered controls.
             1: _dialogID (STRING) - invoked dialog ID (value set via dialog's attribute "DialogID"). "" if not set.
             2: _cob (dzn_AdvDialog2 hashMapObject) - dzn_AdvDialog2 object.
-            3: _interrupted (BOOL) - `true` if dialog closed by display destruction. In this case dialog is already destoyed 
-                                     and no values may be extracted. `false` if dialog is requestsd by script and controls 
+            3: _interrupted (BOOL) - `true` if dialog closed by display destruction. In this case dialog is already destoyed
+                                     and no values may be extracted. `false` if dialog is requestsd by script and controls
                                      are still available for retieving data via dzn_AdvDialog2 functions.
 
         === Helper functions ===

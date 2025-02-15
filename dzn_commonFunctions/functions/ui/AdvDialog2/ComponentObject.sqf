@@ -9,6 +9,8 @@ TODO:
 // COB Definition
 private _cob = createHashMapObject [[
     ["#str", { "AdvDialog2_ComponentObject" }],
+    [Q(PFH), nil],
+
     [Q(Dialog), nil],
     [Q(DialogID), ""],
     [Q(DialogAttributes), createHashMapFromArray [
@@ -56,6 +58,8 @@ private _cob = createHashMapObject [[
     PREP_COB_FUNCTION(onChekboxLabelClicked),
     PREP_COB_FUNCTION(onEvent),
     PREP_COB_FUNCTION(onButtonClick),
+
+    PREP_COB_FUNCTION(onPFH),
 
     ["#create", {
         // Register types

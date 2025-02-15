@@ -27,6 +27,8 @@ DBG_1("_controls=%1", _controls, _display);
 {
     // -- Override current attributes
     private _attrs = _x getVariable [P_ATTRS, createHashMap];
+    DBG_1("ATTRS=%1", _attrs);
+
     // -- Parse and merge
     [_self, _attrs, [_newAttrs, _newEvents], _x] call (_self get Q(Parsers) get (_x getVariable P_TYPE));
 

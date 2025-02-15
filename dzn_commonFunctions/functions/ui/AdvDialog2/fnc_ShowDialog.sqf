@@ -35,10 +35,10 @@ private _cbaEvents = _self get Q(CBAEvents);
 } forEach _cbaEvents;
 
 // Handle deletion of CBA handlers in case user presses Esc (Close attribute is false, but no dialog)
-[
-    { !dialog && !(_this get Q(Closed)) },
-    { _this call [F(Close), [true]]; },
+_self set [Q(PFH), [
+    { (_this # 0) call [F(onPFH), []]; }, // _this # 1 - pfhID
+    0,
     _self
-] call CBA_fnc_waitUntilAndExecute;
+] call CBA_fnc_addPerFrameHandler];
 
 forceUnicode -1;

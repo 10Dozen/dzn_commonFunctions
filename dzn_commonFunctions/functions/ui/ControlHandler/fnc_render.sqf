@@ -39,6 +39,7 @@ if (isNull _ctrl) then {
 
 // -- Re-save attrs each time to handle modify
 _ctrl setVariable [P_ATTRS, _itemAttrs];
+DBG_1("SAVING control attrs: %1", _itemAttrs);
 
 DBG_1("Invoking Rendering function for control type %1", _itemType);
 [_self, _ctrl, _itemAttrs] call (_self get Q(Renderers) get _itemType);

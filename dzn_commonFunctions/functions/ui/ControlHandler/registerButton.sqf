@@ -36,7 +36,7 @@ private _parse = {
     _itemAttrs set [A_TITLE, _title];
     _itemAttrs set [A_CALLBACK, _callback];
     _itemAttrs set [A_CALLBACK_ARGS, _args];
-    _itemAttrs set [A_BG, ITEM_BG_COLOR_RGBA];
+    _itemAttrs set [A_BG, _itemAttrs get [A_BG, _ITEM_BG_COLOR_RGBA]];
     _itemAttrs set [A_EVENTS, _events];
     _cob call [F(MergeAttributes), [_itemAttrs, _attrs]];
 };

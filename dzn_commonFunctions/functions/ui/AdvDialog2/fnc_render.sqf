@@ -31,6 +31,8 @@ if (isNil "_dialog") then {
 _self set [Q(Dialog), _dialog];
 _self set [Q(DialogID), _dialogAttrs getOrDefault [A_DIALOG_ID, ""]];
 
+["dzn_AdvDialog2_onBeforeOpened", [_dialog, _self get Q(DialogID), _self]] call CBA_fnc_localEvent;
+
 private _ctrlGroup = _dialog ctrlCreate [RSC_GROUP, -1];
 _ctrlGroup ctrlSetPosition [_dialogX + _dialogW/2, 0, 0, 0];
 _ctrlGroup ctrlCommit 0;

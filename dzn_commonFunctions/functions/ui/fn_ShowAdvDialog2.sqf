@@ -125,13 +125,13 @@
             _this # 0 - dzn_AdvDialog2 component object to provide useful methods;
             _this # 1 - passed args;
 
-        ["OnCustomEvent", 1@EventName(STRING), 2@Callback(CODE), 3@Args(ANY)]
+        ["OnCBAEvent", 1@EventName(STRING), 2@Callback(CODE), 3@Args(ANY)]
             Code to be executed on custom CBA event (sent by e.g. CBA_fnc_localEvent).
             Callback params:
-            _this - arguments:
+            _thisArgs - arguments:
                 0: _cob - dzn_AdvDialog2 component object to provide useful methods;
                 1: _args - passed args
-            _thisArgs - Arguments added to event by this function.  <ANY>
+            //_thisArgs - Arguments added to event by this function.  <ANY>
             _thisId - Same as the return value of this function.  <NUMBER>
             _thisType - Name of the event.  (Same as _eventName passed to this function) STRING
             _thisFnc - Piece of code added to the event by this function <CODE>

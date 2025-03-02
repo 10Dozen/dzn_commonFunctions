@@ -97,7 +97,8 @@ for "_i" from 0 to _itemsCount do {
         [A_COLOR, TEXT_COLOR_RGBA],
         [A_BG, NO_BG_COLOR_RGBA],
         [A_TAG, format ["Untagged_%1", _i]],
-        [A_ENABLED, true]
+        [A_ENABLED, true],
+        [A_SHOW, true]
     ];
 
     DBG_1("Invoking parse function for %1", _type);

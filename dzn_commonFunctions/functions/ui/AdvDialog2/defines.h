@@ -68,6 +68,7 @@
 #define A_X L(x)
 #define A_Y L(y)
 #define A_ENABLED L(enabled)
+#define A_SHOW L(show)
 #define A_TITLE L(title)
 #define A_SLIDER_RANGE L(sliderRange)
 #define A_SELECTED L(selected)
@@ -128,7 +129,8 @@
     CTRL ctrlSetFont (_item get A_FONT); \
     CTRL ctrlSetFontHeight (_item get A_SIZE); \
     CTRL ctrlSetBackgroundColor (_item get A_BG); \
-    CTRL ctrlSetTooltip (_item getOrDefault [A_TOOLTIP, ""])
+    CTRL ctrlSetTooltip (_item getOrDefault [A_TOOLTIP, ""]); \
+    CTRL ctrlShow (_item get A_SHOW)
 
 #define SET_EVENTS(CTRL) \
     CTRL setVariable [Q(DialogCOB), _self]; \

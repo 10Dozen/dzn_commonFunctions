@@ -155,7 +155,6 @@ class CfgFunctions
             class registerRCE {};
             class RCE {};
             class receiveRCE {};
-            class createRCECallback {};
         }
     };
 };

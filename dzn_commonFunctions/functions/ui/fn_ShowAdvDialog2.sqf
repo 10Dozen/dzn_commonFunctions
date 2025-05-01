@@ -65,7 +65,7 @@
               (without 'on' prefix).
               Parameters of the callback function:
                 _this # 0 -- event's arguments (see BIKI);
-                _this # 1 - helper function collections (dzn_AdvDialog2 object hashMap), see below;
+                _this # 1 -- dzn_AdvDialog2 component object to provide useful methods;
                 _this # 2 -- callback arguments;
 
         // Input, Input_area

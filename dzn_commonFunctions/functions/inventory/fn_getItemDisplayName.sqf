@@ -1,7 +1,9 @@
 // @DisplayName =  @Classname call dzn_fnc_getItemDisplayName
 
 private["_name"];
-	
+
+if !(_this isEqualType "") exitWith { "UNDEFINED" };
+
 _name = if (isText (configFile >> "cfgWeapons" >> _this >> "displayName")) then {
 	getText(configFile >> "cfgWeapons" >> _this >> "displayName")
 } else {
